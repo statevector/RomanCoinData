@@ -38,10 +38,11 @@ def get_auction_type(bs):
 	except:
 		exit('unable to find auction type')
 
-def get_auction_ID(bs, auc):
+def get_auction_ID(bs):
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
 	#print(text)
+	auc = get_auction_type(bs)
 	try:
 		if auc == 'Feature Auction':
 			result = re.search(r'(CNG|Nomos|Triton) (\d|\w)+, ', text)
@@ -72,22 +73,18 @@ def get_auction_lot(bs):
 def get_lot_description(bs):
 	div = bs.find('div', attrs={'class':'lot'})
 	#print(div.contents)
-	div.a.decompose() # remove image...?
+	if div.a is not None:
+		div.a.decompose() # remove image...?
 	if div.h1 is not None:
 		div.h1.decompose() # remove special title section (e.g. Deified and Rejuvenated Julius Caesar)
-	div.table.decompose() # remove table of lot, sale, auction info
+	if div.table is not None:
+		div.table.decompose() # remove table of lot, sale, auction info
 	if div.p is not None:
 		div.p.decompose() # remove special coin notes section
 	text = div.text
 	description = text.replace(u'\xa0', u' ') # unicode formatting
-	#description = description.split('\r') # split on line break
 	description = description.strip()
-	description = description.replace(',', '-')
 	return description
-	#re.sub('\s+',' ',lot_desc)
-	#lot_desc = lot_desc.splitlines() # split on line breaks
-	#lot_desc = list(filter(None, lot_desc)) # remove ''
-	#print(lot_desc)
 
 def get_sale_price(bs):
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
@@ -138,15 +135,12 @@ if __name__ == '__main__':
 	urls = get_coin_urls(html)
 
 	#urls = ["https://cngcoins.com/Coin.aspx?CoinID=388133"]
-
-	#for idx, url in enumerate(urls):
-	#	print(idx, url)
 	
 	print('Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description')
 
 	for idx, url in enumerate(urls):
 		
-		#if idx>10: continue
+		#if idx>3: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
@@ -158,7 +152,7 @@ if __name__ == '__main__':
 		#print(' Auction Type: {}'.format(auction_type))
 
 		# grab auction id (Triton, CNG, etc.)
-		auction_id = get_auction_ID(bs, auction_type)
+		auction_id = get_auction_ID(bs)
 		#print(' Auction ID: {}'.format(auction_id))
 
 		# grab lot number
