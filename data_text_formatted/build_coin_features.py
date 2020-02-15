@@ -59,15 +59,6 @@ def get_size_weight_hour(text):
 		return pd.Series(result.split(':'))
 	return pd.Series([None, None, None])
 
-
-
-
-
-
-
-
-
-
 #(18mm, 3.62 g, 6h)
 	# result = re.search(r'\((\d+[.,]\d+|\d+)mm,\s+(\d+[\.,]\d+|\d+)\s\w+,\s+\d+h\)', text) # with 'mm', 'g/gm', 'h'
 	# if result is not None:
@@ -88,24 +79,17 @@ def get_size_weight_hour(text):
 	# 	return tuple([0, string, 0])
 	#return None, None, None
 
-
-
-
-
 def get_mint(text):
-	if '(Lyon)' in text:
-		text = text.replace('(Lyon)', '') # hack cause I cant figure out the right regex
-	if '(?)' in text:
-		text = text.replace('(?)', '') # hack cause I cant figure out the right regex
-	#result = re.search(r'\w+ mint', text)
-	#result = re.search(r'(\w+|\w+ \(\w+\)) mint', text) # e.g. Lugdunum (Lyon) mint
-	#result = re.search(r'\D+mint', text) # e.g. Lugdunum (Lyon) mint, OR Colonia Patricia(?) mint
-	result = re.search(r'(\w+\s\w+|\w+)\s+mint', text)
-	if result is not None:
-		return result.group(0)
-	if 'mint' not in text:
-		return 'NA'
+	for segment in text.split('.'):
+		for subsegment in segment.split(';'):
+			if 'mint' in subsegment:
+				return subsegment
 	return None
+
+
+
+
+
 
 # match pattern 'RIC I/II/III 0-9/00-99/000-999'
 # em-dash (—) is one of the two types of dashes used in punctuation, the other being the en-dash (–).
@@ -131,9 +115,10 @@ def get_RIC(text):
 ########################################
 
 def is_travel_series(text):
-	#“Travel series” issue
-	pass
-
+	if "Travel series" in text:
+		return True
+	return False
+	
 def get_coin_properties(text):
 	props = [False]*27 # number of properties we're checking
 	if 'broad flan' in text: 
@@ -232,6 +217,8 @@ if __name__ == '__main__':
 	df[['size', 'weight', 'hour']] = df['Description'].apply(lambda x: get_size_weight_hour(x))
 	print(df.info())
 
+	df['Mint'] = df['Description'].apply(lambda x: get_mint(x))
+
 	# 1. idea is to apply a bunch of methods against 'Description'
 	# 2. pull out the relevant features (e.g. emperor, denomination, etc.)
 	# 3. standardize 'Description' for TFIDF?
@@ -239,13 +226,6 @@ if __name__ == '__main__':
 	print(df)
 
 	quit()
-
-	# get coin info
-
-
-	#mint = get_mint(coin) # figure this out...
-	mint = 'NA'
-	#print(mint)
 
 	RIC = get_RIC(coin)
 	#print(RIC)
