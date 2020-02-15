@@ -81,9 +81,10 @@ def get_lot_description(bs):
 		div.table.decompose() # remove table of lot, sale, auction info
 	if div.p is not None:
 		div.p.decompose() # remove special coin notes section
-	text = div.text
-	description = text.replace(u'\xa0', u' ') # unicode formatting
+	description = div.text
+	description = description.replace(u'\xa0', u' ') # unicode formatting
 	description = description.strip()
+	description = description.replace(',', ':') # need a unique csv formatting character
 	return description
 
 def get_sale_price(bs):
