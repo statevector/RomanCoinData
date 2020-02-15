@@ -13,16 +13,12 @@ emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho',
 
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 
 			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'forgery', 
-			  'bezel']
+			  'bezel', 'electrotype']
 
 denominations = ['Aureus', 'Denarius', 'Sestertius']
 
 grades = ['FDC', 'Superb EF', 'Choice EF', 'EF', 'Near EF', 'Nice VF', 
 		  'Good VF', 'VF', 'Near VF', 'Good Fine', 'Fine']
-
-mints = ['Lyon', 'Rome'] # finish this
-#Spanish mint (Colonia Caesaraugusta)
-
 
 def list_csv_files(path):
 	return [path+'/'+f for f in os.listdir(path) 
@@ -60,24 +56,24 @@ def get_size_weight_hour(text):
 	return pd.Series([None, None, None])
 
 #(18mm, 3.62 g, 6h)
-	# result = re.search(r'\((\d+[.,]\d+|\d+)mm,\s+(\d+[\.,]\d+|\d+)\s\w+,\s+\d+h\)', text) # with 'mm', 'g/gm', 'h'
-	# if result is not None:
-	# 	string = result.group(0)
-	# 	string = string[1:-1] # remove '(' and ')'
-	# 	return tuple(string.split(','))
-	# result = re.search(r'\((\d+[\.,]\d+|\d+)\s+\w+,\s+\d+h\)', text) # with 'g/gm', 'h'
-	# if result is not None:
-	# 	string = result.group(0)
-	# 	string = string[1:-1] # remove '(' and ')'
-	# 	if string[1] == ',':
-	# 		string = string.replace(',','.',1) # for a,bc instead of a.bc
-	# 	return (0,) + tuple(string.split(','))
-	# result = re.search(r'\((\d+[\.,]\d+|\d+)\s+\w+(, |)\)', text) # with 'g/gm' only, sometimes '(x.yz gm, )'
-	# if result is not None:
-	# 	string = result.group(0)
-	# 	string = string[1:-1] # remove '(' and ')'
-	# 	return tuple([0, string, 0])
-	#return None, None, None
+# result = re.search(r'\((\d+[.,]\d+|\d+)mm,\s+(\d+[\.,]\d+|\d+)\s\w+,\s+\d+h\)', text) # with 'mm', 'g/gm', 'h'
+# if result is not None:
+# 	string = result.group(0)
+# 	string = string[1:-1] # remove '(' and ')'
+# 	return tuple(string.split(','))
+# result = re.search(r'\((\d+[\.,]\d+|\d+)\s+\w+,\s+\d+h\)', text) # with 'g/gm', 'h'
+# if result is not None:
+# 	string = result.group(0)
+# 	string = string[1:-1] # remove '(' and ')'
+# 	if string[1] == ',':
+# 		string = string.replace(',','.',1) # for a,bc instead of a.bc
+# 	return (0,) + tuple(string.split(','))
+# result = re.search(r'\((\d+[\.,]\d+|\d+)\s+\w+(, |)\)', text) # with 'g/gm' only, sometimes '(x.yz gm, )'
+# if result is not None:
+# 	string = result.group(0)
+# 	string = string[1:-1] # remove '(' and ')'
+# 	return tuple([0, string, 0])
+#return None, None, None
 
 def get_mint(text):
 	for segment in text.split('.'):
@@ -86,31 +82,33 @@ def get_mint(text):
 				return subsegment
 	return None
 
-
-
-
-
-
-# match pattern 'RIC I/II/III 0-9/00-99/000-999'
-# em-dash (—) is one of the two types of dashes used in punctuation, the other being the en-dash (–).
-def get_RIC(text):
+def get_RIC_number(text):
+	# match pattern 'RIC I/II/III 0-9/00-99/000-999'
 	result = re.search(r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])', text)
 	if result is not None:
 		return result.group(0)
-	result = re.search(r'RIC (IV|III|II|I) (—|–|-)', text) # what is the - notation?
+	# match pattern 'RIC I/II/III -' (what is the - notation?)
+	result = re.search(r'RIC (IV|III|II|I) (—|–|-)', text) 
 	if result is not None:
 		return result.group(0)
-	result = re.search(r'RIC (—|–|-)', text) # only the dash?
+	# match pattern 'RIC -' (only the dash?)
+	result = re.search(r'RIC (—|–|-)', text) 
 	if result is not None:
 		return result.group(0)
-	result = re.search(r'RIC \d+', text) # missing the numerals
+	# match pattern 'RIC 0-999...' (only the numerals?)
+	result = re.search(r'RIC \d+', text) 
 	if result is not None:
 		return result.group(0)
-	result = re.search(r'RIC', text) # missing RIC completely
-	if result is None:
-		return 'NA'
+	# match pattern 'RIC'n (missing dash and numerals?)
+	result = re.search(r'RIC', text) 
+	if result is not None:
+		return result.group(0)
 	return None
 
+# consider converting all dash types (hyphen, en-, em-, minus, others?) to a common dash?
+# em-dash (—) is one of the two types of dashes used in punctuation, the other being the en-dash (–).
+def dash_convert(text):
+	pass
 
 ########################################
 
@@ -118,7 +116,7 @@ def is_travel_series(text):
 	if "Travel series" in text:
 		return True
 	return False
-	
+
 def get_coin_properties(text):
 	props = [False]*27 # number of properties we're checking
 	if 'broad flan' in text: 
@@ -205,7 +203,8 @@ if __name__ == '__main__':
 	print(df.info())
 
 	#df['Description'].apply(lambda x: x.lower())
-	df['has_StopWord'] = df['Description'].apply(lambda x: has_stop_word(x))
+
+	df['StopWord'] = df['Description'].apply(lambda x: has_stop_word(x))
 	print(df.info())
 
 	df['Emperor'] = df['Description'].apply(lambda x: get_emperor(x))
@@ -214,51 +213,55 @@ if __name__ == '__main__':
 	df['Denomination'] = df['Description'].apply(lambda x: get_denomination(x))
 	print(df.info())
 
-	df[['size', 'weight', 'hour']] = df['Description'].apply(lambda x: get_size_weight_hour(x))
+	df[['Size', 'Weight', 'Hour']] = df['Description'].apply(lambda x: get_size_weight_hour(x))
 	print(df.info())
 
 	df['Mint'] = df['Description'].apply(lambda x: get_mint(x))
+	print(df.info())
 
+	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))
+	print(df.info())
+
+	#df['RIC_Length'].apply(lambda x: len(x) if x is not None else x)
+	# print(df.info())
+	
 	# 1. idea is to apply a bunch of methods against 'Description'
 	# 2. pull out the relevant features (e.g. emperor, denomination, etc.)
 	# 3. standardize 'Description' for TFIDF?
 
 	print(df)
 
-	quit()
+	# quit()
 
-	RIC = get_RIC(coin)
-	#print(RIC)
+	# grade = get_grade(coin)
+	# #print(grade)
 
-	grade = get_grade(coin)
-	#print(grade)
+	# # if any value is none, break
+	# inputs = [auction_type, auction_ID, lot, estimate, price, emperor, denomination, RIC, grade]
+	# if None in inputs:
+	# 	#print(' --> None Found')
+	# 	print("FAILURE")
+	# 	print('div text:', lot_desc)
+	# 	print('chris inputs:', inputs)
+	# 	print('A ID:',auction_ID)
+	# 	print('lot:', lot)
+	# 	print('estimate:', estimate)
+	# 	print(idx, link.a['href'])
 
-	# if any value is none, break
-	inputs = [auction_type, auction_ID, lot, estimate, price, emperor, denomination, RIC, grade]
-	if None in inputs:
-		#print(' --> None Found')
-		print("FAILURE")
-		print('div text:', lot_desc)
-		print('chris inputs:', inputs)
-		print('A ID:',auction_ID)
-		print('lot:', lot)
-		print('estimate:', estimate)
-		print(idx, link.a['href'])
+	# # get coin properties
 
-	# get coin properties
+	# coin_properties = get_coin_properties(coin)
 
-	coin_properties = get_coin_properties(coin)
-
-	#for prop, has_prop in zip(properties_list, coin_properties):
-	#	print('{}: {}'.format(prop, has_prop))
+	# #for prop, has_prop in zip(properties_list, coin_properties):
+	# #	print('{}: {}'.format(prop, has_prop))
 
 
-	# print CSV rows
-	print('{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(
-		auction_type, auction_ID, lot, estimate, price, emperor, denomination, size, weight, orientation, mint, RIC, grade), end='')
-	for has_prop in coin_properties:
-		print(',{}'.format(int(has_prop)), end='')
-	print(' ')
+	# # print CSV rows
+	# print('{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(
+	# 	auction_type, auction_ID, lot, estimate, price, emperor, denomination, size, weight, orientation, mint, RIC, grade), end='')
+	# for has_prop in coin_properties:
+	# 	print(',{}'.format(int(has_prop)), end='')
+	# print(' ')
 
 
 
