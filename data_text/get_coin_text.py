@@ -90,8 +90,9 @@ def format_measurements(text):
 	# fist set of parentheses; maybe try 'h\)' also
 	# but, no guarantee 'h' will be there 
 	# see https://regexr.com/4ucqs for example
+	# '\(.+\)[ |.]'
 	try:
-		result = re.search(r'\(.+\)[ |.]', text) 
+		result = re.search(r'\(.+h\)', text) 
 		if result is not None:
 			result = result.group(0)
 			# remove comma for CSV formatting
@@ -104,7 +105,7 @@ def format_measurements(text):
 			result = result.replace(' h', 'h')
 			# now substitute the previous match with  
 			# the its newly formatted counterpart
-			text = re.sub(r'\(.+\)[ |.]', result, text)
+			text = re.sub(r'\(.+h\)', result, text)
 			return text
 		else:
 			raise TypeError()
