@@ -12,13 +12,21 @@ emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho',
 			'Antoninus Pius', 'Marcus Aurelius']
 
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 
-			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'forgery', 
-			  'bezel', 'electrotype']
+			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'Forgery', 
+			  'forgery', 'bezel', 'electrotype', 'MIXED']
 
 denominations = ['Aureus', 'Denarius', 'Sestertius']
 
-grades = ['FDC', 'Superb EF', 'Choice EF', 'EF', 'Near EF', 'Nice VF', 
-		  'Good VF', 'VF', 'Near VF', 'Good Fine', 'Fine']
+# order matters for search!
+grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 'Nice VF', 
+		  'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 'Fine']
+
+# properties = ['broad flan', 'lusterous', 'toned', 'attractively toned', 
+# 	'cabinet toning', 'quality portrait', 'rare', 'centered', 'off center', 
+# 	'marks', 'deposits','flan flaw', 'flan crack', 'hairlines', 'die break','surface flaws',
+# 	'roughness', 'tooling', 'die rust', 'corrosion', 'porosity', 'scratches', 
+# 	'edge test', 'surface test','edge splits', 'pvc residue', 'weak strike', 
+# 	'edge chip']
 
 def list_csv_files(path):
 	return [path+'/'+f for f in os.listdir(path) 
@@ -33,53 +41,49 @@ def get_emperor(text):
 			return emperor
 	return None
 
+def get_reign(text):
+	for segment in text.split('.'):
+		if 'BC-AD' in segment:
+			return segment
+	return None
+
 def get_denomination(text):
 	for denomination in denominations:
 		if denomination in text:
 			return denomination
 	return None
 
-def get_grade(text):
-	for grade in grades:
-		if grade in text:
-			return grade
-	return None
-
-# return a pandas series to be automatically inserted into the dataframe
 # https://stackoverflow.com/a/23690329/11656635
-def get_size_weight_hour(text):
-	result = re.search(r'\(\d+.\w+\W\s+\d+.\w+\s+\w+\W\s+\d+.\)', text)
-	if result is not None:
-		result = result.group(0)
-		result = result[1:-1] # remove '(' and ')'
-		return pd.Series(result.split(':'))
-	return pd.Series([None, None, None])
-
-#(18mm, 3.62 g, 6h)
-# result = re.search(r'\((\d+[.,]\d+|\d+)mm,\s+(\d+[\.,]\d+|\d+)\s\w+,\s+\d+h\)', text) # with 'mm', 'g/gm', 'h'
-# if result is not None:
-# 	string = result.group(0)
-# 	string = string[1:-1] # remove '(' and ')'
-# 	return tuple(string.split(','))
-# result = re.search(r'\((\d+[\.,]\d+|\d+)\s+\w+,\s+\d+h\)', text) # with 'g/gm', 'h'
-# if result is not None:
-# 	string = result.group(0)
-# 	string = string[1:-1] # remove '(' and ')'
-# 	if string[1] == ',':
-# 		string = string.replace(',','.',1) # for a,bc instead of a.bc
-# 	return (0,) + tuple(string.split(','))
-# result = re.search(r'\((\d+[\.,]\d+|\d+)\s+\w+(, |)\)', text) # with 'g/gm' only, sometimes '(x.yz gm, )'
-# if result is not None:
-# 	string = result.group(0)
-# 	string = string[1:-1] # remove '(' and ')'
-# 	return tuple([0, string, 0])
-#return None, None, None
+def get_measurements(text):
+	#print('I am here')
+	#print(text)
+	try:
+		result = re.search(r'\(.+h\)', text)
+		#print('result: ', result)
+		#print('is none: ', result is None)
+		if result is not None:
+			result = result.group(0)
+			#print(result)
+			result = result[1:-1] # remove '(' and ')'
+			#print(result)
+			result = result.split(' ')
+			#print(result)
+			return result
+		else:
+			raise TypeError()
+	except:
+		exit('unable to extract measurements for {}'.format(text))	
 
 def get_mint(text):
 	for segment in text.split('.'):
-		for subsegment in segment.split(';'):
-			if 'mint' in subsegment:
-				return subsegment
+		if 'mint' in segment:
+			return segment
+	return None
+
+def get_strike_date(text):
+	for segment in text.split('.'):
+		if 'Struck' in segment:
+				return segment
 	return None
 
 def get_RIC_number(text):
@@ -88,101 +92,122 @@ def get_RIC_number(text):
 	if result is not None:
 		return result.group(0)
 	# match pattern 'RIC I/II/III -' (what is the - notation?)
-	result = re.search(r'RIC (IV|III|II|I) (—|–|-)', text) 
+	result = re.search(r'RIC (IV|III|II|I) -', text) 
 	if result is not None:
 		return result.group(0)
 	# match pattern 'RIC -' (only the dash?)
-	result = re.search(r'RIC (—|–|-)', text) 
+	result = re.search(r'RIC -', text) 
 	if result is not None:
 		return result.group(0)
 	# match pattern 'RIC 0-999...' (only the numerals?)
 	result = re.search(r'RIC \d+', text) 
 	if result is not None:
 		return result.group(0)
-	# match pattern 'RIC'n (missing dash and numerals?)
+	# match pattern 'RIC' (missing dash and numerals?)
 	result = re.search(r'RIC', text) 
 	if result is not None:
 		return result.group(0)
 	return None
 
-# consider converting all dash types (hyphen, en-, em-, minus, others?) to a common dash?
-# em-dash (—) is one of the two types of dashes used in punctuation, the other being the en-dash (–).
-def dash_convert(text):
-	pass
+# crudely assume the longest segment contains
+# the coin imagery for this first iteration
+def get_imagery(text):
+	# isolate the description 
+	lower = text.find('mint')
+	upper = text.find('RIC')
+	if lower>0 and upper>0:
+		text = text[lower:upper]
+	else:
+		return None
+	print(text)
+	segments = text.split('.')
+	length = 0
+	imagery = ""
+	for segment in segments:
+		if len(segment)>length:
+			imagery = segment
+			length = len(segment)
+	return imagery
 
-########################################
+def get_grade(text):
+	segments = text.split('.')
+	# iterate in reverse since we know the grade 
+	# information resides in the last sentence;
+	# we dont want false positives (e.g. 'fine portrait')
+	for segment in reversed(segments):
+		for grade in grades:
+			if grade in segment:
+				return grade
+	return None
 
-def is_travel_series(text):
-	if "Travel series" in text:
-		return True
-	return False
+# do manual stemming/lemmatization for now
+def stem_comments(text):
+	text = text.lower()
+	text = text.replace('lustre', 'lust')
+	text = text.replace('luster', 'lust')
+	text = text.replace('lustrous', 'lust')
+	text = text.replace('toned', 'tone')
+	text = text.replace('toning', 'tone')
+	text = text.replace('attractively', 'attractive')
+	text = text.replace('iridescence', 'iridescent')
+	text = text.replace('portraiture', 'portrait')
+	text = text.replace('scarse', 'rare')
+	text = text.replace('centered', 'center')
+	# but not marks --> mark or scratches --> scratch. probably info in the plural form.
+	text = text.replace('roughness', 'rough')
+	text = text.replace('tooled', 'tool')
+	text = text.replace('tooling', 'tool')
+	text = text.replace('smoothed', 'smooth')
+	text = text.replace('smoothing', 'smooth')
+	text = text.replace('corroded', 'corrosion')
+	text = text.replace('porosity', 'porous')
+	text = text.replace('granularity', 'granular')
+	text = text.replace('pitting', 'pits')
+	text = text.replace('pitted', 'pits')
+	# 'cut' is implicit here; want to match with e.g. 'test cut on reverse/obverse'
+	text = text.replace('edge test', 'edge test cut') 
+	text = text.replace('surface test', 'surface test cut')
+	text = text.replace('struck', 'strike')
 
-def get_coin_properties(text):
-	props = [False]*27 # number of properties we're checking
-	if 'broad flan' in text: 
-		props[0] = True
-	if 'luster' in text or 'lustre' in text or 'lustrous' in text: 
-		props[1] = True
-	if 'tone' in text or 'toned' in text or 'toning' in text:
-		props[2] = True
-	if 'attractively' in text or 'golden' in text or 'rose' in text or 'blue' in text or 'iridescent' in text or 'iridescence' in text or 'rainbow' in text:
-		props[3] = True
-	if 'cabinet tone' in text or 'cabinet toning' in text:
-		props[4] = True
-	if 'portrait' in text or 'portraiture' in text:
-		props[5] = True
-	if 'rare' in text or 'scarse' in text:
-		props[6] = True
-	if 'centered' in text:
-		props[7] = True
-	if 'off center' in text:
-		props[8] = True
-	if 'mark' in text or 'marks' in text:
-		props[9] = True
-	if 'deposits' in text:
-		props[10] = True
-	if 'flan crack' in text or 'flan flaw' in text:
-		props[11] = True
-	if 'hairlines' in text:
-		props[12] = True	
-	if 'die break' in text:
-		props[13] = True	
-	if 'surface flaws' in text:
-		props[14] = True
-	if 'rough' in text or 'roughness' in text:
-		props[15] = True
-	if 'tooled' in text or 'tooling' in text or 'smoothed' in text or 'smoothing' in text:
-		props[16] = True
-	if 'die rust' in text:
-		props[17] = True
-	if 'corrosion' in text:
-		props[18] = True
-	if 'porosity' in text or 'porous' in text or 'granular' in text:
-		props[19] = True
-	if 'scratch' in text or 'scratches' in text:
-		props[20] = True
-	if 'edge test' in text:
-		props[21] = True
-	if 'test cut on obverse' in text or 'test cut on reverse' in text:
-		props[22] = True
-	if 'splits' in text:
-		props[23] = True
-	if 'pvc residue' in text:
-		props[24] = True
-	if 'weak strike' in text:
-		props[25] = True
-	if 'edge chip' in text:
-		props[26] = True
-	return props
+	text = text.replace('banker’s', 'banker') # unicode encoding?
+	text = text.replace('bankers’', 'banker')
 
-properties_list = ['broad flan', 'lusterous', 'toned', 'attractively toned', 
-	'cabinet toning', 'quality portrait', 'rare', 'centered', 'off center', 
-	'marks', 'deposits','flan flaw', 'hairlines', 'die break','surface flaws',
-	'roughness', 'tooling', 'die rust', 'corrosion', 'porosity', 'scratches', 
-	'edge test', 'surface test','edge splits', 'pvc residue', 'weak strike', 
-	'edge chip']
-	
-########################################
+	# maybe combine these?
+	#'golden' in text or 'rose' in text or 'blue' in text or 'rainbow' in text:
+	return text
+
+def get_comments(text):
+	# isolate the comments section. We know it
+	# occurs after the RIC number is presented.
+	comments = ""
+	lower = text.find('RIC') # add ACIP; RSC as backups
+	if lower>0:
+		comments = text[lower:]
+	else:
+		return None
+	print('post Isolate RIC:\n {}'.format(comments))
+	# remove RIC clause
+	comments = comments.split('.')
+	comments = comments[1:] 
+	comments = ' '.join(comments)
+	print('post Remvove RIC:\n {}'.format(comments))
+	# remove grade
+	for grade in grades:
+		if grade in comments:
+			comments = comments.replace(grade, '')
+	print('post Remvove Grade:\n {}'.format(comments))
+	# standardize text
+	comments = stem_comments(comments)
+	print('post Standardize:\n {}'.format(comments))
+	return comments
+
+
+# def is_travel_series(text):
+# 	if "Travel series" in text:
+# 		return True
+# 	return False
+
+
 
 
 
@@ -194,15 +219,11 @@ if __name__ == '__main__':
 	#files = list_csv_files("/Users/cwillis/GitHub/RomanCoinData/data_text/output/")
 	#print(files)
 
-	# print CSV header
-	print('Auction Type,Auction ID,Lot Number,Estimate,Sale,Emperor,Denomination,Diameter,Weight,Orientation,Mint,RIC,Grade,Broad Flan,Lusterous,Toned,Attractively Toned,Cabinet Toning,Quality Portrait,Rare,Centered,Off Center,Marks,Deposits,Flan Flaw,Hairlines,Die Break,Surface Flaws,Roughness,Tooled,Die Rust,Corrosion,Porosity,Scratches,Edge Test,Surface Test,Edge Splits,PVC Residue,Weak Strike,Edge Chip')
-
 	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/Augustus_AR_EA1.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/test.csv'
 
 	df = pd.read_csv(file)
 	print(df.info())
-
-	#df['Description'].apply(lambda x: x.lower())
 
 	df['StopWord'] = df['Description'].apply(lambda x: has_stop_word(x))
 	print(df.info())
@@ -210,13 +231,27 @@ if __name__ == '__main__':
 	df['Emperor'] = df['Description'].apply(lambda x: get_emperor(x))
 	print(df.info())
 
+	df['Reign'] = df['Description'].apply(lambda x: get_reign(x))
+	print(df.info())
+
 	df['Denomination'] = df['Description'].apply(lambda x: get_denomination(x))
 	print(df.info())
 
-	df[['Size', 'Weight', 'Hour']] = df['Description'].apply(lambda x: get_size_weight_hour(x))
+	# what is going on here...
+	df['Size'], df['Weight'], df['Hour'] = df['Description'].apply(lambda x: get_measurements(x))[0]
 	print(df.info())
 
 	df['Mint'] = df['Description'].apply(lambda x: get_mint(x))
+	print(df.info())
+
+	#df['Moneyer'] = df['Description'].apply(lambda x: get_moneyer(x))
+	#print(df.info())
+ 	#mescinius rufus: moneyer
+
+	df['Struck'] = df['Description'].apply(lambda x: get_strike_date(x))
+	print(df.info())
+
+	df['Imagery'] = df['Description'].apply(lambda x: get_imagery(x))
 	print(df.info())
 
 	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))
@@ -224,41 +259,29 @@ if __name__ == '__main__':
 
 	#df['RIC_Length'].apply(lambda x: len(x) if x is not None else x)
 	# print(df.info())
-	
+
+	df['Grade'] = df['Description'].apply(lambda x: get_grade(x))
+	print(df.info())
+
+	df['Comments'] = df['Description'].apply(lambda x: get_comments(x))
+	print(df.info())
+
+	print(df)
+
+	# finally remove the 'Description' column?
+	# df.drop(['Description'], inplace=True)
+
 	# 1. idea is to apply a bunch of methods against 'Description'
 	# 2. pull out the relevant features (e.g. emperor, denomination, etc.)
 	# 3. standardize 'Description' for TFIDF?
 
-	print(df)
-
-	# quit()
-
-	# grade = get_grade(coin)
-	# #print(grade)
-
-	# # if any value is none, break
-	# inputs = [auction_type, auction_ID, lot, estimate, price, emperor, denomination, RIC, grade]
-	# if None in inputs:
-	# 	#print(' --> None Found')
-	# 	print("FAILURE")
-	# 	print('div text:', lot_desc)
-	# 	print('chris inputs:', inputs)
-	# 	print('A ID:',auction_ID)
-	# 	print('lot:', lot)
-	# 	print('estimate:', estimate)
-	# 	print(idx, link.a['href'])
-
-	# # get coin properties
-
-	# coin_properties = get_coin_properties(coin)
-
-	# #for prop, has_prop in zip(properties_list, coin_properties):
-	# #	print('{}: {}'.format(prop, has_prop))
-
+	# check for None results!!!
+	# -->
 
 	# # print CSV rows
 	# print('{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(
-	# 	auction_type, auction_ID, lot, estimate, price, emperor, denomination, size, weight, orientation, mint, RIC, grade), end='')
+	# 	auction_type, auction_ID, lot, estimate, price, emperor, \
+	# denomination, size, weight, orientation, mint, RIC, grade), end='')
 	# for has_prop in coin_properties:
 	# 	print(',{}'.format(int(has_prop)), end='')
 	# print(' ')
