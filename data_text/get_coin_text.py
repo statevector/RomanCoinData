@@ -1,7 +1,5 @@
 
 import requests
-#from urllib.request import urlopen
-#from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
 import re
 import sys
@@ -70,22 +68,75 @@ def get_auction_lot(bs):
 	except:
 		exit('unable to find lot number')
 
+# convert all dash types (hyphen, en-, em-, minus, others?) to a
+# common dash to simplify analysis later
+# https://en.wikipedia.org/wiki/Dash#Similar_Unicode_characters
+def format_dash(text):
+	#text = text.encode('utf-8')
+	text = text.replace(u'\xa0', u' ')   # ???
+	text = text.replace(u'\u2010', u'-') # hyphen
+	text = text.replace(u'\u2012', u'-') # figure dash
+	text = text.replace(u'\u2013', u'-') # en-dash
+	text = text.replace(u'\u2014', u'-') # em-dash
+	text = text.replace(u'\u2015', u'-') # horizonal bar
+	text = text.replace(u'\u002D', u'-') # hyphen-minus
+	text = text.replace(u'\u00AD', u'-') # soft hyphen
+	text = text.replace(u'\u2212', u'-') # minus sign
+	return text
+
+# format size, weight, orientation information
+def format_measurements(text):
+	# the [ |.] at the end is crucial to capture the 
+	# fist set of parentheses; maybe try 'h\)' also
+	# but, no guarantee 'h' will be there 
+	# see https://regexr.com/4ucqs for example
+	try:
+		result = re.search(r'\(.+\)[ |.]', text) 
+		if result is not None:
+			result = result.group(0)
+			# remove comma for CSV formatting
+			result = result.replace(',', '')
+			# consolidate measurement variations
+			result = result.replace(' gm', 'g')
+			result = result.replace('gm', 'g')
+			result = result.replace(' g', 'g')
+			result = result.replace(' mm', 'mm')
+			result = result.replace(' h', 'h')
+			# now substitute the previous match with  
+			# the its newly formatted counterpart
+			text = re.sub(r'\(.+\)[ |.]', result, text)
+			return text
+		else:
+			raise TypeError()
+	except:
+		exit('unable to format measurements for {}'.format(text))
+
+def format_lot_description(text):
+	text = format_dash(text)
+	text = format_measurements(text)
+	# remove whitespace
+	text = text.strip()
+	# remove commas to print to CSV
+	text = text.replace(',', '')
+	return text
+
 def get_lot_description(bs):
 	div = bs.find('div', attrs={'class':'lot'})
 	#print(div.contents)
+	# remove image...?
 	if div.a is not None:
-		div.a.decompose() # remove image...?
+		div.a.decompose()
+	# remove special title section 
+	# (e.g. "Deified and Rejuvenated Julius Caesar")
 	if div.h1 is not None:
-		div.h1.decompose() # remove special title section (e.g. Deified and Rejuvenated Julius Caesar)
+		div.h1.decompose()
+	# remove table of lot, sale, auction info
 	if div.table is not None:
-		div.table.decompose() # remove table of lot, sale, auction info
+		div.table.decompose()
+	# remove special coin notes section
 	if div.p is not None:
-		div.p.decompose() # remove special coin notes section
-	description = div.text
-	description = description.replace(u'\xa0', u' ') # unicode formatting
-	description = description.strip()
-	description = description.replace(',', ':') # need a unique csv formatting character
-	return description
+		div.p.decompose()
+	return div.text
 
 def get_sale_price(bs):
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
@@ -132,16 +183,16 @@ if __name__ == '__main__':
 	#urls = get_coin_urls(html)
 
 	html = open(sys.argv[1])
-	print(html)
+	#print(html)
 	urls = get_coin_urls(html)
 
 	#urls = ["https://cngcoins.com/Coin.aspx?CoinID=388133"]
 	
+	# build CSV output
 	print('Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description')
-
 	for idx, url in enumerate(urls):
 		
-		#if idx>3: continue
+		#if idx>10: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
@@ -168,8 +219,12 @@ if __name__ == '__main__':
 		sale_price = get_sale_price(bs)
 		#print(' Sale price: {}'.format(price))
 
-		# grab lot description
+		# grab lot description...
 		description = get_lot_description(bs)
+		#print(' Description: {}'.format(description))
+
+		# ... and format it!
+		description = format_lot_description(description)
 		#print(' Description: {}'.format(description))
 
 		print('{},{},{},{},{},{}'.format(auction_type, \
