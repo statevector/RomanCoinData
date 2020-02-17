@@ -4,6 +4,11 @@ from bs4 import BeautifulSoup
 import re
 import sys
 
+stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 
+			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'Forgery', 
+			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation',
+			  'NGC encapsulation']
+
 headers = {"User-Agent": 
 	"Analyzing Roman coins for a class project. \
 	If problems, please contact me at willisc9@msu.edu"}
@@ -11,7 +16,7 @@ headers = {"User-Agent":
 def get_html(url):
 	try:
 		html = requests.get(url, headers=headers)
-	except HTTPError as e:
+	except HTTPError as err:
 		exit('unable to load page')
 	return html
 
@@ -19,7 +24,7 @@ def get_coin_urls(html):
 	try:
 		bs = BeautifulSoup(html, 'html.parser')
 		urls = bs.find_all('td', attrs={'align':'center'})
-	except AttributeError as e:
+	except AttributeError as err:
 		exit('AttributeError with bs')	
 	return [url.a['href'] for url in urls if url.a is not None]
 
@@ -68,59 +73,35 @@ def get_auction_lot(bs):
 	except:
 		exit('unable to find lot number')
 
-# convert all dash types (hyphen, en-, em-, minus, others?) to a
-# common dash to simplify analysis later
-# https://en.wikipedia.org/wiki/Dash#Similar_Unicode_characters
-def format_dash(text):
-	#text = text.encode('utf-8')
-	text = text.replace(u'\xa0', u' ')   # ???
-	text = text.replace(u'\u2010', u'-') # hyphen
-	text = text.replace(u'\u2012', u'-') # figure dash
-	text = text.replace(u'\u2013', u'-') # en-dash
-	text = text.replace(u'\u2014', u'-') # em-dash
-	text = text.replace(u'\u2015', u'-') # horizonal bar
-	text = text.replace(u'\u002D', u'-') # hyphen-minus
-	text = text.replace(u'\u00AD', u'-') # soft hyphen
-	text = text.replace(u'\u2212', u'-') # minus sign
-	return text
-
-# format size, weight, orientation information
-def format_measurements(text):
-	# the [ |.] at the end is crucial to capture the 
-	# fist set of parentheses; maybe try 'h\)' also
-	# but, no guarantee 'h' will be there 
-	# see https://regexr.com/4ucqs for example
-	# '\(.+\)[ |.]'
+def get_sale_estimate(bs):
+	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
+	text = text.replace(u'\xa0', u' ')
 	try:
-		result = re.search(r'\(.+h\)', text) 
+		result = re.search(r'Estimate \$\d+', text)
 		if result is not None:
-			result = result.group(0)
-			# remove comma for CSV formatting
-			result = result.replace(',', '')
-			# consolidate measurement variations
-			result = result.replace(' gm', 'g')
-			result = result.replace('gm', 'g')
-			result = result.replace(' g', 'g')
-			result = result.replace(' mm', 'mm')
-			result = result.replace(' h', 'h')
-			# now substitute the previous match with  
-			# the its newly formatted counterpart
-			text = re.sub(r'\(.+h\)', result, text)
-			return text
-		else:
-			raise TypeError()
+			price = re.search(r'\d+', result.group())
+			if price is not None:
+				return int(price.group())
+		raise TypeError()
 	except:
-		exit('unable to format measurements for {}'.format(text))
+		exit('unable to find sale estimate')
 
-def format_lot_description(text):
-	text = format_dash(text)
-	text = format_measurements(text)
-	# remove whitespace
-	text = text.strip()
-	# remove commas to print to CSV
-	text = text.replace(',', '')
-	return text
+def get_sale_price(bs):
+	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
+	text = text.replace(u'\xa0', u' ')
+	try:
+		result = re.search(r'Sold [Ff]or \$\d+', text)
+		if result is not None:
+			price = re.search(r'\d+', result.group())
+			if price is not None:
+				return int(price.group())
+		raise TypeError()
+	except:
+		exit('unable to find sale price')
 
+# This is probably too restrictive as it is now.
+# We want to probably keep the special titles and
+# the special notes (e.g. from the XXX collection)
 def get_lot_description(bs):
 	div = bs.find('div', attrs={'class':'lot'})
 	#print(div.contents)
@@ -137,35 +118,13 @@ def get_lot_description(bs):
 	# remove special coin notes section
 	if div.p is not None:
 		div.p.decompose()
-	return div.text
+	#return div.text
+	text = div.text.strip()
+	# remove commas to print to CSV
+	return text.replace(',', '')
 
-def get_sale_price(bs):
-	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
-	#text = text.replace('&nbsp;', ' ')
-	text = text.replace(u'\xa0', u' ')
-	try:
-		result = re.search(r'Sold [Ff]or \$\d+', text)
-		if result is not None:
-			price = re.search(r'\d+', result.group())
-			if price is not None:
-				return int(price.group())
-		raise TypeError()
-	except:
-		exit('unable to find sale price')
-
-def get_sale_estimate(bs):
-	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
-	text = text.replace(u'\xa0', u' ')
-	try:
-		result = re.search(r'Estimate \$\d+', text)
-		if result is not None:
-			price = re.search(r'\d+', result.group())
-			if price is not None:
-				return int(price.group())
-		raise TypeError()
-	except:
-		exit('unable to find sale estimate')
-
+def is_nonstandard_lot(text):
+	return any(word in text for word in stop_words)
 
 #<_io.TextIOWrapper name='/Users/cwillis/GitHub/RomanCoinModel/raw_data/CNG/html/Augustus_AR_PA1.html' mode='r' encoding='UTF-8'>
 #urls loaded
@@ -190,7 +149,7 @@ if __name__ == '__main__':
 	#urls = ["https://cngcoins.com/Coin.aspx?CoinID=388133"]
 	
 	# build CSV output
-	print('Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description')
+	print('Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description,Nonstandard Lot')
 	for idx, url in enumerate(urls):
 		
 		#if idx>10: continue
@@ -220,17 +179,17 @@ if __name__ == '__main__':
 		sale_price = get_sale_price(bs)
 		#print(' Sale price: {}'.format(price))
 
-		# grab lot description...
+		# grab the lot description
 		description = get_lot_description(bs)
 		#print(' Description: {}'.format(description))
 
-		# ... and format it!
-		description = format_lot_description(description)
-		#print(' Description: {}'.format(description))
+		# identify nonstandard lots (i.e. those with a stop word)
+		nonstandard_lot = is_nonstandard_lot(description)
+		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
-		print('{},{},{},{},{},{}'.format(auction_type, \
+		print('{},{},{},{},{},{},{}'.format(auction_type, \
 			auction_id, acution_lot, sale_estimate, \
-			sale_price, description))
+			sale_price, description, nonstandard_lot))
 
 
 
