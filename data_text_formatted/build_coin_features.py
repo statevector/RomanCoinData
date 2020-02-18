@@ -8,6 +8,7 @@ import os
 import pandas as pd
 
 pd.options.display.max_rows = 999
+pd.set_option('display.width', 1000)
 
 emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho', 
 			'Vespasian', 'Domitian', 'Trajan', 'Hadrian', 
@@ -93,10 +94,28 @@ def format_measurements(text):
 def format_grade(text):
 	pass
 
+
+
+def format_mint(text):
+	text = re.sub(r'Rome mint;', 
+		'Rome mint.', text)
+	text = re.sub(r'Emerita mint;', 
+		'Emerita (Mérida) mint.', text)
+	text = re.sub(r'Uncertain Spanish mint \(Colonia Patricia\?\)', 
+		'Spanish mint (Colonia Patricia?)', text)
+	text = re.sub(r'Colonia Patricia\(\?\) mint', 
+		'Spanish mint (Colonia Patricia?)', text)
+	text = re.sub(r'Uncertain Spanish mint \(Colonia Caesaraugusta\?\)', 
+		'Spanish mint (Colonia Caesaraugusta?)', text)
+	# ...
+	return text
+
+
 def format_description(text):
 	text = format_dash(text)
 	text = format_measurements(text)
-	text = format_grade(text)
+	#text = format_grade(text)
+	text = format_mint(text)
 	return text
 
 def list_csv_files(path):
@@ -297,16 +316,14 @@ if __name__ == '__main__':
 	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/Augustus_AR_EA1.csv' # 193/193
 	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/Augustus_AR_EA2.csv' # 191/192, NGC encapsulation
 	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/Augustus_AR_EA3.csv' # 193/195, checks out (each missing h)
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/Augustus_AR_EA4.csv' # older, need to check
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/Augustus_AR_EA4.csv' # older, needs checks, especially comments
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/Augustus_AR_PA1.csv' # 119/119, comments!
 
 	df = pd.read_csv(file)
 	print(df.info())
 
 	# remove entries tagged as non-standard
 	df = df[~df['Nonstandard Lot']]
-	#df.drop(df[df['Nonstandard Lot']].index, inplace = True) 
-	#print(df.info())
-	#df.drop(df[df['Nonstandard Lot']==True].index, inplace = True)
 	print(df.info())
 	
 	# do some light cleaning and standardization of the 'Description' field
