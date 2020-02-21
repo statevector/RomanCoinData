@@ -4,10 +4,11 @@ from bs4 import BeautifulSoup
 import re
 import sys
 
+# eliminate observations that contain the following words
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 
 			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'Forgery', 
 			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation',
-			  'NGC encapsulation']
+			  'NGC encapsulation', 'ANACS', 'Restitution issue']
 
 headers = {"User-Agent": 
 	"Analyzing Roman coins for a class project. \
