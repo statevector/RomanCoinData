@@ -24,12 +24,20 @@ def list_csv_files(path):
 	return [path+'/'+f for f in os.listdir(path) 
 		if f.split('.')[-1]=='csv']
 
+# the general function
+# def get_keyword(text, keyword):
+# 	for segment in text.split('.'):
+# 		if keyword in segment:
+# 			return segment
+# 	return None
+
 def get_emperor(text):
 	for emperor in emperors:
 		if emperor in text:
 			return emperor
 	return None
 
+# this needs to be expanded
 def get_reign(text):
 	for segment in text.split('.'):
 		if 'BC-AD' in segment:
@@ -43,22 +51,48 @@ def get_denomination(text):
 	return None
 
 def get_diameter(text):
+	#print(text)
 	for segment in text.split('.'):
+		#print(segment)
 		if 'Diameter' in segment:
-			return segment
+			segment = segment.replace('*', '.')
+			segment = segment.replace('Diameter', '')
+			segment = segment.replace('mm', '')
+			segment = segment.replace('Silver', '') # weird edge case in EA1
+			print(segment)
+			segment = segment.strip()
+			return float(segment)
 	return None
 
 def get_weight(text):
+	#print(text)
 	for segment in text.split('.'):
+		#print(segment)
 		if 'Weight' in segment:
-			return segment
-	return text
+			segment = segment.replace('*', '.')
+			segment = segment.replace('Weight', '')
+			segment = segment.replace('g', '')
+			segment = segment.strip()
+			return float(segment)
+	return None
 
 def get_hour(text):
+	#print(text)
 	for segment in text.split('.'):
+		#print(segment)
 		if 'Hour' in segment:
+			segment = segment.replace('*', '.')
+			segment = segment.replace('Hour', '')
+			segment = segment.replace('h', '')
+			segment = segment.strip()
+			return int(segment)
+	return None
+
+def get_mcase(text):
+	for segment in text.split('.'):
+		if 'Measurement Case' in segment:
 			return segment
-	return text
+	return None
 
 def get_mint(text):
 	for segment in text.split('.'):
@@ -199,7 +233,7 @@ if __name__ == '__main__':
 	#files = list_csv_files("/Users/cwillis/GitHub/RomanCoinData/data_text/output/")
 	#print(files)
 
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1.csv' # 193/193
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv' # 193/193
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA2.csv' # 191/192, NGC encapsulation
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA3.csv' # 193/195, checks out (each null missing h)
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA4.csv' # checked. good.
@@ -228,6 +262,9 @@ if __name__ == '__main__':
 	print(df.info())
 
 	df['Hour'] = df['Description'].apply(lambda x: get_hour(x))
+	print(df.info())
+
+	df['MCase'] = df['Description'].apply(lambda x: get_mcase(x)) # debug
 	print(df.info())
 
 	df['Mint'] = df['Description'].apply(lambda x: get_mint(x))
