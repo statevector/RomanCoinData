@@ -6,6 +6,9 @@ import pandas as pd
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
 
+def get_positions(x, character):
+	return [pos for (pos, char) in enumerate(x) if char == character]
+
 def list_csv_files(path):
 	return [path+'/'+f for f in os.listdir(path) if f.split('.')[-1]=='csv']
 
@@ -41,8 +44,7 @@ def format_spaces(text, verbose=False):
 		if(verbose): print('space followed by period:\n{}'.format(text))
 	return text
 
-# probably want to fold this into the format_measurements function
-def clean_measurements(result):
+def standardize_measurements(result):
 	# consolidate measurement variations
 	result = result.replace('  g', ' g')
 	result = result.replace(' g', 'g')
@@ -53,68 +55,95 @@ def clean_measurements(result):
 	# remove initial spaces
 	result = result.replace(' mm', 'mm')
 	result = result.replace(' h', 'h')
-	# remove final spaces
 	return result
 
-def get_positions(x, character):
-	return [pos for (pos, char) in enumerate(x) if char == character]
+def strip_measurements(result, words):
+	result = result[1:-1] # remove '(' and ')'
+	result = result.split(' ')
+	result_clean = []
+	for r, w in zip(result, words):
+		# this is ugly but helps with later parsing
+		rr = r.replace('.', '*')
+		result_clean.append(rr +' '+w+'.')
+	result_clean = ' '.join(result_clean)
+	return result_clean
 
-# format size, weight, orientation information
 def format_measurements(text):
 	try:
+		isClean = False
 		# case 1: complete string
 		regex = r'\(.+mm.+g.+h\)'
 		result = re.search(regex, text)
 		if result is not None:
-			result = result.group(0)
-			result = clean_measurements(result)
-			result = result[1:-1] # remove '(' and ')'
-			# cleaner way to do this?
-			spaces = get_positions(result, ' ')
-			result = 'Diameter '+result[0:spaces[0]] +\
-				'. Weight '+result[spaces[0]+1:spaces[1]] +\
-				'. Hour '+result[spaces[1]+1:]  # no '.' at the end!
-			print('case1: ', result)
+			# format diameter, weight, orientation info
+			result = standardize_measurements(result.group(0))
+			words = ['Diameter', 'Weight', 'Hour']
+			result = strip_measurements(result, words)
+			result = result + ' Measurement Case 1'
+			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			return text
+			isClean = True
 		# case 2: missing 'h' only
 		regex = r'\(.+mm.+g\)'
 		result = re.search(regex, text)
 		if result is not None:
-			result = result.group(0)
-			result = clean_measurements(result)
-			print('case2: ', result)
+			# format diameter, weight, orientation info
+			result = standardize_measurements(result.group(0))
+			words = ['Diameter', 'Weight']
+			result = regroup_measurements(result, words)
+			result = result + ' Unlisted Hour.'
+			result = result + ' Measurement Case 2'
+			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			return text
+			isClean = True
 		# case 3: missing 'g' and 'h' (no end space)
 		regex = r'\(.+mm\)'
 		result = re.search(regex, text)
 		if result is not None:
-			result = result.group(0)
-			result = clean_measurements(result)
-			print('case3: ', result)
+			# format diameter, weight, orientation info
+			result = standardize_measurements(result.group(0))
+			words = ['Diameter']
+			result = regroup_measurements(result, words)
+			result = result + ' Unlisted Weight. Unlisted Hour.'
+			result = result + ' Measurement Case 3'
+			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			return text
+			isClean = True
 		# case 4: missing 'mm' only
 		regex = r'\(.+g.+h\)'
 		result = re.search(regex, text)
 		if result is not None:
-			result = result.group(0)
-			result = clean_measurements(result)
-			print('case4: ', result)			
+			# format diameter, weight, orientation info
+			result = standardize_measurements(result.group(0))
+			words = ['Weight', 'Hour']
+			result = regroup_measurements(result, words)
+			result = ' Unlisted Diameter' + result
+			result = result + ' Measurement Case 4'
+			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			return text
+			isClean = True
 		# case 5: missing 'g' and 'h' (with ending space)
-		# regex = r'\(.+mm \)'
-		# result = re.search(regex, text)
-		# if result is not None:
-		# 	result = result.group(0)
-		# 	result = result.replace('mm ', 'mm')
-		# 	text = re.sub(regex, result, text)
-		# 	print(text)
-		# 	return text
-		# case 6, 7, 8, ...
-		raise TypeError()
+		regex = r'\(.+mm \)'
+		result = re.search(regex, text)
+		if result is not None:
+			result = result.group(0)
+			result = result.replace('mm ', 'mm')
+			# format diameter, weight, orientation info
+			result = standardize_measurements(result)
+			words = ['Diameter']
+			result = regroup_measurements(result, words)
+			result = result + ' Unlisted Weight. Unlisted Hour.'
+			result = result + ' Measurement Case 5'
+			# substitute this reformatted info into the original text
+			text = re.sub(regex, result, text)
+			isClean = True
+		if not isClean:
+			raise TypeError()
+		# find and replace 'AR Denarius' with 'AR Denarius.'
+		result = re.search(r'AR Denarius', text)
+		text = re.sub(r'AR Denarius', 'AR Denarius.', text)
+		print(text)
+		return text
 	except:
 		exit('unable to format measurements for {}'.format(text))
 
@@ -125,17 +154,21 @@ def format_grade(text):
 	return text
 
 def format_mint(text):
+	# account for moneyer situations
+	text = re.sub(r'mint;', 'mint.', text)
 	# Rome
 	text = re.sub(r'Rome mint;', 'Rome mint.', text)
 	#text = re.sub(r' Rome mint\.', 'Rome mint.', text) # Augustus EA4
 	# Emerita
 	text = re.sub(r'Emerita mint\.', 
 		'Emerita (Mérida) mint.', text)
-	text = re.sub(r'Emerita mint;', 
-		'Emerita (Mérida) mint;', text)
+	#text = re.sub(r'Emerita mint;', 
+	#	'Emerita (Mérida) mint;', text)	# delete after check.
 	text = re.sub(r'Spanish mint - Emerita', 
 		'Emerita (Mérida) mint', text) # Augustus EA4
 	# Colonia Patricia
+	text = re.sub(r'Spanish mint possibly Colonia Patricia', 
+		'Spanish mint (Colonia Patricia?)', text) # Augustus EA1
 	text = re.sub(r'Uncertain Spanish mint \(Colonia Patricia\?\)', 
 		'Spanish mint (Colonia Patricia?)', text)
 	text = re.sub(r'Colonia Patricia\(\?\) mint', 
@@ -163,6 +196,12 @@ def format_mint(text):
 	text = re.sub(r'Uncertain Spanish mint', 
 		'Spanish mint', text) # Augustus EA4
 	# ...
+	return text
+
+# check for existence of 'moneyer' keyword
+# search between mint and struck
+def impute_moneyer(text):
+	#
 	return text
 
 def format_abbreviations(text):
@@ -206,83 +245,16 @@ def impute_mint(text, verbose=False):
 	return text
 
 
-
-
-
-
-
-def get_measurements(text):
-	# see https://regexr.com/4ucqs for example
-	try:
-		# case 1: complete string
-		result = re.search(r'\(.+mm.+g.+h\)', text)
-		if result is not None:
-			result = result.group(0)
-			result = result[1:-1] # remove '(' and ')'
-			#print(result)
-			size, weight, hour = result.split(' ')
-			return pd.Series([size, weight, hour])
-		# case 2: missing 'h' only
-		result = re.search(r'\(.+mm.+g\)', text)
-		if result is not None:
-			result = result.group(0)
-			result = result[1:-1] # remove '(' and ')'
-			#print(result)
-			size, weight = result.split(' ')
-			hour = None
-			#print("warning hour is none")
-			return pd.Series([size, weight, hour])
-		# case 3: missing 'g' and 'h' (no space at end)
-		result = re.search(r'\(.+mm\)', text)
-		if result is not None:
-			result = result.group(0)
-			result = result[1:-1] # remove '(' and ')'
-			#print(result)
-			size = result.split(' ')
-			weight = None
-			hour = None
-			return pd.Series([size, weight, hour])
-		# case 4: missing 'mm' only
-		result = re.search(r'\(.+g.+h\)', text)
-		if result is not None:
-			result = result.group(0)
-			result = result[1:-1] # remove '(' and ')'
-			#print(result)
-			size = None
-			weight, hour = result.split(' ')
-			return pd.Series([size, weight, hour])
-		# case 5: missing 'g' and 'h' (with space at end)
-		# result = re.search(r'\(.+mm \)', text)
-		# if result is not None:
-		# 	result = result.group(0)
-		# 	result = result[1:-1] # remove '(' and ')'
-		# 	print(result)
-		# 	size = result.split(' ')
-		# 	print(size)
-		# 	quit()
-		# 	weight = None
-		# 	hour = None
-		# 	return pd.Series([size, weight, hour])
-		raise TypeError()
-	except:
-		exit('unable to extract measurements for {}'.format(text))
-
-
-
-
-
-
-
 if __name__ == '__main__':
 
 	#files = list_csv_files("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/")
 	#print(files)
 
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA1.csv' # 193/193
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA2.csv' # 191/192, NGC encapsulation
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA3.csv' # 193/195, checks out (each null missing h)
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv' # checked. good.
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA1.csv' # 119/119, comments!
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA1.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA2.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA3.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA1.csv'
 	
 	df = pd.read_csv(file)
 	print(df.info())
@@ -292,6 +264,8 @@ if __name__ == '__main__':
 	print(df.info())
 	
 	# do some light cleaning and standardization of the 'Description' field
+	# for subsequent feature engineering
+
 	df['Description'] = df['Description'].apply(lambda x: format_dashes(x))
 	#print(df.info())
 
@@ -302,10 +276,13 @@ if __name__ == '__main__':
 	#print(df.info())
 
 	#df['Description'] = df['Description'].apply(lambda x: format_grade(x))
-	#print(df.info())
+	##print(df.info())
 
 	df['Description'] = df['Description'].apply(lambda x: format_mint(x))
 	#print(df.info())
+
+	#df['Description'] = df['Description'].apply(lambda x: format_moneyer(x))
+	##print(df.info())
 
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
 	#print(df.info())
@@ -318,6 +295,8 @@ if __name__ == '__main__':
 
 	print(df)
 
-
-
+	# write output	
+	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned'
+	output = file.split('/')[-1].split('.')[0]+'_cleaned.csv'
+	df.to_csv(directory+'/'+output, index=False)
 
