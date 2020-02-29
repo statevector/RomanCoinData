@@ -54,6 +54,8 @@ def get_diameter(text):
 	#print(text)
 	for segment in text.split('.'):
 		#print(segment)
+		if 'Unlisted Diameter' in segment:
+			return None
 		if 'Diameter' in segment:
 			segment = segment.replace('@', '.')
 			segment = segment.replace('Diameter', '')
@@ -67,11 +69,15 @@ def get_weight(text):
 	#print(text)
 	for segment in text.split('.'):
 		#print(segment)
+		if 'Unlisted Weight' in segment:
+			return None
 		if 'Weight' in segment:
+			print(segment)
 			segment = segment.replace('@', '.')
 			segment = segment.replace('Weight', '')
 			segment = segment.replace('g', '')
 			segment = segment.strip()
+			print(segment)
 			return float(segment)
 	return None
 
@@ -103,6 +109,8 @@ def get_mint(text):
 
 def get_strike_date(text):
 	for segment in text.split('.'):
+		if 'Struck Unlisted' in segment:
+			return None
 		if 'Struck' in segment:
 				return segment
 	return None
@@ -240,10 +248,11 @@ if __name__ == '__main__':
 
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA2_cleaned.csv'
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA3_cleaned.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA4.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA1.csv'
-	
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA3_cleaned.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA4_cleaned.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA1_cleaned.csv'
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA2_cleaned.csv'
+
 	df = pd.read_csv(file)
 	print(df.info())
 
