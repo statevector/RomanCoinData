@@ -75,7 +75,7 @@ def strip_measurements(result, words):
 	for r, w in zip(result, words):
 		# this is ugly but helps with later parsing
 		rr = r.replace('.', '@')
-		result_clean.append(r +' '+w+'.')
+		result_clean.append(rr +' '+w+'.')
 	result_clean = ' '.join(result_clean)
 	return result_clean
 
@@ -136,13 +136,14 @@ def format_measurements(text):
 			result = standardize_measurements(result.group(0))
 			words = ['Weight', 'Hour']
 			result = strip_measurements(result, words)
-			result = ' Unlisted Diameter' + result
+			result = ' Unlisted Diameter. ' + result
 			result = result + ' Measurement Case 4'
 			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
 			# find and replace 'AR Denarius' with 'AR Denarius.'
 			# this ensures proper separation between fields.
 			text = re.sub(r'AR Denarius', 'AR Denarius.', text)
+			print(text)
 			return text
 		# case 5: missing 'g' and 'h' (with ending space)
 		regex = r'\(.+mm \)'
@@ -275,9 +276,11 @@ if __name__ == '__main__':
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA1.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA2.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA3.csv'
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA1.csv'
-	
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv'
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA1.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA2.csv' # need to scrape
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA3.csv'
+
 	df = pd.read_csv(file)
 	print(df.info())
 
