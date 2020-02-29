@@ -274,8 +274,8 @@ if __name__ == '__main__':
 
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA1.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA2.csv'
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA3.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA3.csv'
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA1.csv'
 	
 	df = pd.read_csv(file)

@@ -5,7 +5,7 @@ import re
 import sys
 
 # eliminate observations that contain the following words
-stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 
+stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
 			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'Forgery', 
 			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation',
 			  'NGC encapsulation', 'ANACS', 'Restitution issue']
@@ -34,7 +34,7 @@ def get_auction_type(bs):
 	text = text.replace(u'\xa0', u' ')
 	#print(text)
 	try:
-		result = re.search(r'(The Coin Shop|Electronic Auction|Feature Auction)', text)
+		result = re.search(r'(The Coin Shop|Electronic Auction|Feature Auction|Affiliated Auction)', text)
 		if result is not None:
 			auction = str(result.group())
 			return auction
@@ -48,6 +48,8 @@ def get_auction_ID(bs):
 	#print(text)
 	auc = get_auction_type(bs)
 	try:
+		if auc == 'Affiliated Auction':
+			result = re.search(r'Nomos (\d|\w)+, ', text)
 		if auc == 'Feature Auction':
 			result = re.search(r'(CNG|Nomos|Triton) (\d|\w)+, ', text)
 		if auc == 'Electronic Auction':
@@ -78,7 +80,7 @@ def get_sale_estimate(bs):
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
 	try:
-		result = re.search(r'Estimate \$\d+', text)
+		result = re.search(r'Estimate (CHF|\$)\d+', text)
 		if result is not None:
 			price = re.search(r'\d+', result.group())
 			if price is not None:
@@ -91,7 +93,7 @@ def get_sale_price(bs):
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
 	try:
-		result = re.search(r'Sold [Ff]or \$\d+', text)
+		result = re.search(r'Sold [Ff]or (CHF|\$)\d+', text)
 		if result is not None:
 			price = re.search(r'\d+', result.group())
 			if price is not None:
