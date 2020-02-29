@@ -79,7 +79,6 @@ def strip_measurements(result, words):
 	result_clean = ' '.join(result_clean)
 	return result_clean
 
-
 def format_measurements(text):
 	try:
 		# case 1: complete string
@@ -239,7 +238,14 @@ def impute_strike(text, verbose=False):
 	result = re.search(r'Struck ', text)
 	if result is None:
 		if(verbose): print('before strike: {}'.format(text))
-		text = re.sub(r'mint\.', 'mint. Struck unlisted.', text)
+		idx = -1
+		segments = text.split('.')
+		for index, segment in enumerate(segments):
+			if 'mint' in segment:
+				idx = index + 1
+		# remember the space
+		segments.insert(idx, ' Struck unlisted.')
+		text = '.'.join(segments)
 		if(verbose): print('after strike: {}'.format(text))
 	return text
 
@@ -253,8 +259,6 @@ def impute_mint(text, verbose=False):
 		segments = text.split('.')
 		for index, segment in enumerate(segments):
 			if 'Struck' in segment:
-				# get the index following where
-				# 'Struck' was found
 				idx = index + 1
 		# remember the space
 		segments.insert(idx, ' Unlisted mint')
