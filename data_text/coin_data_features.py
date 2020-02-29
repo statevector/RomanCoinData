@@ -55,11 +55,10 @@ def get_diameter(text):
 	for segment in text.split('.'):
 		#print(segment)
 		if 'Diameter' in segment:
-			segment = segment.replace('*', '.')
+			segment = segment.replace('@', '.')
 			segment = segment.replace('Diameter', '')
 			segment = segment.replace('mm', '')
 			segment = segment.replace('Silver', '') # weird edge case in EA1
-			print(segment)
 			segment = segment.strip()
 			return float(segment)
 	return None
@@ -69,7 +68,7 @@ def get_weight(text):
 	for segment in text.split('.'):
 		#print(segment)
 		if 'Weight' in segment:
-			segment = segment.replace('*', '.')
+			segment = segment.replace('@', '.')
 			segment = segment.replace('Weight', '')
 			segment = segment.replace('g', '')
 			segment = segment.strip()
@@ -80,8 +79,10 @@ def get_hour(text):
 	#print(text)
 	for segment in text.split('.'):
 		#print(segment)
+		if 'Unlisted Hour' in segment:
+			return None
 		if 'Hour' in segment:
-			segment = segment.replace('*', '.')
+			segment = segment.replace('@', '.')
 			segment = segment.replace('Hour', '')
 			segment = segment.replace('h', '')
 			segment = segment.strip()
@@ -134,6 +135,8 @@ def get_RIC_number(text):
 def get_imagery(text, verbose=True):
 	lower = text.find('Struck')
 	upper = text.find('RIC')
+	if upper<0:
+		upper = text.find('BMCRE') # backup
 	if lower>0 and upper>0:
 		text = text[lower:upper]
 	else:
@@ -206,11 +209,13 @@ def get_comments(text):
 	# occurs AFTER the RIC number.
 	comments = None
 	#print('pre Isolate RIC:\n {}'.format(text))
-	lower = text.find('RIC') # add ACIP; RSC as backups
+	lower = text.find('RIC') # add ACIP; RSC; BMCRE as backups
+	if lower<0:
+		lower = text.find('BMCRE')		
 	if lower>0:
 		comments = text[lower:]
 	else:
-		quit('Error: RIC not identified')
+		exit('Error: RIC not identified in {}'.format(text))
 		return None
 	#print('post Isolate RIC:\n {}'.format(comments))
 	# remove RIC clause
@@ -233,11 +238,11 @@ if __name__ == '__main__':
 	#files = list_csv_files("/Users/cwillis/GitHub/RomanCoinData/data_text/output/")
 	#print(files)
 
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv' # 193/193
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA2.csv' # 191/192, NGC encapsulation
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA3.csv' # 193/195, checks out (each null missing h)
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA4.csv' # checked. good.
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA1.csv' # 119/119, comments!
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA2_cleaned.csv'
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA3_cleaned.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA4.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA1.csv'
 	
 	df = pd.read_csv(file)
 	print(df.info())
