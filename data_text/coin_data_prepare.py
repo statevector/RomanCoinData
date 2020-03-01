@@ -57,11 +57,13 @@ def get_diameter(text):
 		if 'Unlisted Diameter' in segment:
 			return None
 		if 'Diameter' in segment:
+			#print(segment)
 			segment = segment.replace('@', '.')
 			segment = segment.replace('Diameter', '')
 			segment = segment.replace('mm', '')
 			segment = segment.replace('Silver', '') # weird edge case in EA1
 			segment = segment.strip()
+			#print(segment)
 			return float(segment)
 	return None
 
@@ -72,12 +74,12 @@ def get_weight(text):
 		if 'Unlisted Weight' in segment:
 			return None
 		if 'Weight' in segment:
-			print(segment)
+			#print(segment)
 			segment = segment.replace('@', '.')
 			segment = segment.replace('Weight', '')
 			segment = segment.replace('g', '')
 			segment = segment.strip()
-			print(segment)
+			#print(segment)
 			return float(segment)
 	return None
 
@@ -88,10 +90,12 @@ def get_hour(text):
 		if 'Unlisted Hour' in segment:
 			return None
 		if 'Hour' in segment:
+			#print(segment)
 			segment = segment.replace('@', '.')
 			segment = segment.replace('Hour', '')
 			segment = segment.replace('h', '')
 			segment = segment.strip()
+			#print(segment)
 			return int(segment)
 	return None
 
@@ -246,12 +250,18 @@ if __name__ == '__main__':
 	#files = list_csv_files("/Users/cwillis/GitHub/RomanCoinData/data_text/output/")
 	#print(files)
 
+	# E-Auction
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA2_cleaned.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA3_cleaned.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA4_cleaned.csv'
+	# Printed Auction
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA1_cleaned.csv'
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA2_cleaned.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA2_cleaned.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA3_cleaned.csv'
+	# Aureus
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AV_EA_cleaned.csv'
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AV_PA_cleaned.csv'
 
 	df = pd.read_csv(file)
 	print(df.info())
@@ -308,13 +318,7 @@ if __name__ == '__main__':
 	# finally remove the 'Description' column?
 	# df.drop(['Description'], inplace=True)
 
-	# 1. idea is to apply a bunch of methods against 'Description'
-	# 2. pull out the relevant features (e.g. emperor, denomination, etc.)
-	# 3. standardize 'Description' for TFIDF?
-
-	# check for None results!!!
-	# -->
-
-	# data now cleaned, print rows CSV
-	#df.to_csv(file.split[-1]+'_cleaned.csv')
-
+	# write output	
+	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared'
+	output = file.split('/')[-1].split('.')[0]+'_prepared.csv'
+	df.to_csv(directory+'/'+output, index=False)
