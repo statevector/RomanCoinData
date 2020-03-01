@@ -7,8 +7,9 @@ import sys
 # eliminate observations that contain the following words
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
 			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'Forgery', 
-			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation',
-			  'NGC encapsulation', 'ANACS', 'Restitution issue']
+			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation', 
+			  'IMITATION', 'INDIA', 'NGC encapsulation', 'ANACS', 
+			  'Restitution issue']
 
 headers = {"User-Agent": 
 	"Analyzing Roman coins for a class project. \
