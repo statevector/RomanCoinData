@@ -53,6 +53,15 @@ def format_abbreviations(text):
 	text = re.sub(r'rev\. ', 'reverse ', text)
 	text = re.sub(r'obv\. ', 'obverse ', text)
 	text = re.sub(r'corr\. ', 'correction ', text)
+	text = re.sub(r'pl\.', 'proof like ', text)
+	return text
+
+def format_denomination(text):
+	# find and replace 'AR Denarius' with 'AR Denarius.'
+	# this ensures proper separation between denomination
+	# and measurement fields.
+	text = re.sub(r'AR Denarius', 'AR Denarius.', text)
+	text = re.sub(r'AV Aureus', 'AV Aureus.', text)
 	return text
 
 def standardize_measurements(result):
@@ -92,9 +101,6 @@ def format_measurements(text):
 			result = result + ' Measurement Case 1'
 			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			# find and replace 'AR Denarius' with 'AR Denarius.'
-			# this ensures proper separation between fields.
-			text = re.sub(r'AR Denarius', 'AR Denarius.', text)
 			return text
 		# case 2: missing 'h' only
 		regex = r'\(.+mm.+g\)'
@@ -108,9 +114,6 @@ def format_measurements(text):
 			result = result + ' Measurement Case 2'
 			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			# find and replace 'AR Denarius' with 'AR Denarius.'
-			# this ensures proper separation between fields.
-			text = re.sub(r'AR Denarius', 'AR Denarius.', text)
 			return text
 		# case 3: missing 'g' and 'h' (no end space)
 		regex = r'\(.+mm\)'
@@ -124,9 +127,6 @@ def format_measurements(text):
 			result = result + ' Measurement Case 3'
 			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			# find and replace 'AR Denarius' with 'AR Denarius.'
-			# this ensures proper separation between fields.
-			text = re.sub(r'AR Denarius', 'AR Denarius.', text)
 			return text
 		# case 4: missing 'mm' only
 		regex = r'\(.+g.+h\)'
@@ -136,14 +136,10 @@ def format_measurements(text):
 			result = standardize_measurements(result.group(0))
 			words = ['Weight', 'Hour']
 			result = strip_measurements(result, words)
-			result = ' Unlisted Diameter. ' + result
+			result = 'Unlisted Diameter. ' + result
 			result = result + ' Measurement Case 4'
 			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			# find and replace 'AR Denarius' with 'AR Denarius.'
-			# this ensures proper separation between fields.
-			text = re.sub(r'AR Denarius', 'AR Denarius.', text)
-			print(text)
 			return text
 		# case 5: missing 'g' and 'h' (with ending space)
 		regex = r'\(.+mm \)'
@@ -159,9 +155,6 @@ def format_measurements(text):
 			result = result + ' Measurement Case 5'
 			# substitute this reformatted info into the original text
 			text = re.sub(regex, result, text)
-			# find and replace 'AR Denarius' with 'AR Denarius.'
-			# this ensures proper separation between fields.
-			text = re.sub(r'AR Denarius', 'AR Denarius.', text)
 			return text
 		raise TypeError()
 	except:
@@ -176,17 +169,26 @@ def format_grade(text):
 def format_mint(text):
 	# account for when moneyer is present
 	text = re.sub(r'mint;', 'mint.', text)
+	# moneyer typo (no punctuation following Rome)
+	text = re.sub(r'Rome mint ', 'Rome mint. ', text) # Augustus PA1
 	# Rome
 	text = re.sub(r'Italian \(Rome\?\) mint', 
 		'Italian mint (Rome?)', text) # Augustus EA3
-	#text = re.sub(r' Rome mint\.', 'Rome mint.', text) # Augustus EA4
-	# Emerita
+	# Emerita (Mérida)
 	text = re.sub(r'Emerita mint\.', 
-		'Emerita (Mérida) mint.', text)
+		'Spanish mint (Emerita).', text)
 	text = re.sub(r'Emerita mint', 
-		'Emerita (Mérida) mint', text)
+		'Spanish mint (Emerita)', text)
 	text = re.sub(r'Spanish mint - Emerita', 
-		'Emerita (Mérida) mint', text) # Augustus EA4
+		'Spanish mint (Emerita)', text) # Augustus EA4
+	text = re.sub(r'Emerita \(Mérida\) mint\(\?\)', 
+		'Spanish mint (Emerita?)', text) # Augustus PA1
+	text = re.sub(r'Emerita \(Mérida\) mint', 
+		'Spanish mint (Emerita)', text) # Augustus PA1
+	text = re.sub(r'Spanish mint Emerita \(Mérida\)\(\?\)', 
+		'Spanish mint (Emerita?)', text) # Augustus PA1
+	text = re.sub(r'Spanish mint \(Emerita\)\(\?\)', 
+		'Spanish mint (Emerita?)', text) # Augustus PA1
 	# Colonia Patricia
 	text = re.sub(r'Spanish mint possibly Colonia Patricia', 
 		'Spanish mint (Colonia Patricia?)', text) # Augustus EA1
@@ -215,16 +217,18 @@ def format_mint(text):
 		'Spanish mint (Colonia Caesaraugusta?)', text) # Augustus EA4
 	# Tarraco
 	text = re.sub(r'Spanish mint - Tarraco', 
-		'Tarraco mint', text) # Augustus EA4
+		'Spanish mint (Tarraco)', text) # Augustus EA4
+	text = re.sub(r'Tarraco\(\?\) mint', 
+		'Spanish mint (Tarraco?)', text) # Augustus EA4
+	text = re.sub(r'Tarraco mint', 
+		'Spanish mint (Tarraco)', text) # Augustus PA1
 	# Lugdunum (Lyon) mint
 	text = re.sub(r'Lugdunum mint', 
-		'Lugdunum (Lyon) mint', text) # Augustus EA3
+		'Gallic mint (Lugdunum)', text) # Augustus EA3
 	text = re.sub(r'Lugdunum \(Lyons\) mint', 
-		'Lugdunum (Lyon) mint', text) # Augustus EA4
-	# Spain
-	#text = re.sub(r'Uncertain Spanish mint', 
-	#	'Spanish mint', text) # Augustus EA4
-	# ...
+		'Gallic mint (Lugdunum)', text) # Augustus EA4
+	text = re.sub(r'Lugdunum \(Lyon\) mint', 
+		'Gallic mint (Lugdunum)', text) # Augustus PA1
 	return text
 
 # check for existence of 'moneyer' keyword
@@ -245,7 +249,7 @@ def impute_strike(text, verbose=False):
 			if 'mint' in segment:
 				idx = index + 1
 		# remember the space
-		segments.insert(idx, ' Struck unlisted.')
+		segments.insert(idx, ' Struck unlisted') # no need for '.'
 		text = '.'.join(segments)
 		if(verbose): print('after strike: {}'.format(text))
 	return text
@@ -273,13 +277,19 @@ if __name__ == '__main__':
 	#files = list_csv_files("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/")
 	#print(files)
 
+	# E-Auction
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA1.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA2.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA3.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv'
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA1.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA2.csv' # need to scrape
+	# Printed Auction
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA1.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA2.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA3.csv'
+	# Aureus
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AV_EA.csv'
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AV_PA.csv'
+
 
 	df = pd.read_csv(file)
 	print(df.info())
@@ -298,6 +308,9 @@ if __name__ == '__main__':
 	#print(df.info())
 
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
+	#print(df.info())
+
+	df['Description'] = df['Description'].apply(lambda x: format_denomination(x))
 	#print(df.info())
 
 	df['Description'] = df['Description'].apply(lambda x: format_measurements(x))
