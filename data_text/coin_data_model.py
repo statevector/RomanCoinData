@@ -4,8 +4,20 @@ import pandas as pd
 
 from sklearn import base
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.feature_extraction.text import HashingVectorizer
-from sklearn.model_selection import cross_val_score
+from sklearn.feature_extraction.text import HashingVectorizer, CountVectorizer, TfidfVectorizer
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.metrics import mean_squared_error
+
+#from sklearn.utils import shuffle
+#from sklearn.model_selection import train_test_split
+#from sklearn.metrics import mean_squared_error
+#from sklearn.preprocessing import StandardScaler
+
+import matplotlib.pyplot as plt
+
+def count_unique_words(series):
+	word_list = series.apply(lambda x: pd.value_counts(x.split(' '))).sum(axis = 0)
+	return word_list.sort_values(ascending=False)
 
 # do description lemmatization and stemming here
 class TextTransformer(base.BaseEstimator, base.TransformerMixin):
@@ -35,32 +47,89 @@ if __name__ == '__main__':
 	data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/Augustus.csv')
 	print(data.shape)
 
-	#ttransformer = TextTransformer('Description')
+	#data['d2'] = data['d2'].apply(lambda x: str(x).replace('λ', 'a'))
+	#data['d2'] = data['d2'].apply(lambda x: str(x).replace('avg', 'aug'))
+	#data['d2'] = data['d2'].apply(lambda x: str(x).replace('vs', 'us'))
+	#data['d2'] = data['d2'].apply(lambda x: str(x).split())
+
+	words = count_unique_words(data['Comments'])
+	print(words)
+
+	# text formatting on the input data set
+	#ttransformer = TextTransformer()
+	#X = cts.fit_transform(data['Comments'])
+	#print(X)
+
+	# transform the data so its good
+	#cts = ColumnSelectTransformer('Description')
 	#data_cst = cts.fit_transform(data)
 	#print(data_cst)
 
-	descriptions = data['Description']
+	#descriptions = data['Comments']
 	#print(descriptions)
 	#print(price)
 
-	hashing_vectorizer = HashingVectorizer()
-	desc_hashed = hashing_vectorizer.fit_transform(descriptions)
-	print(desc_hashed.shape)
+	#from nltk.stem.snowball import SnowballStemmer
+	#stemmer = SnowballStemmer('english')
+	#data['d3'] = data['d2'].apply(lambda x: ' '.join([stemmer.stem(word) for word in x.split()]))
 
-	clf = Ridge(alpha=1.0).fit(desc_hashed, price)
+	#vectorizer = CountVectorizer() # (3867, 4528)
+	#vectorizer = CountVectorizer(stop_words='english') # (3867, 4363)
+	#vectorizer = CountVectorizer(min_df=30) # (3867, 545)
+	#vectorizer = CountVectorizer(stop_words='english', min_df=30) # (3867, 491), 471 w/ nltk
+	#vectorizer = TfidfVectorizer(stop_words='english', min_df=30) 
+
+	vectorizer = CountVectorizer()
+	X = vectorizer.fit_transform(data['Comments'])
+	print(X.shape) # (1268, 453)
+	print(X.toarray())
+	print(vectorizer.get_feature_names())
+ 
+	y = data['Sold']
+
+	clf = Ridge(alpha=1.0).fit(X, y)
 	print(clf)
 
-	alphas = [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
-	for alpha in alphas:
-	    est = Ridge(alpha=alpha)
-	    cv_score = cross_val_score(est, desc_hashed, price, cv=5)
-	    print('alpha: {}, cv score: {}'.format(alpha, cv_score.mean())) 
+	# alphas = [0.0001, 0.001, 0.01, 0.1, 1, 10, 1e2, 1e3, 1e4, 1e5]
+	# for alpha in alphas:
+	# 	est = Ridge(alpha=alpha)
+	# 	cv_score = cross_val_score(est, X, y, cv=5)
+	# 	print('alpha: {}, cv score: {}'.format(alpha, cv_score.mean()))
 
-	alphas = [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
-	for alpha in alphas:
-	    est = Lasso(alpha=alpha)
-	    cv_score = cross_val_score(est, desc_hashed, price, cv=5)
-	    print('alpha: {}, cv score: {}'.format(alpha, cv_score.mean()))
+	X_train, X_test, y_train, y_test = train_test_split(X, y, 
+		test_size=0.20, random_state=42)
+
+	#scaler = StandardScaler()
+	#X_train = scaler.fit_transform(X_train)
+	#X_test = scaler.transform(X_test)
+
+	model = Ridge(alpha=100, max_iter=1e8).fit(X_train, y_train)
+	#print('coef: {}'.format(model.coef_))
+	#print('intercept: {}'.format(model.intercept_))
+
+	y_train_pred = model.predict(X_train)
+	y_test_pred = model.predict(X_test)
+	print('mse: {}'.format(np.sqrt(mean_squared_error(y_test, y_test_pred))))
+
+	#for x,y in zip(X_test, y_test):
+	#	print(model.predict(x), y)
+
+	plt.scatter(y_train_pred, y_train, c = "blue", marker = "s", label = "Training data")
+	#plt.scatter(y_test_pred, y_test, c = "lightgreen", marker = "s", label = "Validation data")
+	plt.title("Linear Regression")
+	plt.xlabel("Predicted values")
+	plt.ylabel("Residuals")
+	plt.legend(loc = "upper left")
+	plt.hlines(y = 0, xmin = 10.5, xmax = 13.5, color = "red")
+	plt.xlim(0,5000)
+	plt.ylim(0,5000)
+	plt.show()
+
+
+
+
+
+
 
 
 
