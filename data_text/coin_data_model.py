@@ -44,10 +44,100 @@ def consolidate_grades(text):
 	return text
 
 def stem_imagery(text):
+
 	#data['d2'] = data['d2'].apply(lambda x: str(x).replace('λ', 'a'))
 	#data['d2'] = data['d2'].apply(lambda x: str(x).replace('avg', 'aug'))
 	#data['d2'] = data['d2'].apply(lambda x: str(x).replace('vs', 'us'))
 	#data['d2'] = data['d2'].apply(lambda x: str(x).split())
+
+	text = text.replace('/', '')
+	text = text.replace('•', '')
+	text = text.replace(';', '')
+	text = text.replace(':', '')
+	text = text.replace('·', '')
+	text = text.replace('(', '')
+	text = text.replace(')', '')
+	text = text.replace('[', '')
+	text = text.replace(']', '')
+	text = text.replace('Λ', 'A')
+
+	text = text.replace('AVGVSTVS', 'augustus')
+	text = text.replace('CAESAR', 'caesar')
+	text = text.replace('holding', 'hold')
+	text = text.replace('inscribed', 'inscribe')
+	text = text.replace('wearing', 'wear')
+	text = text.replace('butting', 'butt')
+	text = text.replace('galloping', 'gallop')
+	text = text.replace('flanking', 'flank')
+	text = text.replace('kneeling', 'kneel')
+	text = text.replace('attached', 'attach')
+	text = text.replace('presenting', 'present')
+	text = text.replace('draped', 'drape')
+	text = text.replace('ties', 'tie')
+	text = text.replace('surmounted', 'surmount')
+	text = text.replace('extending', 'extend')
+	text = text.replace('seated', 'sit')
+	text = text.replace('steps', 'step')
+	text = text.replace('raised', 'raise')
+	text = text.replace('lashing', 'lash')
+	text = text.replace('AVGVSTO', 'augustus')
+	text = text.replace('CAESARI', 'caesar')
+	text = text.replace('drapery', 'drape')
+	text = text.replace('resting', 'rest')
+	text = text.replace('diademed', 'diadem')
+	text = text.replace('facing', 'face')
+	text = text.replace('CΛESΛR', 'caesar')
+	text = text.replace('advancing', 'advance')
+	text = text.replace('driving', 'drive')
+	text = text.replace('bareheaded', 'bare-headed')
+	text = text.replace('PΛTER', 'pater')
+	text = text.replace('ram’s', 'ram')
+	text = text.replace('PATER', 'pater')
+	text = text.replace('helmeted', 'helmet')
+	text = text.replace('raising', 'raise')
+	#text = text.replace('Arm', 'Armenia')
+	#text = text.replace('Ger', 'Germania')
+	text = text.replace('ΛVGVSTI', 'augustus')
+	text = text.replace('riding', 'ride')
+	text = text.replace('offering', 'offer')
+	text = text.replace('marked', 'mark')
+	text = text.replace('buried', 'bury')
+	text = text.replace('PΛTRIΛE', 'patria')
+	text = text.replace('entwined', 'entwine')
+	text = text.replace('PATRIAE', 'patria')
+	text = text.replace('CAESARES', 'caesares')
+	text = text.replace('CAES', 'caesar')
+	text = text.replace('AVGVS', 'augustus')
+	text = text.replace('AVGVST', 'augustus')
+	text = text.replace('containing', 'entwine')
+	text = text.replace('consisting', 'entwine')
+	text = text.replace('held', 'entwine')
+	text = text.replace('implements', 'entwine')
+	text = text.replace('slightly', 'entwine')
+	text = text.replace('placed', 'entwine')
+	text = text.replace('arched', 'entwine')
+	text = text.replace('ARMENIA', 'armenia')
+	text = text.replace('MAR', 'mars')
+	text = text.replace('CΛESΛRES', 'caesares')
+	text = text.replace('MAR', 'mars')
+	text = text.replace('AVGVSTI', 'augustus')
+	text = text.lower()
+
+	# data['has_Armenia'] = data['Imagery'].apply(lambda x: 
+	# 	True if 'armenia' in x.lower() else False) 
+
+	# data['has_Germania'] = data['Imagery'].apply(lambda x: 
+	# 	True if 'ger' in x.lower() else False) # GERMΛNICVS
+
+	# data['has_Dacia'] = data['Imagery'].apply(lambda x: 
+	# 	True if 'dac' in x.lower() else False)
+
+	# data['has_Egypt'] = data['Imagery'].apply(lambda x: 
+	# 	True if 'egypt' in x.lower() else False)
+
+	# data['has_Parthia'] = data['Imagery'].apply(lambda x: 
+	# 	True if 'parth' in x.lower() else False)
+
 	return text
 
 def stem_comments(text):
@@ -138,6 +228,8 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
+	pd.options.display.max_rows = 999
+
 	# min/max df tests
 	# cv = CountVectorizer(min_df=2, max_df=1.0, lowercase=True) 
 	# # here is just a simple list of 3 documents.
@@ -167,7 +259,8 @@ if __name__ == '__main__':
 	# non predictive
 	data.drop(['Auction Lot'], axis=1, inplace=True)
 
-	# highly predictive
+	# transform to be symmetric (big model improvement!)
+	data['Estimate'] = data['Estimate'].map(lambda x: np.log1p(x))
 	#data.drop(['Estimate'], axis=1, inplace=True)
 
 	# non predictive
@@ -182,14 +275,16 @@ if __name__ == '__main__':
 	data['Comments'] = data['Comments'].map(stem_comments)
 	#words = count_unique_words(data['Comments'])
 	#print(words)
-	data.drop(columns=['Comments'], axis=1, inplace=True)
+	#data.drop(columns=['Comments'], axis=1, inplace=True)
 
 	# do manual stemming/lemmatization for now
-	data['Imagery'] = data['Imagery'].map(lambda x: x.lower())
+	#data['Imagery'] = data['Imagery'].map(lambda x: x.lower())
 	data['Imagery'] = data['Imagery'].map(stem_imagery)
 	#words = count_unique_words(data['Imagery'])
-	#print(words)
-	data.drop(columns=['Imagery'], axis=1, inplace=True)
+	#print(words, len(words))
+	#quit()
+	#data.drop(columns=['Imagery'], axis=1, inplace=True)
+	#data['Imagery']
 
 	# impute missing 'Diameter' measurements (not sure why these are 'NaN' and not 'None')
 	diameter_mode = data['Diameter'].mode()[0]
@@ -271,19 +366,19 @@ if __name__ == '__main__':
 	# data['is_cabinet_toned'] = data['Comments'].apply(lambda x: 
 	# 	True if 'cabinet' in x else False)
 
-	# # keywords: rarity
+	# # # keywords: rarity
 	# data['is_rare'] = data['Comments'].apply(lambda x: 
 	# 	True if 'rare' in x else False)
 	# data['is_very_rare'] = data['Comments'].apply(lambda x: 
 	# 	True if 'extremely rare' in x or 'very rare' in x or 'unique' in x else False)
 
-	# # keywords: portrait
+	# # # keywords: portrait
 
 	# data['has_nice_portrait'] = data['Comments'].apply(lambda x: 
 	# 	True if 'portrait' in x and not 'on portrait' in x else False)
 
 	# data['has_problem_portrait'] = data['Comments'].apply(lambda x: 
-	# 	True if 'on portrait' in x else False) # exclude scratches/marks/ etc on portrait
+	#  	True if 'on portrait' in x else False) # exclude scratches/marks/ etc on portrait
 
 	# data['is_centered'] = data['Comments'].apply(lambda x: 
 	# 	True if 'center' in x and not 'off-center' in x else False)
@@ -441,8 +536,8 @@ if __name__ == '__main__':
 	
 
 
-	# comment_stops = ['a', 'an', 'and', 'as', 'from', 'in', 'of', 'off', 'on', 'the', 'to', 'under', 'with']
-	# v1 = CountVectorizer(min_df=50, stop_words=comment_stops)
+	#comment_stops = ['a', 'an', 'and', 'as', 'from', 'in', 'of', 'off', 'on', 'the', 'to', 'under', 'with']
+	# v1 = CountVectorizer(min_df=50)#, stop_words=comment_stops)
 	# X1 = v1.fit_transform(data['Comments'])
 	# print('shape: {}'.format(X1.shape)) # (1268, ~92)
 	# #print(X1)
@@ -451,16 +546,17 @@ if __name__ == '__main__':
 	# print(v1.stop_words_)
 	# X1 = X1.toarray()
 
-	# v2 = CountVectorizer(min_df=50, stop_words=comment_stops)
-	# X2 = v2.fit_transform(data['Imagery'])
-	# print('shape: {}'.format(X2.shape)) # (1268, ~92)
-	# #print(X2)
-	# #print(X2.toarray())
-	# print('features: {}'.format(v2.get_feature_names()))
-	# print(v2.stop_words_)
-	# X2 = X2.toarray()
+	v2 = CountVectorizer(min_df=50)#, stop_words=comment_stops)
+	X2 = v2.fit_transform(data['Imagery'])
+	print('shape: {}'.format(X2.shape)) # (1268, ~92)
+	#print(X2)
+	#print(X2.toarray())
+	print('features: {}'.format(v2.get_feature_names()))
+	print(v2.stop_words_)
+	X2 = X2.toarray()
 
-
+	data.drop(columns=['Comments'], axis=1, inplace=True)
+	data.drop(columns=['Imagery'], axis=1, inplace=True)
 	
 	Xb = data.values
 
@@ -471,9 +567,11 @@ if __name__ == '__main__':
 	#data.join(data_ct, index='index')
 
 	# combine the baseline features with the language features
-	#X = np.hstack((Xb, X1))
-	#X = np.hstack((Xb, X1, X2))
 	X = Xb
+	#X = np.hstack((Xb, X1))
+	#X = np.hstack((Xb, X2))
+	#X = np.hstack((Xb, X1, X2))
+	
 	print(X.shape)
 	print(X)
 
@@ -506,7 +604,7 @@ if __name__ == '__main__':
 		print('alpha: {}, cv score: {}'.format(alpha, cv_score.mean()))
 
 	
-	#model = RandomForestRegressor(n_estimators=200, max_depth=20, max_features='auto').fit(X_train, y_train)
+	#model = RandomForestRegressor(n_estimators=600, max_depth=6, max_features='auto').fit(X_train, y_train)
 	#x = pd.DataFrame(zip(X.columns, model.feature_importances_), columns=['feature', 'import'])
 	#pd.set_option('display.max_rows', None)
 	##print(x.sort_values(by=['coefficient']))
@@ -530,21 +628,34 @@ if __name__ == '__main__':
 	#print(y_test[0:10])
 	#print(y_test_pred[0:10])
 
+	# how do our predictions compare to the test set values?
+	#for yp, y in zip(y_test_pred, y_test):
+	#	print(np.exp(yp), np.exp(y))
 
-	#for x,y in zip(X_test, y_test):
-	#	print(model.predict(x), y)
+	# build standardized residuals (i.e. the "pulls")
+	res_train_std = (y_train_pred - y_train)/np.std(y_train_pred - y_train)
+	res_test_std = (y_test_pred - y_test)/np.std(y_test_pred - y_test)
 
-	if(True):
+	if(False):
 		import matplotlib.pyplot as plt
-		plt.scatter(y_train_pred, y_train_pred - y_train, c = "blue", marker = "s", label = "Training data")
-		plt.scatter(y_test_pred, y_test_pred - y_test, c = "lightgreen", marker = "s", label = "Validation data")
+		plt.scatter(y_train_pred, res_train_std, c = "blue", marker = "s", label = "Training data")
+		plt.scatter(y_test_pred, res_test_std, c = "lightgreen", marker = "s", label = "Validation data")
 		plt.title("Linear Regression")
 		plt.xlabel("Predicted values")
-		plt.ylabel("Residuals")
+		plt.ylabel("Standardized Residuals")
 		plt.legend(loc = "upper left")
-		plt.hlines(y = 0, xmin = 10.5, xmax = 13.5, color = "red")
-		#plt.xlim(0,5000)
-		#plt.ylim(0,5000)
+		plt.hlines(y = 0, xmin = 4, xmax = 13.5, color = 'red', alpha = 0.5)
+		plt.xlim(4,12)
+		plt.ylim(-5,5)
+		plt.show()
+
+	if(False):
+		import matplotlib.pyplot as plt
+		n, bins, _ = plt.hist(res_test_std, 50)
+		plt.xlabel('Residuals')
+		plt.ylabel('Counts')
+		plt.title('Residuals')
+		plt.grid(True)
 		plt.show()
 
 
