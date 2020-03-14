@@ -288,8 +288,7 @@ if __name__ == '__main__':
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_PA3.csv'
 	# Aureus
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AV_EA.csv'
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AV_PA.csv'
-
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AV_PA.csv'
 
 	df = pd.read_csv(file)
 	print(df.info())

@@ -1,7 +1,5 @@
 # coding: utf-8
 
-import requests
-from bs4 import BeautifulSoup
 import re
 import sys
 import os
@@ -174,41 +172,6 @@ def get_grade(text):
 				return grade
 	return None
 
-# do manual stemming/lemmatization for now
-def stem_comments(text):
-	text = text.lower()
-	text = text.replace('lustre', 'lust')
-	text = text.replace('luster', 'lust')
-	text = text.replace('lustrous', 'lust')
-	text = text.replace('toned', 'tone')
-	text = text.replace('toning', 'tone')
-	text = text.replace('attractively', 'attractive')
-	text = text.replace('iridescence', 'iridescent')
-	text = text.replace('darkly', 'dark')
-	text = text.replace('portraiture', 'portrait')
-	text = text.replace('centered', 'center')
-	# but not marks --> mark or scratches --> scratch. probably info in the plural form.
-	text = text.replace('roughness', 'rough')
-	text = text.replace('tooled', 'tool')
-	text = text.replace('tooling', 'tool')
-	text = text.replace('smoothed', 'smooth')
-	text = text.replace('smoothing', 'smooth')
-	text = text.replace('corroded', 'corrosion')
-	text = text.replace('porosity', 'porous')
-	text = text.replace('granularity', 'granular')
-	text = text.replace('pitting', 'pits')
-	text = text.replace('pitted', 'pits')
-	# 'cut' is implicit here; want to match with e.g. 'test cut on reverse/obverse'
-	text = text.replace('edge test', 'edge test cut') 
-	text = text.replace('surface test', 'surface test cut')
-	text = text.replace('struck', 'strike')
-	text = text.replace('banker’s', 'banker') # standardize apostrophes?
-	text = text.replace('bankers’', 'banker')
-	text = text.replace('cleaned', 'clean')
-	text = text.replace('cleaning', 'clean')
-	text = text.replace('off center', 'off-center')
-	return text
-
 # condidate descriptions where necessary
 def consolidate_descriptors(text):
 	text = text.replace('scarse', 'rare')
@@ -240,15 +203,14 @@ def get_comments(text):
 		if grade in comments:
 			comments = comments.replace(grade, '')
 	#print('post Remvove Grade:\n {}'.format(comments))
-	# standardize text
-	comments = stem_comments(comments)
-	#print('post Standardize:\n {}'.format(comments))
 	return comments
 
 if __name__ == '__main__':
 
-	#files = list_csv_files("/Users/cwillis/GitHub/RomanCoinData/data_text/output/")
-	#print(files)
+	# make corrections to cleaned files, and re-run here to pick them up and put them into the "Augustus_prepared.csv" file
+	files = list_csv_files('/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/')
+	df = pd.concat([pd.read_csv(f) for f in files]) 
+	print(df.info())
 
 	# E-Auction
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv'
@@ -261,10 +223,10 @@ if __name__ == '__main__':
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA3_cleaned.csv'
 	# Aureus
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AV_EA_cleaned.csv'
-	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AV_PA_cleaned.csv'
+	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AV_PA_cleaned.csv'
 
-	df = pd.read_csv(file)
-	print(df.info())
+	#df = pd.read_csv(file)
+	#print(df.info())
 
 	# remove entries tagged as non-standard
 	df = df[~df['Nonstandard Lot']]
@@ -315,10 +277,11 @@ if __name__ == '__main__':
 
 	print(df)
 
-	# finally remove the 'Description' column?
-	# df.drop(['Description'], inplace=True)
+	# finally remove the 'Description' column!
+	df.drop(['Description'], inplace=True, axis=1)
 
-	# write output	
+	# write output
+	file = 'Augustus'
 	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared'
 	output = file.split('/')[-1].split('.')[0]+'_prepared.csv'
 	df.to_csv(directory+'/'+output, index=False)
