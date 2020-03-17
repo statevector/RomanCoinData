@@ -34,13 +34,13 @@ def get_coin_urls(html):
 		exit('AttributeError with bs')
 	return [url.a['href'] for url in urls if url.a is not None]
 
-def get_coin_url_images(html):
-	try:
-		bs = BeautifulSoup(html, 'html.parser')
-		urls = bs.find_all('td', attrs={'align':'center'})
-	except AttributeError as err:
-		exit('AttributeError with bs')
-	return [(url.a['href'], url.img['src']) for url in urls if url.a is not None]
+# def get_coin_url_images(html):
+# 	try:
+# 		bs = BeautifulSoup(html, 'html.parser')
+# 		urls = bs.find_all('td', attrs={'align':'center'})
+# 	except AttributeError as err:
+# 		exit('AttributeError with bs')
+# 	return [(url.a['href'], url.img['src']) for url in urls if url.a is not None]
 
 def get_auction_type(bs):
 	text = bs.find('h2', attrs={'id':'coin_hCont'}).text
@@ -123,7 +123,7 @@ def get_sale_price(bs):
 def get_lot_description(bs):
 	div = bs.find('div', attrs={'class':'lot'})
 	#print(div.contents)
-	# remove image...?
+	# remove image (breaks get_image_url() if placed after)
 	if div.a is not None:
 		div.a.decompose()
 	# remove special title section 
@@ -144,7 +144,7 @@ def get_lot_description(bs):
 def is_nonstandard_lot(text):
 	return any(word in text for word in stop_words)
 
-def get_image_link(bs):
+def get_image_url(bs):
 	image = bs.find('div', attrs={'class':'lot'}).img['src']
 	if image is None:
 		raise TypeError('bs unable to grab image')
@@ -159,7 +159,7 @@ def load_image(url):
 	else: 
 		return None
 
-# def get_image_link(bs):
+# def get_image_url(bs):
 # 	try:
 # 		image = bs.find('div', attrs={'class':'lot'}).img['src']
 # 	except TypeError as err:
@@ -183,25 +183,32 @@ if __name__ == '__main__':
 	#print(html)
 	urls = get_coin_urls(html)
 
-	#url = 'https://cngcoins.com/Coin.aspx?CoinID=387264'
-	#webpage = requests.get(url, headers=headers)
-	#bs = BeautifulSoup(webpage.text, 'html.parser')
-	#x = get_image_link(bs)
-	#print(x)
-	#y = load_image(x)
-	#print(y, y.shape)
-	
+	# url = 'https://cngcoins.com/Coin.aspx?CoinID=387264'
+	# webpage = requests.get(url, headers=headers)
+	# bs = BeautifulSoup(webpage.text, 'html.parser')
+	# print(bs)
+	# x = get_image_url(bs)
+	# print(x)
+	# y = load_image(x)
+	# print(y, y.shape)
+	# quit()
+
 	# build CSV output
-	print('Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description,Nonstandard Lot')
+	print('Image,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description,Nonstandard Lot')
 	for idx, url in enumerate(urls):
 		
-		#if idx>10: continue
+		if idx>2: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
 		webpage = requests.get(url, headers=headers)
 		bs = BeautifulSoup(webpage.text, 'html.parser')
-		
+		#print(bs)
+
+		# grab the url of the coin image
+		image_url = get_image_url(bs)
+		#print(' Image URL: {}'.format(image_url))
+
 		# grab auction type (CS, EA, PS)
 		auction_type = get_auction_type(bs)
 		#print(' Auction Type: {}'.format(auction_type))
@@ -230,9 +237,7 @@ if __name__ == '__main__':
 		nonstandard_lot = is_nonstandard_lot(description)
 		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
-		# grab the url of the coin image
-		image_link = get_image_link(bs)
-
-		print('{},{},{},{},{},{},{}'.format(auction_type, \
-			auction_id, acution_lot, sale_estimate, \
-			sale_price, description, nonstandard_lot))
+		print('{},{},{},{},{},{},{}'.format(image_url, \
+			auction_type, auction_id, acution_lot, \
+			sale_estimate, sale_price, description, \
+			nonstandard_lot))
