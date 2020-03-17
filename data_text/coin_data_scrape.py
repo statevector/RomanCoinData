@@ -1,8 +1,12 @@
 
 import requests
-from bs4 import BeautifulSoup
 import re
 import sys
+import numpy as np
+
+from bs4 import BeautifulSoup
+from io import BytesIO
+from PIL import Image
 
 # eliminate observations that contain the following words
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
@@ -27,8 +31,16 @@ def get_coin_urls(html):
 		bs = BeautifulSoup(html, 'html.parser')
 		urls = bs.find_all('td', attrs={'align':'center'})
 	except AttributeError as err:
-		exit('AttributeError with bs')	
+		exit('AttributeError with bs')
 	return [url.a['href'] for url in urls if url.a is not None]
+
+def get_coin_url_images(html):
+	try:
+		bs = BeautifulSoup(html, 'html.parser')
+		urls = bs.find_all('td', attrs={'align':'center'})
+	except AttributeError as err:
+		exit('AttributeError with bs')
+	return [(url.a['href'], url.img['src']) for url in urls if url.a is not None]
 
 def get_auction_type(bs):
 	text = bs.find('h2', attrs={'id':'coin_hCont'}).text
@@ -80,6 +92,7 @@ def get_auction_lot(bs):
 def get_sale_estimate(bs):
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
+	#print(text)
 	try:
 		result = re.search(r'Estimate (CHF|\$)\d+', text)
 		if result is not None:
@@ -93,6 +106,7 @@ def get_sale_estimate(bs):
 def get_sale_price(bs):
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
+	#print(text)
 	try:
 		result = re.search(r'Sold [Ff]or (CHF|\$)\d+', text)
 		if result is not None:
@@ -130,10 +144,29 @@ def get_lot_description(bs):
 def is_nonstandard_lot(text):
 	return any(word in text for word in stop_words)
 
-#<_io.TextIOWrapper name='/Users/cwillis/GitHub/RomanCoinModel/raw_data/CNG/html/Augustus_AR_PA1.html' mode='r' encoding='UTF-8'>
-#urls loaded
+def get_image_link(bs):
+	image = bs.find('div', attrs={'class':'lot'}).img['src']
+	if image is None:
+		raise TypeError('bs unable to grab image')
+	#print(image)
+	return image
 
+def load_image(url): 
+	res = requests.get(url)
+	if res.ok and 'image' in res.headers['content-type']:
+		img_arr = np.array(Image.open(BytesIO(res.content)))
+		return img_arr
+	else: 
+		return None
 
+# def get_image_link(bs):
+# 	try:
+# 		image = bs.find('div', attrs={'class':'lot'}).img['src']
+# 	except TypeError as err:
+# 		print('bs unable to grab image')
+# 		raise
+# 	#print(image)
+# 	return image
 
 if __name__ == '__main__':
 
@@ -150,7 +183,13 @@ if __name__ == '__main__':
 	#print(html)
 	urls = get_coin_urls(html)
 
-	#urls = ["https://cngcoins.com/Coin.aspx?CoinID=388133"]
+	#url = 'https://cngcoins.com/Coin.aspx?CoinID=387264'
+	#webpage = requests.get(url, headers=headers)
+	#bs = BeautifulSoup(webpage.text, 'html.parser')
+	#x = get_image_link(bs)
+	#print(x)
+	#y = load_image(x)
+	#print(y, y.shape)
 	
 	# build CSV output
 	print('Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description,Nonstandard Lot')
@@ -191,10 +230,9 @@ if __name__ == '__main__':
 		nonstandard_lot = is_nonstandard_lot(description)
 		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
+		# grab the url of the coin image
+		image_link = get_image_link(bs)
+
 		print('{},{},{},{},{},{},{}'.format(auction_type, \
 			auction_id, acution_lot, sale_estimate, \
 			sale_price, description, nonstandard_lot))
-
-
-
-
