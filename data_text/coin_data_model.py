@@ -15,7 +15,7 @@ from sklearn.ensemble import RandomForestRegressor
 #from sklearn.metrics import mean_squared_error
 
 pd.options.display.max_rows = 999
-pd.set_option('display.width', 1000)
+pd.options.display.max_colwidth = 185
 
 def count_unique_words(series):
 	word_list = series.apply(lambda x: pd.value_counts(x.split(' '))).sum(axis = 0)
@@ -138,10 +138,36 @@ def stem_imagery(text):
 	# data['has_Parthia'] = data['Imagery'].apply(lambda x: 
 	# 	True if 'parth' in x.lower() else False)
 
+	# s = data['Imagery']
+	# #words = s.apply(lambda x: pd.value_counts(x.split(' '))).sum(axis=0)
+	# t = s.apply(lambda x: x.replace('(',''))
+	# t = t.apply(lambda x: x.replace(')',''))
+	# t = t.apply(lambda x: x.replace('[',''))
+	# t = t.apply(lambda x: x.replace(']',''))
+	# t = t.apply(lambda x: x.replace(':',''))
+	# t = t.apply(lambda x: x.replace(';',''))
+	# t = t.apply(lambda x: x.replace('• ',''))
+	# t = t.apply(lambda x: x.replace('· ',''))
+	# t = t.apply(lambda x: x.replace('bare-headed', 'bare head'))
+
+	# words = t.apply(lambda x: pd.value_counts(x.split(' '))).sum(axis=0)
+	# swords = words.sort_index(axis=0)
+
 	return text
 
 def stem_comments(text):
 	text = text.lower()
+
+	# >>> s = s.apply(lambda x: x.lower())
+	# >>> s = s.apply(lambda x: x.replace('(', ''))
+	# >>> s = s.apply(lambda x: x.replace(')', ''))
+	# >>> s = s.apply(lambda x: x.replace('[', ''))
+	# >>> s = s.apply(lambda x: x.replace(']', ''))
+	# >>> s = s.apply(lambda x: x.replace('\'s', ' of'))
+	# >>> s = s.apply(lambda x: x.replace('’s', ' of'))
+	# >>> s = s.apply(lambda x: x.replace(':', ''))
+	# >>> s = s.apply(lambda x: x.replace(';', ''))
+
 	text = text.replace('lustre', 'lust')
 	text = text.replace('luster', 'lust')
 	text = text.replace('lustrous', 'lust')
@@ -164,13 +190,23 @@ def stem_comments(text):
 	text = text.replace('corroded', 'corrosion')
 	text = text.replace('porosity', 'porous')
 	text = text.replace('granularity', 'granular')
+
 	text = text.replace('pitting', 'pits')
 	text = text.replace('pitted', 'pits')
 	# 'cut' is implicit here; want to match with e.g. 'test cut on reverse/obverse'
 	text = text.replace('edge test', 'edge test cut') 
 	text = text.replace('surface test', 'surface test cut')
+	# consolidate
+	text = text.replace('on the reverse', 'on reverse')
+	text = text.replace('on the obverse', 'on obverse')
 	text = text.replace('struck', 'strike')
-	text = text.replace('banker’s', 'banker') # standardize apostrophes?
+	text = text.replace('striking', 'strike')
+	text = text.replace('struck', 'strike')
+	text = text.replace('weakness', 'weak')
+	text = text.replace('flatly', 'flat')
+	text = text.replace('some chipping', 'chips')
+	 # standardize apostrophes?
+	text = text.replace('banker’s', 'banker')
 	text = text.replace('bankers’', 'banker')
 	text = text.replace('bankers\'', 'banker')
 	text = text.replace('cleaned', 'clean')
@@ -189,18 +225,45 @@ def stem_comments(text):
 	text = text.replace('graffito', 'graffiti')
 	text = text.replace('deeply', 'deep')
 
+	# mis-spellings
+	text = text.replace('scracthes', 'scratches')
+	text = text.replace('granualar', 'granular')
+	text = text.replace('vareity', 'variety')
 	text = text.replace('scarse', 'rare')
 
-	text = text.replace('planchet', 'flan')
+
 	#text = text.replace('flan flaw', 'flan-flaw')
 	#text = text.replace('flan crack', 'flan-crack')
 	#text = text.replace('die rust', 'die-rust')
 	#text = text.replace('die break', 'die-break')
 
-	# slightly --> slight --> minor
+	text = text.replace('planchet', 'flan')
+	text = text.replace('slightly', 'slight')
+	text = text.replace('bent', 'bend')
+	text = text.replace('boldly', 'bold')
+	text = text.replace('brightly', 'bright')
+	text = text.replace('die break', 'die-break') # visually inspected
+	text = text.replace('die breaks', 'die-breaks')
+	text = text.replace('crystalized', 'crystal')
+	text = text.replace('crystallization', 'crystal')
+	text = text.replace('crystallized', 'crystal')
+	text = text.replace('earlobe', 'ear')
+	text = text.replace('exceptionally', 'exceptional')
+
+	text = text.replace('harshly', 'harsh')
+	text = text.replace('lacquered', 'lacquer')
+	text = text.replace('lamination', 'delamination')
+	text = text.replace('mount', 'mounted')
+	text = text.replace('nicely', 'nice')
+	text = text.replace('reddish', 'red')
+	text = text.replace('roughly', 'rough')
+	text = text.replace('rusty', 'rust')
+	text = text.replace('scarce', 'rare')
+
 	# small vs. tiny vs. minor vs. slight vs. trivial, inconsequential, thin
-	# wonderful, excellent, lovely, terrific, exceptional, extremely, artistic, beautiful, gorgeous
-		
+	# wonderful, excellent, lovely, terrific, exceptional, extremely, artistic, beautiful, gorgeous, bold
+	# nick, ding
+
 	return text
 
 # do description lemmatization and stemming here
@@ -345,20 +408,20 @@ if __name__ == '__main__':
 
 	data.drop(['Sold'], axis=1, inplace=True)
 
-	data.info()
+	#data.info()
 	#quit()
 
 	# add some features from 'Comments'
 	
 	# # keywords: tone
-	# data['is_lustrous'] = data['Comments'].apply(lambda x: 
-	# 	True if 'lust' in x else False)
-	# data['is_toned'] = data['Comments'].apply(lambda x: 
-	# 	True if 'tone' in x else False)
-	# data['is_attractive'] = data['Comments'].apply(lambda x: 
-	# 	True if 'attractive' in x else False)
-	# data['is_iridescent'] = data['Comments'].apply(lambda x: 
-	# 	True if 'iridescent' in x else False)
+	data['is_lustrous'] = data['Comments'].apply(lambda x: 
+		True if 'lust' in x else False)
+	data['is_toned'] = data['Comments'].apply(lambda x: 
+		True if 'tone' in x else False)
+	data['is_attractive'] = data['Comments'].apply(lambda x: 
+		True if 'attractive' in x else False)
+	data['is_iridescent'] = data['Comments'].apply(lambda x: 
+		True if 'iridescent' in x else False)
 	# data['is_gray'] = data['Comments'].apply(lambda x: 
 	# 	True if 'gray' in x else False)
 	# data['is_golden'] = data['Comments'].apply(lambda x: 
@@ -366,24 +429,35 @@ if __name__ == '__main__':
 	# data['is_cabinet_toned'] = data['Comments'].apply(lambda x: 
 	# 	True if 'cabinet' in x else False)
 
-	# # # keywords: rarity
-	# data['is_rare'] = data['Comments'].apply(lambda x: 
+	# keywords: rarity
+
+	#data['is_rare'] = data['Comments'].apply(lambda x: 
 	# 	True if 'rare' in x else False)
-	# data['is_very_rare'] = data['Comments'].apply(lambda x: 
-	# 	True if 'extremely rare' in x or 'very rare' in x or 'unique' in x else False)
 
-	# # # keywords: portrait
+	# adds 0.02 to r^2
+	data['is_very_rare'] = data['Comments'].apply(lambda x: 
+		any(word in x for word in ('extremely rare', 'very rare', 'unique', 'coinArchives')))
+	#print(data['is_very_rare'].value_counts())
 
-	# data['has_nice_portrait'] = data['Comments'].apply(lambda x: 
+	# keywords: portrait
+
+	# sub 0.01 to r^2
+	data['has_facial_features'] = data['Comments'].apply(lambda x: 
+		any(word in x for word in ('eye', 'cheek', 'eyebrow', 'head', 'chin', 'forehead', 'jaw' ,'neck', 'nose')))
+	#print(data['has_facial_features'].value_counts())
+
+	# reduces r^2
+	#data['has_nice_portrait'] = data['Comments'].apply(lambda x: 
 	# 	True if 'portrait' in x and not 'on portrait' in x else False)
 
-	# data['has_problem_portrait'] = data['Comments'].apply(lambda x: 
+	#data['has_problem_portrait'] = data['Comments'].apply(lambda x: 
 	#  	True if 'on portrait' in x else False) # exclude scratches/marks/ etc on portrait
 
-	# data['is_centered'] = data['Comments'].apply(lambda x: 
-	# 	True if 'center' in x and not 'off-center' in x else False)
+	# sub 0.01 to r^2
+	data['is_centered'] = data['Comments'].apply(lambda x: 
+		True if 'center' in x and not 'off-center' in x else False)
 
-	# data['is_off_center'] = data['Comments'].apply(lambda x: 
+	#data['is_off_center'] = data['Comments'].apply(lambda x: 
 	# 	True if 'off-center' in x else False)
 	
 	# # keywords: die, flan
@@ -435,11 +509,13 @@ if __name__ == '__main__':
 	# data['has_scratch'] = data['Comments'].apply(lambda x: 
 	# 	True if 'scratch' in x or 'scratches' in x else False) # 870... focus here
 	
-	# data['has_edge_test'] = data['Comments'].apply(lambda x: 
-	# 	True if 'edge test cut' in x else False) # 29
+	# minor increase in r^2 (0.8752633613317787)
+	#data['has_edge_test'] = data['Comments'].apply(lambda x: 
+	# 	True if 'edge test cut' in x else False)
 	
-	# data['has_test_cut'] = data['Comments'].apply(lambda x: 
-	# 	True if 'test cut' in x else False) # 88
+	# minor increase in r^2 (0.8757633338870784)
+	#data['has_surface_test'] = data['Comments'].apply(lambda x: 
+	#	True if 'surface test cut' in x else False)
 
 	# data['has_splits'] = data['Comments'].apply(lambda x: 
 	# 	True if 'split' in x else False) # 43
@@ -537,28 +613,35 @@ if __name__ == '__main__':
 
 
 	#comment_stops = ['a', 'an', 'and', 'as', 'from', 'in', 'of', 'off', 'on', 'the', 'to', 'under', 'with']
-	# v1 = CountVectorizer(min_df=50)#, stop_words=comment_stops)
-	# X1 = v1.fit_transform(data['Comments'])
-	# print('shape: {}'.format(X1.shape)) # (1268, ~92)
-	# #print(X1)
-	# #print(X1.toarray())
-	# print('features: {}'.format(v1.get_feature_names()))
-	# print(v1.stop_words_)
-	# X1 = X1.toarray()
+	v1 = CountVectorizer(min_df=50)
+	X1 = v1.fit_transform(data['Comments'])
+	print('shape: {}'.format(X1.shape)) # (1268, ~92)
+	#print(X1)
+	#print(X1.toarray())
+	print('features: {}'.format(v1.get_feature_names()))
+	print('stop words: {}'.format(sorted(v1.stop_words_)))
+	X1 = X1.toarray()
 
-	v2 = CountVectorizer(min_df=50)#, stop_words=comment_stops)
-	X2 = v2.fit_transform(data['Imagery'])
-	print('shape: {}'.format(X2.shape)) # (1268, ~92)
-	#print(X2)
-	#print(X2.toarray())
-	print('features: {}'.format(v2.get_feature_names()))
-	print(v2.stop_words_)
-	X2 = X2.toarray()
+	# v2 = CountVectorizer(min_df=50)#, stop_words=comment_stops)
+	# X2 = v2.fit_transform(data['Imagery'])
+	# print('shape: {}'.format(X2.shape)) # (1268, ~92)
+	# #print(X2)
+	# #print(X2.toarray())
+	# print('features: {}'.format(v2.get_feature_names()))
+	#print('stop words: {}'.format(v2.stop_words_))
+	# X2 = X2.toarray()
 
 	data.drop(columns=['Comments'], axis=1, inplace=True)
 	data.drop(columns=['Imagery'], axis=1, inplace=True)
-	
+	data.info()
+
 	Xb = data.values
+
+
+	#from sklearn.pipeline import FeatureUnion
+	#union = FeatureUnion([("pca", PCA(n_components=1)), ("svd", TruncatedSVD(n_components=2))])
+	#>>> X = [[0., 1., 3], [2., 2., 5]]
+	#>>> union.fit_transform(X)
 
 	#data['index'] = data.index
 	#print(data.info())
