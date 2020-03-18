@@ -3,6 +3,7 @@ import requests
 import re
 import sys
 import numpy as np
+import copy
 
 from bs4 import BeautifulSoup
 from io import BytesIO
@@ -26,6 +27,14 @@ def get_html(url):
 		exit('unable to load page')
 	return html
 
+def load_image(url): 
+	res = requests.get(url, headers=headers)
+	if res.ok and 'image' in res.headers['content-type']:
+		img_arr = np.array(Image.open(BytesIO(res.content)))
+		return img_arr
+	else: 
+		return None
+
 def get_coin_urls(html):
 	try:
 		bs = BeautifulSoup(html, 'html.parser')
@@ -41,6 +50,22 @@ def get_coin_urls(html):
 # 	except AttributeError as err:
 # 		exit('AttributeError with bs')
 # 	return [(url.a['href'], url.img['src']) for url in urls if url.a is not None]
+
+def get_image_url(bs):
+	image = bs.find('div', attrs={'class':'lot'}).img['src']
+	if image is None:
+		raise TypeError('bs unable to grab image')
+	#print(image)
+	return image
+
+# def get_image_url(bs):
+# 	try:
+# 		image = bs.find('div', attrs={'class':'lot'}).img['src']
+# 	except TypeError as err:
+# 		print('bs unable to grab image')
+# 		raise
+# 	#print(image)
+# 	return image
 
 def get_auction_type(bs):
 	text = bs.find('h2', attrs={'id':'coin_hCont'}).text
@@ -117,13 +142,35 @@ def get_sale_price(bs):
 	except:
 		exit('unable to find sale price')
 
-# This is probably too restrictive as it is now.
-# We want to probably keep the special titles and
-# the special notes (e.g. from the XXX collection)
+def get_lot_header(bs):
+	header = bs.find('h1', attrs={'id':'coin_hHead'})
+	if header is not None:
+		#print(header)
+		try:
+			return header.text
+		except TypeError as err:
+			print('bs unable to grab lot header')
+			raise
+	return None
+
+def get_lot_notes(bs):
+	notes = bs.find('p', attrs={'id':'coin_pNotes'})
+	if notes is not None:
+		#print(notes)
+		try:
+			if notes.text == ' ':
+				return None
+			else:
+				return notes.text
+		except TypeError as err:
+			print('bs unable to grab lot notes')
+			raise
+	return None
+
 def get_lot_description(bs):
 	div = bs.find('div', attrs={'class':'lot'})
 	#print(div.contents)
-	# remove image (breaks get_image_url() if placed after)
+	# remove image link
 	if div.a is not None:
 		div.a.decompose()
 	# remove special title section 
@@ -136,37 +183,17 @@ def get_lot_description(bs):
 	# remove special coin notes section
 	if div.p is not None:
 		div.p.decompose()
-	#return div.text
-	text = div.text.strip()
+	# remove white space
+	try:
+		text = div.text.strip()
+	except TypeError as err:
+		print('bs unable to grab lot description')
+		raise
 	# remove commas to print to CSV
 	return text.replace(',', '')
 
 def is_nonstandard_lot(text):
 	return any(word in text for word in stop_words)
-
-def get_image_url(bs):
-	image = bs.find('div', attrs={'class':'lot'}).img['src']
-	if image is None:
-		raise TypeError('bs unable to grab image')
-	#print(image)
-	return image
-
-def load_image(url): 
-	res = requests.get(url)
-	if res.ok and 'image' in res.headers['content-type']:
-		img_arr = np.array(Image.open(BytesIO(res.content)))
-		return img_arr
-	else: 
-		return None
-
-# def get_image_url(bs):
-# 	try:
-# 		image = bs.find('div', attrs={'class':'lot'}).img['src']
-# 	except TypeError as err:
-# 		print('bs unable to grab image')
-# 		raise
-# 	#print(image)
-# 	return image
 
 if __name__ == '__main__':
 
@@ -183,21 +210,24 @@ if __name__ == '__main__':
 	#print(html)
 	urls = get_coin_urls(html)
 
-	# url = 'https://cngcoins.com/Coin.aspx?CoinID=387264'
-	# webpage = requests.get(url, headers=headers)
-	# bs = BeautifulSoup(webpage.text, 'html.parser')
-	# print(bs)
-	# x = get_image_url(bs)
-	# print(x)
-	# y = load_image(x)
-	# print(y, y.shape)
+	# some good examples to get right
+	# urls = ['https://cngcoins.com/Coin.aspx?CoinID=376445', 
+	# 		'https://cngcoins.com/Coin.aspx?CoinID=372920', 
+	# 		'https://cngcoins.com/Coin.aspx?CoinID=387264']
+	# for idx, url in enumerate(urls):
+	# 	webpage = requests.get(url, headers=headers)
+	# 	bs = BeautifulSoup(webpage.text, 'html.parser')
+	# 	x = get_lot_header(bs)
+	# 	print(x)
+	# 	y = get_lot_notes(bs)
+	# 	print(y)
 	# quit()
 
 	# build CSV output
-	print('Image,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Description,Nonstandard Lot')
+	print('Image,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
 	for idx, url in enumerate(urls):
 		
-		if idx>2: continue
+		if idx>5: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
@@ -221,13 +251,21 @@ if __name__ == '__main__':
 		acution_lot = get_auction_lot(bs)
 		#print(' Lot Number: {}'.format(lot))
 
-		# grab estimate
+		# grab the sale estimate
 		sale_estimate = get_sale_estimate(bs)
 		#print(' Sale estimate: {}'.format(estimate))
 
-		# grab sale price
+		# grab the sale price
 		sale_price = get_sale_price(bs)
 		#print(' Sale price: {}'.format(price))
+
+		# grab the lot header if present
+		header = get_lot_header(bs)
+		#print(' Lot Header: {}'.format(header))
+
+		# grab the lot notes if present
+		notes = get_lot_notes(bs)
+		#print(' Lot Notes: {}'.format(notes))
 
 		# grab the lot description
 		description = get_lot_description(bs)
@@ -237,7 +275,7 @@ if __name__ == '__main__':
 		nonstandard_lot = is_nonstandard_lot(description)
 		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
-		print('{},{},{},{},{},{},{}'.format(image_url, \
+		print('{},{},{},{},{},{},{},{},{}'.format(image_url, \
 			auction_type, auction_id, acution_lot, \
-			sale_estimate, sale_price, description, \
-			nonstandard_lot))
+			sale_estimate, sale_price, header, notes, \
+			description, nonstandard_lot))
