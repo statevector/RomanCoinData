@@ -3,11 +3,14 @@ import requests
 import re
 import sys
 import numpy as np
-import copy
 
 from bs4 import BeautifulSoup
 from io import BytesIO
 from PIL import Image
+
+# array printing
+np.set_printoptions(threshold=sys.maxsize)
+#np.set_printoptions(threshold=np.inf)
 
 # eliminate observations that contain the following words
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
@@ -27,13 +30,19 @@ def get_html(url):
 		exit('unable to load page')
 	return html
 
-def load_image(url): 
+def url_to_image(url, flatten=False, gray=False): 
 	res = requests.get(url, headers=headers)
 	if res.ok and 'image' in res.headers['content-type']:
-		img_arr = np.array(Image.open(BytesIO(res.content)))
-		return img_arr
+		image = Image.open(BytesIO(res.content)) # this is an image 
+		if gray:
+			image = image.convert('L') #LA
+		arr_img = np.asarray(image)
+		if flatten:
+			return arr_img.flatten(), arr_img.shape
+		return arr_img
 	else: 
-		return None
+		raise TypeError('requests unable to process image url')
+	return None
 
 def get_coin_urls(html):
 	try:
@@ -43,18 +52,12 @@ def get_coin_urls(html):
 		exit('AttributeError with bs')
 	return [url.a['href'] for url in urls if url.a is not None]
 
-# def get_coin_url_images(html):
-# 	try:
-# 		bs = BeautifulSoup(html, 'html.parser')
-# 		urls = bs.find_all('td', attrs={'align':'center'})
-# 	except AttributeError as err:
-# 		exit('AttributeError with bs')
-# 	return [(url.a['href'], url.img['src']) for url in urls if url.a is not None]
-
-def get_image_url(bs):
+def get_image_url(bs, to_small=False):
 	image = bs.find('div', attrs={'class':'lot'}).img['src']
 	if image is None:
-		raise TypeError('bs unable to grab image')
+		raise TypeError('bs unable to grab image url')
+	if to_small:
+		image = re.sub(r'big', 'small', image)
 	#print(image)
 	return image
 
@@ -210,7 +213,10 @@ if __name__ == '__main__':
 	#print(html)
 	urls = get_coin_urls(html)
 
-	# some good examples to get right
+
+	# # some good examples to get right
+	# import cv2
+	# import matplotlib.pyplot as plt	
 	# urls = ['https://cngcoins.com/Coin.aspx?CoinID=376445', 
 	# 		'https://cngcoins.com/Coin.aspx?CoinID=372920', 
 	# 		'https://cngcoins.com/Coin.aspx?CoinID=387264']
@@ -221,13 +227,28 @@ if __name__ == '__main__':
 	# 	print(x)
 	# 	y = get_lot_notes(bs)
 	# 	print(y)
+	# 	z = get_image_url(bs, to_small=True)
+	# 	print(z)
+	# 	arr_img, (img_row, img_col, img_chan) = url_to_image(z, flatten=True, gray=False)
+	# 	print(arr_img.shape, img_row, img_col, img_chan)
+	# 	#for x in arr_img:
+	# 	#	print(x)
+	# 	arr_img2 = arr_img.reshape(img_row, img_col, img_chan)
+	# 	print(arr_img2.shape)
+	# 	# show image
+	# 	cv2.imshow("resized", arr_img2)
+	# 	cv2.waitKey(0)
+	# 	# convert PIL BGR image to open cv RGB standard
+	# 	im = cv2.cvtColor(arr_img2, cv2.COLOR_BGR2RGB)
+	# 	cv2.imshow("resized", im)
+	# 	cv2.waitKey(0)
 	# quit()
 
 	# build CSV output
-	print('Image,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
+	print('URL,Image,Rows,Columns,Channels,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
 	for idx, url in enumerate(urls):
 		
-		if idx>5: continue
+		#if idx>3: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
@@ -236,8 +257,12 @@ if __name__ == '__main__':
 		#print(bs)
 
 		# grab the url of the coin image
-		image_url = get_image_url(bs)
-		#print(' Image URL: {}'.format(image_url))
+		img_url = get_image_url(bs, to_small=True)
+		#print(' Image URL: {}'.format(img_url))
+
+		# create a flattened numpy array of image and save its dimensions
+		img_arr, img_row, img_col, img_chan = url_to_image(img_url, flatten=True)
+		#print(' Image: {}'.format(img_arr))
 
 		# grab auction type (CS, EA, PS)
 		auction_type = get_auction_type(bs)
@@ -275,7 +300,7 @@ if __name__ == '__main__':
 		nonstandard_lot = is_nonstandard_lot(description)
 		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
-		print('{},{},{},{},{},{},{},{},{}'.format(image_url, \
-			auction_type, auction_id, acution_lot, \
-			sale_estimate, sale_price, header, notes, \
-			description, nonstandard_lot))
+		print('{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(img_url, \
+			img_arr, img_row, img_col, img_chan, auction_type, \
+			auction_id, acution_lot, sale_estimate, sale_price, header, \
+			notes, description, nonstandard_lot))
