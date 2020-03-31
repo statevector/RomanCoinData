@@ -38,7 +38,7 @@ def url_to_image(url, flatten=False, gray=False):
 			image = image.convert('L') #LA
 		arr_img = np.asarray(image)
 		if flatten:
-			return arr_img.flatten(), arr_img.shape
+			return arr_img.flatten().tolist(), arr_img.shape
 		return arr_img
 	else: 
 		raise TypeError('requests unable to process image url')
@@ -248,7 +248,7 @@ if __name__ == '__main__':
 	print('URL,Image,Rows,Columns,Channels,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
 	for idx, url in enumerate(urls):
 		
-		#if idx>3: continue
+		if idx>3: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
@@ -261,7 +261,7 @@ if __name__ == '__main__':
 		#print(' Image URL: {}'.format(img_url))
 
 		# create a flattened numpy array of image and save its dimensions
-		img_arr, img_row, img_col, img_chan = url_to_image(img_url, flatten=True)
+		img_arr, (img_row, img_col, img_chan) = url_to_image(img_url, flatten=True)
 		#print(' Image: {}'.format(img_arr))
 
 		# grab auction type (CS, EA, PS)
@@ -300,7 +300,7 @@ if __name__ == '__main__':
 		nonstandard_lot = is_nonstandard_lot(description)
 		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
-		print('{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(img_url, \
+		print('{},{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(img_url, \
 			img_arr, img_row, img_col, img_chan, auction_type, \
 			auction_id, acution_lot, sale_estimate, sale_price, header, \
 			notes, description, nonstandard_lot))
