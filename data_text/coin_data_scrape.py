@@ -30,19 +30,33 @@ def get_html(url):
 		exit('unable to load page')
 	return html
 
-def url_to_image(url, flatten=False, gray=False): 
+def url_to_image(url, gray=False): 
 	res = requests.get(url, headers=headers)
 	if res.ok and 'image' in res.headers['content-type']:
-		image = Image.open(BytesIO(res.content)) # this is an image 
+		image = Image.open(BytesIO(res.content))
 		if gray:
 			image = image.convert('L') #LA
-		arr_img = np.asarray(image)
-		if flatten:
-			return arr_img.flatten().tolist(), arr_img.shape
-		return arr_img
+		return image
 	else: 
 		raise TypeError('requests unable to process image url')
 	return None
+
+def image_to_array(img, flatten=False): 
+	arr_img = np.asarray(img)
+	if flatten:
+		return arr_img.flatten(), arr_img.shape
+	return arr_img, arr_img.shape
+
+def array_to_string(arr): 
+	arr = arr.tolist()
+	arr = ' '.join([str(x) for x in arr])
+	return arr
+
+def string_to_array(x, rows, cols, chan): 
+	# np.array([int(x) for x in arr if x!=' ']) # convert back to np array
+	a = np.array(list(map(int, x.split(' '))), np.uint8)
+	a = a.reshape(a, rows, cols, chan) #151,300,3
+	return a
 
 def get_coin_urls(html):
 	try:
@@ -229,7 +243,7 @@ if __name__ == '__main__':
 	# 	print(y)
 	# 	z = get_image_url(bs, to_small=True)
 	# 	print(z)
-	# 	arr_img, (img_row, img_col, img_chan) = url_to_image(z, flatten=True, gray=False)
+	# 	arr_img, (img_row, img_col, img_chan) = url_to_array(z, flatten=True, gray=False)
 	# 	print(arr_img.shape, img_row, img_col, img_chan)
 	# 	#for x in arr_img:
 	# 	#	print(x)
@@ -260,9 +274,17 @@ if __name__ == '__main__':
 		img_url = get_image_url(bs, to_small=True)
 		#print(' Image URL: {}'.format(img_url))
 
-		# create a flattened numpy array of image and save its dimensions
-		img_arr, (img_row, img_col, img_chan) = url_to_image(img_url, flatten=True)
-		#print(' Image: {}'.format(img_arr))
+		# create an image from the url
+		img = url_to_image(img_url, gray=False)
+		#print(' Image: {}'.format(img))
+
+		# create a flattened array from the image
+		img_arr, (img_row, img_col, img_chan) = image_to_array(img, flatten=True)
+		#print(' Image Array: {}'.format(img_arr))
+
+		# create a string from the flattened array
+		img_str = array_to_string(img_arr)
+		#print(' Image Str: {}'.format(img_str))
 
 		# grab auction type (CS, EA, PS)
 		auction_type = get_auction_type(bs)
@@ -301,6 +323,6 @@ if __name__ == '__main__':
 		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
 		print('{},{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(img_url, \
-			img_arr, img_row, img_col, img_chan, auction_type, \
+			img_str, img_row, img_col, img_chan, auction_type, \
 			auction_id, acution_lot, sale_estimate, sale_price, header, \
 			notes, description, nonstandard_lot))
