@@ -164,7 +164,8 @@ def get_lot_header(bs):
 	if header is not None:
 		#print(header)
 		try:
-			return header.text
+			# remove commas to print to CSV
+			return header.text.replace(',', '')
 		except TypeError as err:
 			print('bs unable to grab lot header')
 			raise
@@ -178,7 +179,8 @@ def get_lot_notes(bs):
 			if notes.text == ' ':
 				return None
 			else:
-				return notes.text
+				# remove commas to print to CSV
+				return notes.text.replace(',', '')
 		except TypeError as err:
 			print('bs unable to grab lot notes')
 			raise
@@ -262,7 +264,7 @@ if __name__ == '__main__':
 	print('URL,Image,Rows,Columns,Channels,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
 	for idx, url in enumerate(urls):
 		
-		if idx>3: continue
+		#if idx>14: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
