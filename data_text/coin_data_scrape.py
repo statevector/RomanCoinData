@@ -261,10 +261,10 @@ if __name__ == '__main__':
 	# quit()
 
 	# build CSV output
-	print('URL,Image,Rows,Columns,Channels,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
+	print('url_page,url_img,Image,Rows,Columns,Channels,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
 	for idx, url in enumerate(urls):
 		
-		#if idx>14: continue
+		#if idx>4: continue
 		#print(idx, url)
 
 		#html = urlopen(url)
@@ -324,7 +324,7 @@ if __name__ == '__main__':
 		nonstandard_lot = is_nonstandard_lot(description)
 		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
 
-		print('{},{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(img_url, \
-			img_str, img_row, img_col, img_chan, auction_type, \
+		print('{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(url, \
+			img_url, img_str, img_row, img_col, img_chan, auction_type, \
 			auction_id, acution_lot, sale_estimate, sale_price, header, \
 			notes, description, nonstandard_lot))

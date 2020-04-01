@@ -9,15 +9,15 @@
 #     # write to .csv
 # done
 
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA1.htm' > 'Augustus_AR_EA1.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA2.htm' > 'Augustus_AR_EA2.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA3.htm' > 'Augustus_AR_EA3.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA4.htm' > 'Augustus_AR_EA4.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_PA1.html' > 'Augustus_AR_PA1.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_PA2.html' > 'Augustus_AR_PA2.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_PA3.html' > 'Augustus_AR_PA3.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AV_EA.htm' > 'Augustus_AV_EA.csv'
-#python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AV_PA.html' > 'Augustus_AV_PA.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA1.htm' > 'Augustus_AR_EA1.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA2.htm' > 'Augustus_AR_EA2.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA3.htm' > 'Augustus_AR_EA3.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_EA4.htm' > 'Augustus_AR_EA4.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_PA1.html' > 'Augustus_AR_PA1.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_PA2.html' > 'Augustus_AR_PA2.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_PA3.html' > 'Augustus_AR_PA3.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AV_EA.htm' > 'Augustus_AV_EA.csv'
+# python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AV_PA.html' > 'Augustus_AV_PA.csv'
 
 #python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Aurelius_AR_EA1.htm' > 'Aurelius_AR_EA1.csv'
 #python3 coin_data_scrape.py '/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Aurelius_AR_EA2.htm' > 'Aurelius_AR_EA2.csv'
