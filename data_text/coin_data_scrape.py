@@ -229,6 +229,8 @@ if __name__ == '__main__':
 	#print(html)
 	urls = get_coin_urls(html)
 
+	# need to understand header here. why NaN?
+	# https://cngcoins.com/Coin.aspx?CoinID=362783
 
 	# # some good examples to get right
 	# import cv2
@@ -249,7 +251,7 @@ if __name__ == '__main__':
 	# 	print(arr_img.shape, img_row, img_col, img_chan)
 	# 	#for x in arr_img:
 	# 	#	print(x)
-	# 	arr_img2 = arr_img.reshape(img_row, img_col, img_chan)
+	# 	arr_img2 = arr_img.reshape(img_row, img_col, img_chan) # make sure this is np.uint8 for cv2 load!
 	# 	print(arr_img2.shape)
 	# 	# show image
 	# 	cv2.imshow("resized", arr_img2)

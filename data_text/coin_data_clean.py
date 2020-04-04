@@ -278,7 +278,7 @@ if __name__ == '__main__':
 	#print(files)
 
 	# E-Auction
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA1.csv'
+	file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA1.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA2.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA3.csv'
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus_AR_EA4.csv'
@@ -297,8 +297,7 @@ if __name__ == '__main__':
 	df = df[~df['Nonstandard Lot']]
 	print(df.info())
 	
-	# do some light cleaning and standardization of the 'Description' field
-	# for subsequent feature engineering
+	# clean and standardize the 'Description' field for subsequent feature engineering
 
 	df['Description'] = df['Description'].apply(lambda x: format_dashes(x))
 	#print(df.info())
