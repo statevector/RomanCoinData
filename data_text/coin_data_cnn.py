@@ -6,6 +6,13 @@ import os
 import matplotlib.pyplot as plt
 import ipdb
 
+#import keras
+#from keras.models import Sequential
+#from keras.layers import Conv2D, MaxPooling2D, Activation, Flatten, Dense, Dropout
+from keras.preprocessing.image import ImageDataGenerator
+#from keras import losses
+#from keras.optimizers import Adam, SGD
+
 if __name__ == '__main__':
 
 	print('loading data...')
@@ -50,7 +57,7 @@ if __name__ == '__main__':
 	X2 = []
 	y = []
 	for index, obs in data.iterrows():
-		if index > 20: continue
+		if index > 30: continue
 		print(index)
 		# reconstruct original image array
 		aaa = np.array(obs['Image'].split(), dtype=np.uint8) # uint8 for cv2
@@ -126,5 +133,44 @@ if __name__ == '__main__':
 	print('x_test shape:', x_test.shape)
 	print('y_train shape:', y_train.shape)
 	print('y_test shape:', y_test.shape)
+
+	# data augmentation
+	datagen = ImageDataGenerator(
+		#brightness_range=[0.9, 1.1],
+		#featurewise_center=True,
+	    #featurewise_std_normalization=True,
+	    #zca_whitening=True,
+	    rotation_range=10., # 20., # 90.,
+	    width_shift_range=0.1, # 20% total width
+	    height_shift_range=0.1, # 20% total height
+	    horizontal_flip=True,
+	    vertical_flip=False,
+	    shear_range=0.9,
+	    zoom_range=0.1, # 10%
+	    fill_mode='constant'
+	    #rescale=1./255)
+	    )
+
+	# compute quantities required for featurewise normalization
+	train_datagen = datagen.fit(x_train)
+
+	# plot a 3x3 grid of normalized images (sanity check)
+	for i, (x_batch, y_batch) in enumerate(datagen.flow(x_train, y_train, batch_size=9)):
+		#fig = plt.figure()
+		print(i, x_batch.shape)
+		for index, x in enumerate(x_batch):
+			# subplot(nrows, ncols, index, **kwargs)
+			plt.subplot(3, 3, index+1)
+			plt.imshow(x)
+		plt.show()
+		if i>=4: 
+			plt.close('all')
+			break
+
+
+
+
+
+
 
 
