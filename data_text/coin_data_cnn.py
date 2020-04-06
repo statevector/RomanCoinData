@@ -7,11 +7,18 @@ import matplotlib.pyplot as plt
 import ipdb
 
 #import keras
-#from keras.models import Sequential
-#from keras.layers import Conv2D, MaxPooling2D, Activation, Flatten, Dense, Dropout
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
 from keras.preprocessing.image import ImageDataGenerator
+from keras import backend
+
 #from keras import losses
-#from keras.optimizers import Adam, SGD
+from keras import optimizers
+#from keras.layers.normalization import BatchNormalization
+
+def rmse(y_true, y_pred):
+	return backend.sqrt(backend.mean(backend.square(y_pred - y_true), axis=-1))
 
 if __name__ == '__main__':
 
@@ -57,8 +64,8 @@ if __name__ == '__main__':
 	X2 = []
 	y = []
 	for index, obs in data.iterrows():
-		if index > 30: continue
-		print(index)
+		#if index > 30: continue
+		print('transform image: {}'.format(index))
 		# reconstruct original image array
 		aaa = np.array(obs['Image'].split(), dtype=np.uint8) # uint8 for cv2
 		aaa = aaa.reshape(obs['Rows'], obs['Columns'], obs['Channels'])
@@ -66,7 +73,7 @@ if __name__ == '__main__':
 		# convert from PIL BGR standard to open CV RGB standard
 		img = cv2.cvtColor(aaa, cv2.COLOR_BGR2RGB)
 		rows, cols, channels = img.shape
-		print('  rows {}, cols {}, channels {}'.format(rows, cols, channels))
+		print('rows {}, cols {}, channels {}'.format(rows, cols, channels))
 		# pad the image to a consistent size to load into a dataframe
 		#imgr = img[0:130, 0:cols, 0:channels]
 		#imgr = cv2.resize(img, (130, cols), interpolation=cv2.INTER_AREA)
@@ -91,7 +98,7 @@ if __name__ == '__main__':
 		#cv2.imshow('title', imgr2)
 		#cv2.waitKey(0)
 		y.append(obs['Sold'])
-
+		print('-------------------------')
 
 	# convert to numpy array and reshape for keras model
 
@@ -120,17 +127,18 @@ if __name__ == '__main__':
 
 	# ... and break into training and test sets
 	n_train = int(0.80 * X.shape[0])
-	x_train, x_test = X[:n_train, :], X[n_train:, :]
+	X_train, X_test = X[:n_train, :], X[n_train:, :]
 	y_train, y_test = y[:n_train], y[n_train:]
 
 	# convert to float and rescale for optimization
-	x_train = x_train.astype('float32')
-	x_test = x_test.astype('float32')
-	x_train /= 255.
-	x_test /= 255.
+	X_train = X_train.astype('float32')
+	X_train /= 255.
+
+	X_test = X_test.astype('float32')
+	X_test /= 255.
 	
-	print('x_train shape:', x_train.shape)
-	print('x_test shape:', x_test.shape)
+	print('x_train shape:', X_train.shape)
+	print('x_test shape:', X_test.shape)
 	print('y_train shape:', y_train.shape)
 	print('y_test shape:', y_test.shape)
 
@@ -145,22 +153,22 @@ if __name__ == '__main__':
 	    height_shift_range=0.1, # 20% total height
 	    horizontal_flip=True,
 	    vertical_flip=False,
-	    shear_range=0.9,
-	    zoom_range=0.1, # 10%
+	    #shear_range=0.9,
+	    #zoom_range=0.1, # 10%
 	    fill_mode='constant'
 	    #rescale=1./255)
 	    )
 
 	# compute quantities required for featurewise normalization
-	train_datagen = datagen.fit(x_train)
+	train_datagen = datagen.fit(X_train)
 
 	# plot a 3x3 grid of normalized images (sanity check)
-	for i, (x_batch, y_batch) in enumerate(datagen.flow(x_train, y_train, batch_size=9)):
+	for i, (X_batch, y_batch) in enumerate(datagen.flow(X_train, y_train, batch_size=9)):
 		#fig = plt.figure()
-		print(i, x_batch.shape)
-		for index, x in enumerate(x_batch):
+		print(i, X_batch.shape)
+		for j, x in enumerate(X_batch):
 			# subplot(nrows, ncols, index, **kwargs)
-			plt.subplot(3, 3, index+1)
+			plt.subplot(3, 3, j+1)
 			plt.imshow(x)
 		plt.show()
 		if i>=4: 
@@ -171,6 +179,67 @@ if __name__ == '__main__':
 
 
 
+	# flatten inputs for baseline tests
+	X_train_b = X_train.reshape(len(X_train),-1)
+	X_test_b = X_test.reshape(len(X_test),-1)
+
+	# baseline model
+	model = Sequential()
+	model.add(Dense(32, activation='relu', input_shape = X_train_b.shape[1:]))
+	model.add(Dropout(rate=0.5))
+	model.add(Dense(16, activation='relu'))
+	model.add(Dropout(rate=0.5))
+	model.add(Dense(8, activation='relu'))
+	model.add(Dropout(rate=0.5))
+	model.add(Dense(4, activation='relu'))
+	model.add(Dropout(rate=0.5))
+	model.add(Dense(1)) # possible to add regularization
+	sgd = optimizers.SGD(learning_rate=0.01, momentum=0.0, nesterov=False)
+
+	model.compile(loss='mse', optimizer=sgd, metrics=['mae'])
+	print(model.summary())
+	history = model.fit(X_train_b, y_train, batch_size=128, epochs=1000, verbose=1, validation_data=(X_test_b, y_test))
+	# score = model.evaluate(X_test, y_test, verbose=0)
+	# print('Test loss:', score[0])
+	# print('Test accuracy:', score[1])
+
+
+	# CNN model
+	# model = Sequential()
+	# model.add(Conv2D(16, kernel_size=(5, 5), activation='relu', padding='same', 
+	# 	input_shape=X.shape[1:]))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	# model.add(Conv2D(16, kernel_size=(3, 3), activation='relu', padding='same'))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	# model.add(Conv2D(16, kernel_size=(3, 3), activation='relu', padding='same'))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	# #model.add(Conv2D(16, kernel_size=(5, 5), activation='relu', padding='same'))
+	# #model.add(MaxPooling2D(pool_size=(2, 2)))
+	# #model.add(BatchNormalization())
+	# model.add(Flatten())
+	# model.add(Dense(16, activation='relu'))
+	# model.add(Dropout(rate=0.5))
+	# model.add(Dense(1)) # possible to add regularization
+
+	# model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+	#print(model.summary())
+
+	# # keras run parameters
+	# batch_size = 64 # 1/100 the data
+	# epochs = 10 # 31... seemed good
+
+	# history = model.fit_generator(
+	# 	datagen.flow(X_train, y_train, shuffle=True, batch_size=batch_size),
+	# 	validation_data=(X_test, y_test),
+	# 	steps_per_epoch=X_train.shape[0]//batch_size, 
+	# 	epochs=epochs, 
+	# 	use_multiprocessing=True, 
+	# 	verbose=1)
+
+	# score = model.evaluate(X_test, y_test, verbose=0)
+
+	# print('Test loss:', score[0])
+	# print('Test accuracy:', score[1])
 
 
 
