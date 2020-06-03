@@ -3,18 +3,17 @@ import requests
 import re
 import sys
 import numpy as np
+import pandas as pd
+from collections import OrderedDict
 
 from bs4 import BeautifulSoup
+
 from io import BytesIO
 from PIL import Image
 
-# array printing
-np.set_printoptions(threshold=sys.maxsize)
-#np.set_printoptions(threshold=np.inf)
-
 # eliminate observations that contain the following words
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
-			  'Brockage', 'brockage', 'Official Dies', 'Æ', 'Forgery', 
+			  'Brockage', 'brockage', 'Official Dies', 'Forgery', 
 			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation', 
 			  'IMITATION', 'INDIA', 'NGC encapsulation', 'ANACS', 
 			  'Restitution issue']
@@ -23,71 +22,43 @@ headers = {"User-Agent":
 	"Analyzing Roman coins for a class project. \
 	If problems, please contact me at willisc9@msu.edu"}
 
-def get_html(url):
-	try:
-		html = requests.get(url, headers=headers)
-	except HTTPError as err:
-		exit('unable to load page')
-	return html
-
-def url_to_image(url, gray=False): 
-	res = requests.get(url, headers=headers)
-	if res.ok and 'image' in res.headers['content-type']:
-		image = Image.open(BytesIO(res.content))
-		if gray:
-			image = image.convert('L') #LA
-		return image
-	else: 
-		raise TypeError('requests unable to process image url')
-	return None
-
-def image_to_array(img, flatten=False): 
-	arr_img = np.asarray(img)
-	if flatten:
-		return arr_img.flatten(), arr_img.shape
-	return arr_img, arr_img.shape
-
-def array_to_string(arr): 
-	arr = arr.tolist()
-	arr = ' '.join([str(x) for x in arr])
-	return arr
-
-def string_to_array(x, rows, cols, chan): 
-	# np.array([int(x) for x in arr if x!=' ']) # convert back to np array
-	a = np.array(list(map(int, x.split(' '))), np.uint8)
-	a = a.reshape(a, rows, cols, chan) #151,300,3
-	return a
-
 def get_coin_urls(html):
 	try:
 		bs = BeautifulSoup(html, 'html.parser')
 		urls = bs.find_all('td', attrs={'align':'center'})
-	except AttributeError as err:
-		exit('AttributeError with bs')
-	return [url.a['href'] for url in urls if url.a is not None]
+	except Exception as error:
+		print(error)
+	return ['https://cngcoins.com/'+url.a['href'] for url in urls if url.a is not None]
 
-def get_image_url(bs, to_small=False):
-	image = bs.find('div', attrs={'class':'lot'}).img['src']
-	if image is None:
+def get_image_url(data):
+	image_url = None
+	try:
+		bs = BeautifulSoup(data, 'html.parser')
+		image_url = bs.find('div', attrs={'class':'lot'}).img['src']
+	except Exception as error:
+		print(error)
+	if image_url is None:
 		raise TypeError('bs unable to grab image url')
-	if to_small:
-		image = re.sub(r'big', 'small', image)
-	#print(image)
+	return image_url
+
+def get_image(url): 
+	r = requests.get(url, headers=headers)
+	image = None
+	if r.ok and 'image' in r.headers['content-type']:
+		image = Image.open(BytesIO(r.content))
+	else: 
+		raise TypeError('requests unable to process image url')
 	return image
 
-# def get_image_url(bs):
-# 	try:
-# 		image = bs.find('div', attrs={'class':'lot'}).img['src']
-# 	except TypeError as err:
-# 		print('bs unable to grab image')
-# 		raise
-# 	#print(image)
-# 	return image
-
-def get_auction_type(bs):
-	text = bs.find('h2', attrs={'id':'coin_hCont'}).text
-	text = text.replace(u'\xa0', u' ')
-	#print(text)
+def get_auction_type(data):
+	text = None
+	try:
+		bs = BeautifulSoup(data, 'html.parser')
+		text = bs.find('h2', attrs={'id':'coin_hCont'}).text
+		text = text.replace(u'\xa0', u' ')
+		#print(text)
+	except Exception as error:
+		print(error)
 	try:
 		result = re.search(r'(The Coin Shop|Electronic Auction|Feature Auction|Affiliated Auction)', text)
 		if result is not None:
@@ -97,11 +68,12 @@ def get_auction_type(bs):
 	except:
 		exit('unable to find auction type')
 
-def get_auction_ID(bs):
+def get_auction_ID(data):
+	bs = BeautifulSoup(data, 'html.parser')
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
 	#print(text)
-	auc = get_auction_type(bs)
+	auc = get_auction_type(data)
 	try:
 		if auc == 'Affiliated Auction':
 			result = re.search(r'Nomos (\d|\w)+, ', text)
@@ -117,7 +89,8 @@ def get_auction_ID(bs):
 	except:
 		exit('unable to find auction id')
 
-def get_auction_lot(bs):
+def get_auction_lot(data):
+	bs = BeautifulSoup(data, 'html.parser')
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
 	#print(text)
@@ -131,7 +104,8 @@ def get_auction_lot(bs):
 	except:
 		exit('unable to find lot number')
 
-def get_sale_estimate(bs):
+def get_sale_estimate(data):
+	bs = BeautifulSoup(data, 'html.parser')
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
 	#print(text)
@@ -145,7 +119,8 @@ def get_sale_estimate(bs):
 	except:
 		exit('unable to find sale estimate')
 
-def get_sale_price(bs):
+def get_sale_price(data):
+	bs = BeautifulSoup(data, 'html.parser')
 	text = bs.find('td', attrs={'id':'coin_coinInfo'}).text
 	text = text.replace(u'\xa0', u' ')
 	#print(text)
@@ -159,19 +134,21 @@ def get_sale_price(bs):
 	except:
 		exit('unable to find sale price')
 
-def get_lot_header(bs):
+def get_lot_header(data):
+	bs = BeautifulSoup(data, 'html.parser')
 	header = bs.find('h1', attrs={'id':'coin_hHead'})
 	if header is not None:
 		#print(header)
 		try:
 			# remove commas to print to CSV
-			return header.text.replace(',', '')
+			return header.text.replace(',', '').strip()
 		except TypeError as err:
 			print('bs unable to grab lot header')
 			raise
 	return None
 
-def get_lot_notes(bs):
+def get_lot_notes(data):
+	bs = BeautifulSoup(data, 'html.parser')
 	notes = bs.find('p', attrs={'id':'coin_pNotes'})
 	if notes is not None:
 		#print(notes)
@@ -180,13 +157,14 @@ def get_lot_notes(bs):
 				return None
 			else:
 				# remove commas to print to CSV
-				return notes.text.replace(',', '')
+				return notes.text.replace(',', '').strip()
 		except TypeError as err:
 			print('bs unable to grab lot notes')
 			raise
 	return None
 
-def get_lot_description(bs):
+def get_lot_description(data):
+	bs = BeautifulSoup(data, 'html.parser')
 	div = bs.find('div', attrs={'class':'lot'})
 	#print(div.contents)
 	# remove image link
@@ -216,117 +194,94 @@ def is_nonstandard_lot(text):
 
 if __name__ == '__main__':
 
-	# augustus, denarius, eA
-	#html = get_html('https://cngcoins.com/Search.aspx?PAGE_NUM=200&PAGE=1&TABS_TYPE=2&CONTAINER_TYPE_ID=2&IS_ADVANCED=1&ITEM_DESC=Augustus.+27+BC-AD+14.+AR+Denarius&ITEM_IS_SOLD=1&SEARCH_IN_CONTAINER_TYPE_ID_1=1&SEARCH_IN_CONTAINER_TYPE_ID_3=1&SEARCH_IN_CONTAINER_TYPE_ID_2=1&SEARCH_IN_CONTAINER_TYPE_ID_4=1#')
-	#urls = get_coin_urls(html.text)
+	html = open(sys.argv[1], 'r')
 
-	# augustus, denarius, pA
-	#html = open('/Users/cwillis/GitHub/RomanCoinData/data_raw/CNG/html/Augustus_AR_PA1.html', 'r')
-	#print(html)
-	#urls = get_coin_urls(html)
-
-	html = open(sys.argv[1])
-	#print(html)
-	urls = get_coin_urls(html)
+	page_urls = get_coin_urls(html)
+	print(page_urls)
+	print(len(page_urls))
 
 	# need to understand header here. why NaN?
 	# https://cngcoins.com/Coin.aspx?CoinID=362783
 
-	# # some good examples to get right
-	# import cv2
-	# import matplotlib.pyplot as plt	
-	# urls = ['https://cngcoins.com/Coin.aspx?CoinID=376445', 
-	# 		'https://cngcoins.com/Coin.aspx?CoinID=372920', 
-	# 		'https://cngcoins.com/Coin.aspx?CoinID=387264']
-	# for idx, url in enumerate(urls):
-	# 	webpage = requests.get(url, headers=headers)
-	# 	bs = BeautifulSoup(webpage.text, 'html.parser')
-	# 	x = get_lot_header(bs)
-	# 	print(x)
-	# 	y = get_lot_notes(bs)
-	# 	print(y)
-	# 	z = get_image_url(bs, to_small=True)
-	# 	print(z)
-	# 	arr_img, (img_row, img_col, img_chan) = url_to_array(z, flatten=True, gray=False)
-	# 	print(arr_img.shape, img_row, img_col, img_chan)
-	# 	#for x in arr_img:
-	# 	#	print(x)
-	# 	arr_img2 = arr_img.reshape(img_row, img_col, img_chan) # make sure this is np.uint8 for cv2 load!
-	# 	print(arr_img2.shape)
-	# 	# show image
-	# 	cv2.imshow("resized", arr_img2)
-	# 	cv2.waitKey(0)
-	# 	# convert PIL BGR image to open cv RGB standard
-	# 	im = cv2.cvtColor(arr_img2, cv2.COLOR_BGR2RGB)
-	# 	cv2.imshow("resized", im)
-	# 	cv2.waitKey(0)
-	# quit()
+	#Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot,URL,URL Image
 
-	# build CSV output
-	print('url_page,url_img,Image,Rows,Columns,Channels,Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot')
-	for idx, url in enumerate(urls):
+	lod=[]
+
+	for idx, url in enumerate(page_urls):
 		
-		#if idx>4: continue
-		#print(idx, url)
+		#if idx>3: continue
+		print(idx)
 
-		#html = urlopen(url)
-		webpage = requests.get(url, headers=headers)
-		bs = BeautifulSoup(webpage.text, 'html.parser')
-		#print(bs)
+		# ordered dict to preserve dataframe header order
+		scraped = OrderedDict()
 
-		# grab the url of the coin image
-		img_url = get_image_url(bs, to_small=True)
-		#print(' Image URL: {}'.format(img_url))
+		r = requests.get(url, headers=headers)
+		data = r.text
 
-		# create an image from the url
-		img = url_to_image(img_url, gray=False)
-		#print(' Image: {}'.format(img))
+		# store the URL of the page on which the coin is listed
+		scraped['URL'] = url
+		print(' URL: {}'.format(url))
 
-		# create a flattened array from the image
-		img_arr, (img_row, img_col, img_chan) = image_to_array(img, flatten=True)
-		#print(' Image Array: {}'.format(img_arr))
-
-		# create a string from the flattened array
-		img_str = array_to_string(img_arr)
-		#print(' Image Str: {}'.format(img_str))
-
-		# grab auction type (CS, EA, PS)
-		auction_type = get_auction_type(bs)
-		#print(' Auction Type: {}'.format(auction_type))
+		# grab auction type
+		auction_type = get_auction_type(data)
+		scraped['Auction Type'] = auction_type
+		print(' Auction Type: {}'.format(auction_type))
 
 		# grab auction id (Triton, CNG, etc.)
-		auction_id = get_auction_ID(bs)
-		#print(' Auction ID: {}'.format(auction_id))
+		auction_id = get_auction_ID(data)
+		scraped['Auction ID'] = auction_id
+		print(' Auction ID: {}'.format(auction_id))
 
 		# grab lot number
-		acution_lot = get_auction_lot(bs)
-		#print(' Lot Number: {}'.format(lot))
+		acution_lot = get_auction_lot(data)
+		scraped['Auction Lot'] = acution_lot
+		print(' Auction Lot: {}'.format(acution_lot))
 
 		# grab the sale estimate
-		sale_estimate = get_sale_estimate(bs)
-		#print(' Sale estimate: {}'.format(estimate))
+		sale_estimate = get_sale_estimate(data)
+		scraped['Estimate'] = sale_estimate
+		print(' Estimate: {}'.format(sale_estimate))
 
 		# grab the sale price
-		sale_price = get_sale_price(bs)
-		#print(' Sale price: {}'.format(price))
+		sale_price = get_sale_price(data)
+		scraped['Sold'] = sale_price
+		print(' Sold: {}'.format(sale_price))
 
 		# grab the lot header if present
-		header = get_lot_header(bs)
-		#print(' Lot Header: {}'.format(header))
-
-		# grab the lot notes if present
-		notes = get_lot_notes(bs)
-		#print(' Lot Notes: {}'.format(notes))
+		header = get_lot_header(data)
+		scraped['Header'] = header
+		print(' Header: {}'.format(header))
 
 		# grab the lot description
-		description = get_lot_description(bs)
-		#print(' Description: {}'.format(description))
+		description = get_lot_description(data)
+		scraped['Description'] = description
+		print(' Description: {}'.format(description))
+
+		# grab the lot notes if present
+		notes = get_lot_notes(data)
+		scraped['Notes'] = notes
+		print(' Notes: {}'.format(notes))
 
 		# identify nonstandard lots (i.e. those with a stop word)
 		nonstandard_lot = is_nonstandard_lot(description)
-		#print(' Nonstandard lot: {}'.format(nonstandard_lot))
+		scraped['Nonstandard Lot'] = nonstandard_lot
+		print(' Nonstandard Lot: {}'.format(nonstandard_lot))
 
-		print('{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(url, \
-			img_url, img_str, img_row, img_col, img_chan, auction_type, \
-			auction_id, acution_lot, sale_estimate, sale_price, header, \
-			notes, description, nonstandard_lot))
+		# store the URL of the auction page
+		img_url = get_image_url(data)
+		scraped['Image URL'] = img_url
+		print(' Image URL: {}'.format(img_url))
+
+		# store the image path and save the image of the coin locally
+		img = get_image(img_url)
+		img_path = 'data_scraped/images/'+img_url.split('/')[-1]
+		img.save(img_path)
+		scraped['Image Path'] = img_path
+		print(' Image Path: {}'.format(img_path))
+
+		lod.append(scraped)
+
+	df = pd.DataFrame(lod)
+
+	df.to_csv('data_scraped/text/'+sys.argv[1].split('/')[-1].split('.')[0]+'.csv', index=False)
+
