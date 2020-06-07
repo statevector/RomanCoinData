@@ -2,14 +2,22 @@
 import requests
 import re
 import sys
+import os
+
 import numpy as np
 import pandas as pd
+
 from collections import OrderedDict
 
 from bs4 import BeautifulSoup
 
 from io import BytesIO
 from PIL import Image
+
+# remove whitespace
+#import re
+#pattern = re.compile(r'\s+')
+#sentence = re.sub(pattern, '', sentence)
 
 # eliminate observations that contain the following words
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
@@ -22,7 +30,7 @@ headers = {"User-Agent":
 	"Analyzing Roman coins for a class project. \
 	If problems, please contact me at willisc9@msu.edu"}
 
-def get_coin_urls(html):
+def get_page_urls(html):
 	try:
 		bs = BeautifulSoup(html, 'html.parser')
 		urls = bs.find_all('td', attrs={'align':'center'})
@@ -140,8 +148,10 @@ def get_lot_header(data):
 	if header is not None:
 		#print(header)
 		try:
-			# remove commas to print to CSV
-			return header.text.replace(',', '').strip()
+			# remove commas for print to CSV
+			header = header.text.replace(',', '').strip()
+			# remove whitespace
+			return ' '.join(header.split())
 		except TypeError as err:
 			print('bs unable to grab lot header')
 			raise
@@ -156,8 +166,10 @@ def get_lot_notes(data):
 			if notes.text == ' ':
 				return None
 			else:
-				# remove commas to print to CSV
-				return notes.text.replace(',', '').strip()
+				# remove commas for print to CSV
+				notes = notes.text.replace(',', '').strip()
+				# remove whitespace
+				return ' '.join(notes.split())
 		except TypeError as err:
 			print('bs unable to grab lot notes')
 			raise
@@ -165,46 +177,61 @@ def get_lot_notes(data):
 
 def get_lot_description(data):
 	bs = BeautifulSoup(data, 'html.parser')
-	div = bs.find('div', attrs={'class':'lot'})
-	#print(div.contents)
+	desc = bs.find('div', attrs={'class':'lot'})
+	#print(desc.contents)
 	# remove image link
-	if div.a is not None:
-		div.a.decompose()
+	if desc.a is not None:
+		desc.a.decompose()
 	# remove special title section 
 	# (e.g. "Deified and Rejuvenated Julius Caesar")
-	if div.h1 is not None:
-		div.h1.decompose()
+	if desc.h1 is not None:
+		desc.h1.decompose()
 	# remove table of lot, sale, auction info
-	if div.table is not None:
-		div.table.decompose()
+	if desc.table is not None:
+		desc.table.decompose()
 	# remove special coin notes section
-	if div.p is not None:
-		div.p.decompose()
-	# remove white space
+	if desc.p is not None:
+		desc.p.decompose()
 	try:
-		text = div.text.strip()
+		# remove commas for print to CSV
+		desc = desc.text.replace(',', '').strip()
 	except TypeError as err:
 		print('bs unable to grab lot description')
 		raise
-	# remove commas to print to CSV
-	return text.replace(',', '')
+	# remove whitespace
+	return ' '.join(desc.split())
 
 def is_nonstandard_lot(text):
 	return any(word in text for word in stop_words)
 
+
 if __name__ == '__main__':
 
-	html = open(sys.argv[1], 'r')
+	print(' Script name: {}'.format(sys.argv[0]))
+	print(' Number of arguments: {}'.format(len(sys.argv)))
+	print(' Arguments include: {}'.format(str(sys.argv)))
 
-	page_urls = get_coin_urls(html)
+	if len(sys.argv)!=2: 
+		exit('missing input!')
+
+	# create output directory for scraped text and image files
+	input_file = sys.argv[1]
+	outname = input_file.split('/')[-1].split('.')[0]+'.csv'
+	print(outname)
+	outdir = 'data_scraped/'+input_file.split('/')[-1].split('.')[0]
+	print(outdir)
+	if not os.path.exists(outdir):
+		os.mkdir(outdir)
+	else:
+		exit('directory exists!')
+	fullname = os.path.join(outdir, outname)
+
+	# convert input to html and extract html page links
+	html_page = open(input_file, 'r')
+	page_urls = get_page_urls(html_page)
 	print(page_urls)
 	print(len(page_urls))
-
-	# need to understand header here. why NaN?
-	# https://cngcoins.com/Coin.aspx?CoinID=362783
-
-	#Auction Type,Auction ID,Auction Lot,Estimate,Sold,Header,Notes,Description,Nonstandard Lot,URL,URL Image
-
+	
 	lod=[]
 
 	for idx, url in enumerate(page_urls):
@@ -212,7 +239,7 @@ if __name__ == '__main__':
 		#if idx>3: continue
 		print(idx)
 
-		# ordered dict to preserve dataframe header order
+		# ordered dict to preserve dataframe column order
 		scraped = OrderedDict()
 
 		r = requests.get(url, headers=headers)
@@ -267,21 +294,21 @@ if __name__ == '__main__':
 		scraped['Nonstandard Lot'] = nonstandard_lot
 		print(' Nonstandard Lot: {}'.format(nonstandard_lot))
 
-		# store the URL of the auction page
+		# grab the URL of the image on the auction page
 		img_url = get_image_url(data)
 		scraped['Image URL'] = img_url
 		print(' Image URL: {}'.format(img_url))
 
-		# store the image path and save the image of the coin locally
+		# store the image path and save the image
 		img = get_image(img_url)
-		img_path = 'data_scraped/images/'+img_url.split('/')[-1]
-		img.save(img_path)
+		img_path = outdir+'/'+img_url.split('/')[-1]
 		scraped['Image Path'] = img_path
 		print(' Image Path: {}'.format(img_path))
+		img.save(img_path)
 
 		lod.append(scraped)
 
+	# build and save the dataframe
 	df = pd.DataFrame(lod)
-
-	df.to_csv('data_scraped/text/'+sys.argv[1].split('/')[-1].split('.')[0]+'.csv', index=False)
+	df.to_csv(fullname, index=False)
 
