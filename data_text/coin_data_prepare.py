@@ -12,7 +12,7 @@ emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho',
 			'Vespasian', 'Domitian', 'Trajan', 'Hadrian', 
 			'Antoninus Pius', 'Marcus Aurelius']
 
-denominations = ['Aureus', 'Denarius', 'Sestertius']
+denominations = ['Aureus', 'Denarius', 'Cistophorus', 'Sestertius']
 
 # order matters for search!
 grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 'Nice VF', 
@@ -59,7 +59,6 @@ def get_diameter(text):
 			segment = segment.replace('@', '.')
 			segment = segment.replace('Diameter', '')
 			segment = segment.replace('mm', '')
-			segment = segment.replace('Silver', '') # weird edge case in EA1
 			segment = segment.strip()
 			#print(segment)
 			return float(segment)
@@ -208,9 +207,9 @@ def get_comments(text):
 if __name__ == '__main__':
 
 	# make corrections to cleaned files, and re-run here to pick them up and put them into the "Augustus_prepared.csv" file
-	files = list_csv_files('/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/')
-	df = pd.concat([pd.read_csv(f) for f in files]) 
-	print(df.info())
+	#files = list_csv_files('/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/')
+	#df = pd.concat([pd.read_csv(f) for f in files]) 
+	#print(df.info())
 
 	# E-Auction
 	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv'
@@ -227,6 +226,44 @@ if __name__ == '__main__':
 
 	#df = pd.read_csv(file)
 	#print(df.info())
+
+	# this is the right way to do it, but it will take time to validate and catch edge cases
+	# fields = ['Emperor', 'Reign', 'Denomination', 'Mint-Moneyer', 'Struck', 'Imagery', 'RIC', 'Grade-Comments-Other']
+	# for idx, field in enumerate(fields):
+	# 	q = df['Description'].apply(lambda x: x.split('. ')[idx])
+	# 	print(q)
+
+	# lof = []
+	# for desc in df['Description']:
+	# 	fields = desc.split('. ')
+	# 	woah = OrderedDict()
+	# 	for field, item in zip(fields, field_map):
+	# 		# if any(emp in field for emp in emps)
+	# 		# 	woah['Emperor'] = emp
+	# 		# if re.match(r'\d+ BC-AD \d+', field):
+	# 		# 	woah['Reign'] = reign
+	# 		# if 'mint' in field:
+	# 		# 	woah['Mint'] = field
+	# 		# if any(denom in field for denom in denoms)
+	# 		# 	woah['Denomination'] = denom
+	# 		woah[item] = field
+	# 	lof.append(woah)
+	# df2 = pd.DataFrame(lof)
+
+	print(' Script name: {}'.format(sys.argv[0]))
+	print(' Number of arguments: {}'.format(len(sys.argv)))
+	print(' Arguments include: {}'.format(str(sys.argv)))
+
+	if len(sys.argv)!=2: 
+		exit('missing input!')
+
+	input_file = sys.argv[1]
+	outname = input_file.split('/')[1]+'_prepared.csv'
+	outdir = 'data_scraped/'+input_file.split('/')[1]
+	fullname = os.path.join(outdir, outname)
+
+	df = pd.read_csv(input_file)
+	print(df.info())
 
 	# remove entries tagged as non-standard
 	df = df[~df['Nonstandard Lot']]
@@ -250,7 +287,7 @@ if __name__ == '__main__':
 	df['Hour'] = df['Description'].apply(lambda x: get_hour(x))
 	print(df.info())
 
-	df['MCase'] = df['Description'].apply(lambda x: get_mcase(x)) # debug
+	df['MCase'] = df['Description'].apply(lambda x: get_mcase(x)) # for debug
 	print(df.info())
 
 	df['Mint'] = df['Description'].apply(lambda x: get_mint(x))
@@ -275,13 +312,19 @@ if __name__ == '__main__':
 	df['Comments'] = df['Description'].apply(lambda x: get_comments(x))
 	print(df.info())
 
+
 	print(df)
 
 	# finally remove the 'Description' column!
 	df.drop(['Description'], inplace=True, axis=1)
 
 	# write output
-	file = 'Augustus'
-	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared'
-	output = file.split('/')[-1].split('.')[0]+'_prepared.csv'
-	df.to_csv(directory+'/'+output, index=False)
+	#file = 'Augustus'
+	#directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared'
+	#output = file.split('/')[-1].split('.')[0]+'_prepared.csv'
+	#df.to_csv(directory+'/'+output, index=False)
+
+	print(df)
+
+	# build and save the dataframe
+	df.to_csv(fullname, index=False)

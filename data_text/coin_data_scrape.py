@@ -19,6 +19,9 @@ from PIL import Image
 #pattern = re.compile(r'\s+')
 #sentence = re.sub(pattern, '', sentence)
 
+#def get_positions(x, character):
+#	return [pos for (pos, char) in enumerate(x) if char == character]
+
 # eliminate observations that contain the following words
 stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
 			  'Brockage', 'brockage', 'Official Dies', 'Forgery', 
