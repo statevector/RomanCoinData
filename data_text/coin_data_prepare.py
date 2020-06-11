@@ -7,6 +7,7 @@ import pandas as pd
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
+pd.set_option('display.max_colwidth', -1)
 
 emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho', 
 			'Vespasian', 'Domitian', 'Trajan', 'Hadrian', 
@@ -16,11 +17,7 @@ denominations = ['Aureus', 'Denarius', 'Cistophorus', 'Sestertius']
 
 # order matters for search!
 grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 'Nice VF', 
-		  'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 'Fine']
-
-def list_csv_files(path):
-	return [path+'/'+f for f in os.listdir(path) 
-		if f.split('.')[-1]=='csv']
+		'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 'Fine']
 
 # the general function
 # def get_keyword(text, keyword):
@@ -33,26 +30,29 @@ def get_emperor(text):
 	for emperor in emperors:
 		if emperor in text:
 			return emperor
-	return None
+	raise Exception('Emperor not found in {}'.format(text))
 
-# this needs to be expanded
 def get_reign(text):
+	#print(text)
 	for segment in text.split('.'):
 		if 'BC-AD' in segment:
 			return segment
-	return None
+		#else if 'AD' in segment: # <--- i.e. post Augustus
+		#	return segment
+	raise Exception('Reign not found in {}'.format(text))
 
 def get_denomination(text):
+	#print(text)
 	for denomination in denominations:
 		if denomination in text:
 			return denomination
-	return None
+	raise Exception('Denomination not found in {}'.format(text))
 
 def get_diameter(text):
 	#print(text)
 	for segment in text.split('.'):
 		#print(segment)
-		if 'Unlisted Diameter' in segment:
+		if 'unlisted Diameter' in segment:
 			return None
 		if 'Diameter' in segment:
 			#print(segment)
@@ -62,13 +62,13 @@ def get_diameter(text):
 			segment = segment.strip()
 			#print(segment)
 			return float(segment)
-	return None
+	raise Exception('Diameter keyword not found in {}'.format(text))
 
 def get_weight(text):
 	#print(text)
 	for segment in text.split('.'):
 		#print(segment)
-		if 'Unlisted Weight' in segment:
+		if 'unlisted Weight' in segment:
 			return None
 		if 'Weight' in segment:
 			#print(segment)
@@ -78,13 +78,13 @@ def get_weight(text):
 			segment = segment.strip()
 			#print(segment)
 			return float(segment)
-	return None
+	raise Exception('Weight keyword not found in {}'.format(text))
 
 def get_hour(text):
 	#print(text)
 	for segment in text.split('.'):
 		#print(segment)
-		if 'Unlisted Hour' in segment:
+		if 'unlisted Hour' in segment:
 			return None
 		if 'Hour' in segment:
 			#print(segment)
@@ -94,27 +94,43 @@ def get_hour(text):
 			segment = segment.strip()
 			#print(segment)
 			return int(segment)
-	return None
+	raise Exception('Hour keyword not found in {}'.format(text))
 
-def get_mcase(text):
-	for segment in text.split('.'):
-		if 'Measurement Case' in segment:
-			return segment
-	return None
+# def get_mcase(text):
+# 	for segment in text.split('.'):
+# 		if 'Measurement Case' in segment:
+# 			return segment
+# 	return None
 
 def get_mint(text):
+	#print(text)
 	for segment in text.split('.'):
+		#print(segment)
+		if 'unlisted Mint' in segment:
+			return None
 		if 'mint' in segment:
 			return segment
-	return None
+	raise Exception('Mint not found in {}'.format(text))
 
 def get_strike_date(text):
+	#print(text)
 	for segment in text.split('.'):
-		if 'Struck Unlisted' in segment:
+		#print(segment)
+		if 'unlisted Struck' in segment:
 			return None
 		if 'Struck' in segment:
 				return segment
-	return None
+	raise Exception('Strike Date not found in {}'.format(text))
+
+def get_moneyer(text):
+	#print(text)
+	for segment in text.split('.'):
+		#print(segment)
+		if 'unlisted moneyer' in segment:
+			return None
+		if 'moneyer' in segment:
+				return segment
+	raise Exception('Moneyer not found in {}'.format(text))
 
 def get_RIC_number(text):
 	# match pattern 'RIC I/II/III 0-9/00-99/000-999'
@@ -137,20 +153,20 @@ def get_RIC_number(text):
 	result = re.search(r'RIC', text) 
 	if result is not None:
 		return result.group(0)
-	return None
+	raise Exception('RIC number not found in {}'.format(text))
 
-# Assume for now longest segment between 'Struck' 
-# and 'RIC' fields contains the coin imagery
 def get_imagery(text, verbose=True):
 	lower = text.find('Struck')
 	upper = text.find('RIC')
 	if upper<0:
 		upper = text.find('BMCRE') # backup
+	# isolate text
 	if lower>0 and upper>0:
 		text = text[lower:upper]
 	else:
-		return None
-	# identify longest segment
+		raise Exception('Unable to isolate \'imagery\' field in {}'.format(text))
+	# assume the longest segment between 'Struck' and 'RIC' 
+	# fields contains the coin imagery content
 	segments = text.split('.')
 	length = 0
 	imagery = None
@@ -161,22 +177,17 @@ def get_imagery(text, verbose=True):
 	return imagery
 
 def get_grade(text):
+	#print(text)
 	segments = text.split('.')
 	# iterate in reverse since we know the grade 
 	# information resides in the last sentence;
 	# we dont want false positives (e.g. 'fine portrait')
 	for segment in reversed(segments):
+		#print(segment)
 		for grade in grades:
 			if grade in segment:
 				return grade
-	return None
-
-# condidate descriptions where necessary
-def consolidate_descriptors(text):
-	text = text.replace('scarse', 'rare')
-	# maybe combine these?
-	#'golden' in text or 'rose' in text or 'blue' in text or 'rainbow' in text:
-	return text
+	raise Exception('Grade not found in {}'.format(text))
 
 def get_comments(text):
 	# isolate the comments section. We know it
@@ -205,27 +216,6 @@ def get_comments(text):
 	return comments
 
 if __name__ == '__main__':
-
-	# make corrections to cleaned files, and re-run here to pick them up and put them into the "Augustus_prepared.csv" file
-	#files = list_csv_files('/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/')
-	#df = pd.concat([pd.read_csv(f) for f in files]) 
-	#print(df.info())
-
-	# E-Auction
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA1_cleaned.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA2_cleaned.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA3_cleaned.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_EA4_cleaned.csv'
-	# Printed Auction
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA1_cleaned.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA2_cleaned.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AR_PA3_cleaned.csv'
-	# Aureus
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AV_EA_cleaned.csv'
-	#file = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_cleaned/Augustus_AV_PA_cleaned.csv'
-
-	#df = pd.read_csv(file)
-	#print(df.info())
 
 	# this is the right way to do it, but it will take time to validate and catch edge cases
 	# fields = ['Emperor', 'Reign', 'Denomination', 'Mint-Moneyer', 'Struck', 'Imagery', 'RIC', 'Grade-Comments-Other']
@@ -263,68 +253,59 @@ if __name__ == '__main__':
 	fullname = os.path.join(outdir, outname)
 
 	df = pd.read_csv(input_file)
-	print(df.info())
-
-	# remove entries tagged as non-standard
-	df = df[~df['Nonstandard Lot']]
-	print(df.info())
+	#print(df.info())
 	
 	df['Emperor'] = df['Description'].apply(lambda x: get_emperor(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Reign'] = df['Description'].apply(lambda x: get_reign(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Denomination'] = df['Description'].apply(lambda x: get_denomination(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Diameter'] = df['Description'].apply(lambda x: get_diameter(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Weight'] = df['Description'].apply(lambda x: get_weight(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Hour'] = df['Description'].apply(lambda x: get_hour(x))
-	print(df.info())
+	#print(df.info())
 
-	df['MCase'] = df['Description'].apply(lambda x: get_mcase(x)) # for debug
-	print(df.info())
+	#df['MCase'] = df['Description'].apply(lambda x: get_mcase(x)) # for debug
+	#print(df.info())
 
 	df['Mint'] = df['Description'].apply(lambda x: get_mint(x))
-	print(df.info())
-
-	#df['Moneyer'] = df['Description'].apply(lambda x: get_moneyer(x))
 	#print(df.info())
- 	#mescinius rufus: moneyer
+
+	df['Moneyer'] = df['Description'].apply(lambda x: get_moneyer(x))
+	#print(df.info())
 
 	df['Struck'] = df['Description'].apply(lambda x: get_strike_date(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Imagery'] = df['Description'].apply(lambda x: get_imagery(x))
-	print(df.info())
+	#print(df.info())
 
 	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Grade'] = df['Description'].apply(lambda x: get_grade(x))
-	print(df.info())
+	#print(df.info())
 
 	df['Comments'] = df['Description'].apply(lambda x: get_comments(x))
-	print(df.info())
+	#print(df.info())
 
-
-	print(df)
+	# woah!!!
+	#df['Inscription'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
+	# select only the imagery
+	#df['Imagery'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.islower()]))                                                          
+	# try splitting on '/' to get obverse and reverse segmentation
 
 	# finally remove the 'Description' column!
 	df.drop(['Description'], inplace=True, axis=1)
-
-	# write output
-	#file = 'Augustus'
-	#directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared'
-	#output = file.split('/')[-1].split('.')[0]+'_prepared.csv'
-	#df.to_csv(directory+'/'+output, index=False)
-
-	print(df)
+	print(df.info())
 
 	# build and save the dataframe
 	df.to_csv(fullname, index=False)

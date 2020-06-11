@@ -4,8 +4,9 @@ import os
 import pandas as pd
 import numpy as np
 
-#pd.options.display.max_rows = 999
-#pd.set_option('display.max_colwidth', -1)
+pd.options.display.max_rows = 999
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_colwidth', -1)
 
 # convert all dash types (hyphen, en-, em-, minus, others?) to a
 # common dash to simplify analysis later
@@ -23,22 +24,6 @@ import numpy as np
 # 	text = text.replace(u'\u2212', u'-') # minus sign
 # 	return text
 
-# # identify textual inconsistencies
-# def format_spaces(text, verbose=False):
-# 	# double space
-# 	result = re.search(r'  ', text)
-# 	if result is not None:
-# 		if(verbose): print('double space:\n{}'.format(text))
-# 		text = re.sub(r'  ', r' ', text)
-# 		if(verbose): print('double space:\n{}'.format(text))
-# 	# space followed by period
-# 	result = re.search(r' \.', text)
-# 	if result is not None:
-# 		if(verbose): print('space followed by period:\n{}'.format(text))
-# 		text = re.sub(r' \.', r'.', text)
-# 		if(verbose): print('space followed by period:\n{}'.format(text))
-# 	return text
-
 def format_abbreviations(text):
 	text = re.sub(r'var\.', 'variation', text)
 	text = re.sub(r'cf\.', 'confer', text)
@@ -50,6 +35,7 @@ def format_abbreviations(text):
 	text = re.sub(r'corr\. ', 'correction ', text)
 	text = re.sub(r'pl\.', 'proof like ', text)
 	# moneyer praenomen
+	text = re.sub(r' C\.', ' C', text) # space to avoid BC.
 	text = re.sub(r'L\.', 'L', text)
 	text = re.sub(r'M\.', 'M', text)
 	text = re.sub(r'P\.', 'P', text)
@@ -65,7 +51,6 @@ def format_measurements(text, verbose=False):
 	text = re.sub(r'AR Denarius', 'AR Denarius.', text)
 	text = re.sub(r'AR Cistophorus', 'AR Cistophorus.', text)
 	text = re.sub(r'Æ Sestertius', 'Æ Sestertius.', text)
-	# <--- other denomination here!
 	if verbose:
 		print(text)
 	# scan text for the following regex patterns
@@ -75,7 +60,7 @@ def format_measurements(text, verbose=False):
 		r'\(.+mm\)\.',            # case 3: missing 'g' and 'h' (no end space)
 		r'\(.+[g|gm].+h\)\.',     # case 4: missing 'mm' only
 		r'\(.+mm \)\.',           # case 5: missing 'g' and 'h' (with ending space)
-		r'\(.+[g|gm]\)\.'         # case 6: missing 'mm' and 'h'
+		r'\(.+[g|gm]\)\.',        # case 6: missing 'mm' and 'h'
 	]
 	for case, pattern in enumerate(patterns):
 		if verbose:
@@ -116,12 +101,18 @@ def format_measurements(text, verbose=False):
 			if case==0:
 				pass
 			if case==1:
-				result.insert(2, 'Unlisted')
+				result.insert(2, 'unlisted')
 			if case==2:
-				result.insert(1, 'Unlisted')
-				result.insert(2, 'Unlisted')
+				result.insert(1, 'unlisted')
+				result.insert(2, 'unlisted')
 			if case==3:
-				result.insert(0, 'Unlisted')
+				result.insert(0, 'unlisted')
+			if case==4:
+				result.insert(1, 'unlisted')
+				result.insert(2, 'unlisted')
+			if case==5:
+				result.insert(0, 'unlisted')
+				result.insert(2, 'unlisted')
 			if verbose:
 				print(result)
 			# build the formatted measurement string
@@ -139,84 +130,10 @@ def format_measurements(text, verbose=False):
 			return text
 	raise Exception('No regex match. Unable to format measurements for {}'.format(text))
 
-
-
-
-	# try:
-	# 	# case 1: complete string
-	# 	regex = r'\(.+mm.+g.+h\)'
-	# 	result = re.search(regex, text)
-	# 	if result is not None:
-	# 		# format diameter, weight, orientation info
-	# 		result = standardize_measurements(result.group(0))
-	# 		words = ['Diameter', 'Weight', 'Hour']
-	# 		result = strip_measurements(result, words)
-	# 		result = result + ' Measurement Case 1'
-	# 		# substitute this reformatted info into the original text
-	# 		text = re.sub(regex, result, text)
-	# 		return text
-
-	# 	# case 2: missing 'h' only
-	# 	regex = r'\(.+mm.+g\)'
-	# 	result = re.search(regex, text)
-	# 	if result is not None:
-	# 		# format diameter, weight, orientation info
-	# 		result = standardize_measurements(result.group(0))
-	# 		words = ['Diameter', 'Weight']
-	# 		result = strip_measurements(result, words)
-	# 		result = result + ' Unlisted Hour.'
-	# 		result = result + ' Measurement Case 2'
-	# 		# substitute this reformatted info into the original text
-	# 		text = re.sub(regex, result, text)
-	# 		return text
-	# 	# case 3: missing 'g' and 'h' (no end space)
-	# 	regex = r'\(.+mm\)'
-	# 	result = re.search(regex, text)
-	# 	if result is not None:
-	# 		# format diameter, weight, orientation info
-	# 		result = standardize_measurements(result.group(0))
-	# 		words = ['Diameter']
-	# 		result = strip_measurements(result, words)
-	# 		result = result + ' Unlisted Weight. Unlisted Hour.'
-	# 		result = result + ' Measurement Case 3'
-	# 		# substitute this reformatted info into the original text
-	# 		text = re.sub(regex, result, text)
-	# 		return text
-	# 	# case 4: missing 'mm' only
-	# 	regex = r'\(.+g.+h\)'
-	# 	result = re.search(regex, text)
-	# 	if result is not None:
-	# 		# format diameter, weight, orientation info
-	# 		result = standardize_measurements(result.group(0))
-	# 		words = ['Weight', 'Hour']
-	# 		result = strip_measurements(result, words)
-	# 		result = 'Unlisted Diameter. ' + result
-	# 		result = result + ' Measurement Case 4'
-	# 		# substitute this reformatted info into the original text
-	# 		text = re.sub(regex, result, text)
-	# 		return text
-	# 	# case 5: missing 'g' and 'h' (with ending space)
-	# 	regex = r'\(.+mm \)'
-	# 	result = re.search(regex, text)
-	# 	if result is not None:
-	# 		result = result.group(0)
-	# 		result = result.replace('mm ', 'mm')
-	# 		# format diameter, weight, orientation info
-	# 		result = standardize_measurements(result)
-	# 		words = ['Diameter']
-	# 		result = strip_measurements(result, words)
-	# 		result = result + ' Unlisted Weight. Unlisted Hour.'
-	# 		result = result + ' Measurement Case 5'
-	# 		# substitute this reformatted info into the original text
-	# 		text = re.sub(regex, result, text)
-	# 		return text
-	# 	raise TypeError()
-	# except:
-	# 	exit('unable to format measurements for {}'.format(text))
-
-
-
-
+def format_mint(text):
+	# mint with semicolon indicates proceeding moneyer
+	text = re.sub(r'mint\;', 'mint.', text)
+	return text
 
 
 # impute 'Stuck' keyword if missing (goes after 'mint')
@@ -298,26 +215,81 @@ if __name__ == '__main__':
 	df = df[~df['Nonstandard Lot']]
 	print(df.shape)
 	
-	# remove Affiliated Auctions based on auction type
+	# remove additional non-standard cases
+	# ====================================
+
+	# remove forgeries
+	df = df[~df['Description'].str.contains(r'forger')]
+
+	# remove 'Affiliated Auctions' based on auction type
 	df = df[~df['Auction Type'].str.contains(r'Affiliated Auction')]
 	print(df.shape)
 
-	# remove Affiliated Auctions based on keyword
+	# remove 'Affiliated Auctions' based on keyword
 	df = df[~df['Description'].str.contains(r'\(Silver')]
 	print(df.shape)
 	df = df[~df['Description'].str.contains(r'\(Gold')]
 	print(df.shape)
 
-	# clean and standardize the 'Description' field for subsequent feature engineering
+	# remove any As denomination that snuck in
+	df = df[~df['Description'].str.contains(r'AE As')]
+	print(df.shape)
 
-	# correct hyphenations
+	# *I think* these are provincial coins
+	# df = df[~df['Description'].str.contains(r'ZEUGITANA')]
+	#df = df[~df['Description'].str.contains(r'BYZACIUM')]
+	#df = df[~df['Description'].str.contains(r'SPAIN Gades')]
+	# df = df[~df['Description'].str.contains(r'THESSALY')]
+	#df = df[~df['Description'].str.contains(r'LYCIAN LEAGUE')]
+	# df = df[~df['Description'].str.contains(r'NUMIDIA')]
+	# df = df[~df['Description'].str.contains(r'SELEUCIS')]
+	# print(df.shape)
+
+	# as far as I can tell these are non-standard (provincial?) sestertii
+	df = df[~df['Description'].str.contains(r'Æ \"Sestertius\"')]
+	df = df[~df['Description'].str.contains(r'Æ \“Sestertius\”')]
+	print(df.shape)
+	# ... as are these
+	df = df[~df['Description'].str.contains(r'Dupondius\?')]
+	df = df[~df['Description'].str.contains(r'Sestertius\?')]
+	df = df[~df['Description'].str.contains(r'Tetrassarion')]
+	print(df.shape)
+
+	# no RIC number present? Only to isolate good Sestertii
+	df = df[df['Description'].str.contains(r'RIC ')]
+	print(df.shape)
+
+	# correct edge cases 
+	# ==================
+
+	# Augustus_Aur_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'BC- AD', 'BC-AD', x))
-	
-	# consolidate Rare keyword with comments section so we don't have to mark everything as not rare
-	#df['Description'] = df['Description'].apply(lambda x: re.sub(r'\. Rare\.', ' Rare.', x))
-	
-	# replace 'Fair' with 'Fine' for consistent grading
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Fair', 'Fine', x))
+	# Augustus_Aur_PA1.csv
+	# <--- okay
+	# Augustus_Den_EA1.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Augustus\. Silver', 'Augustus. 27 BC-AD 14. AR Denarius', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'175mm', '17.5mm', x))
+	# Augustus_Den_EA2.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'6nh', '6h', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Nice VF', 'Good VF', x))
+	# Augustus_Den_EA3.csv 
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'379 g', '3.79 g', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'230mm', '20mm', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(9mm', '(9mm', x))
+	# Augustus_Den_EA4.csv
+	# <--- okay
+	# Augustus_Den_PA1.csv
+	# <--- okay
+	# Augustus_Den_PA2.csv
+	# <--- okay
+	# Augustus_Den_PA3.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'3/91', '3.91', x))
+	# Augustus_Ses_EA1.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x))
+
+	# clean and standardize the Description field
+	# ====================================
 
 	#df['Description'] = df['Description'].apply(lambda x: format_dashes(x))
 	#print(df.info())
@@ -331,6 +303,9 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: format_measurements(x))
 	#print(df.info())
 
+	df['Description'] = df['Description'].apply(lambda x: format_mint(x))
+	#print(df.info())
+
 	df['Description'] = df['Description'].apply(lambda x: impute_strike(x))
 	#print(df.info())
 
@@ -340,7 +315,6 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: impute_moneyer(x))
 	#print(df.info())
 
-	print(df.shape)
 	print(df.info())
 
 	# build and save the dataframe
