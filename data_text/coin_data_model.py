@@ -15,7 +15,73 @@ from sklearn.ensemble import RandomForestRegressor
 #from sklearn.metrics import mean_squared_error
 
 pd.options.display.max_rows = 999
-pd.options.display.max_colwidth = 185
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_colwidth', -1)
+
+# def format_mint(text):
+# 	# account for when moneyer is present
+# 	text = re.sub(r'mint;', 'mint.', text)
+# 	# moneyer typo (no punctuation following Rome)
+# 	text = re.sub(r'Rome mint ', 'Rome mint. ', text) # Augustus PA1
+# 	# Rome
+# 	text = re.sub(r'Italian \(Rome\?\) mint', 
+# 		'Italian mint (Rome?)', text) # Augustus EA3
+# 	# Emerita (Mérida)
+# 	text = re.sub(r'Emerita mint\.', 
+# 		'Spanish mint (Emerita).', text)
+# 	text = re.sub(r'Emerita mint', 
+# 		'Spanish mint (Emerita)', text)
+# 	text = re.sub(r'Spanish mint - Emerita', 
+# 		'Spanish mint (Emerita)', text) # Augustus EA4
+# 	text = re.sub(r'Emerita \(Mérida\) mint\(\?\)', 
+# 		'Spanish mint (Emerita?)', text) # Augustus PA1
+# 	text = re.sub(r'Emerita \(Mérida\) mint', 
+# 		'Spanish mint (Emerita)', text) # Augustus PA1
+# 	text = re.sub(r'Spanish mint Emerita \(Mérida\)\(\?\)', 
+# 		'Spanish mint (Emerita?)', text) # Augustus PA1
+# 	text = re.sub(r'Spanish mint \(Emerita\)\(\?\)', 
+# 		'Spanish mint (Emerita?)', text) # Augustus PA1
+# 	# Colonia Patricia
+# 	text = re.sub(r'Spanish mint possibly Colonia Patricia', 
+# 		'Spanish mint (Colonia Patricia?)', text) # Augustus EA1
+# 	text = re.sub(r'Spanish mint II \(Colonia Patricia\?\)', 
+# 		'Spanish mint (Colonia Patricia?)', text) # Augustus EA3
+# 	text = re.sub(r'Spanish \(Colonia Patricia\?\) mint', 
+# 		'Spanish mint (Colonia Patricia?)', text) # Augustus EA3
+# 	text = re.sub(r'Uncertain Spanish mint \(Colonia Patricia\?\)', 
+# 		'Spanish mint (Colonia Patricia?)', text)
+# 	text = re.sub(r'Colonia Patricia\(\?\) mint', 
+# 		'Spanish mint (Colonia Patricia?)', text)
+# 	text = re.sub(r'Colonia Patricia mint', 
+# 		'Spanish mint (Colonia Patricia)', text) # Augustus EA4
+# 	# Colonia Caesaraugusta
+# 	text = re.sub(r'Uncertain Spanish mint \(Colonia Caesaraugusta\?\)', 
+# 		'Spanish mint (Colonia Caesaraugusta?)', text)
+# 	text = re.sub(r'Spanish \(Colonia Caesaraugusta\?\) mint', 
+# 		'Spanish mint (Colonia Caesaraugusta?)', text) # Augustus EA3
+# 	text = re.sub(r'Spanish mint \(Caesaraugusta\?\)', 
+# 		'Spanish mint (Colonia Caesaraugusta?)', text) # Augustus EA4
+# 	text = re.sub(r'Caesaraugusta mint', 
+# 		'Spanish mint (Colonia Caesaraugusta)', text) # Augustus EA4
+# 	text = re.sub(r'Spanish mint \(Colonia Caesaraugusta\?\)', 
+# 		'Spanish mint (Colonia Caesaraugusta?)', text) # Augustus EA4
+# 	text = re.sub(r'Spanish mint \(Caesaraugusta\?\)', 
+# 		'Spanish mint (Colonia Caesaraugusta?)', text) # Augustus EA4
+# 	# Tarraco
+# 	text = re.sub(r'Spanish mint - Tarraco', 
+# 		'Spanish mint (Tarraco)', text) # Augustus EA4
+# 	text = re.sub(r'Tarraco\(\?\) mint', 
+# 		'Spanish mint (Tarraco?)', text) # Augustus EA4
+# 	text = re.sub(r'Tarraco mint', 
+# 		'Spanish mint (Tarraco)', text) # Augustus PA1
+# 	# Lugdunum (Lyon) mint
+# 	text = re.sub(r'Lugdunum mint', 
+# 		'Gallic mint (Lugdunum)', text) # Augustus EA3
+# 	text = re.sub(r'Lugdunum \(Lyons\) mint', 
+# 		'Gallic mint (Lugdunum)', text) # Augustus EA4
+# 	text = re.sub(r'Lugdunum \(Lyon\) mint', 
+# 		'Gallic mint (Lugdunum)', text) # Augustus PA1
+# 	return text
 
 def count_unique_words(series):
 	word_list = series.apply(lambda x: pd.value_counts(x.split(' '))).sum(axis = 0)
@@ -109,13 +175,13 @@ def stem_imagery(text):
 	text = text.replace('CAES', 'caesar')
 	text = text.replace('AVGVS', 'augustus')
 	text = text.replace('AVGVST', 'augustus')
-	text = text.replace('containing', 'entwine')
-	text = text.replace('consisting', 'entwine')
-	text = text.replace('held', 'entwine')
-	text = text.replace('implements', 'entwine')
-	text = text.replace('slightly', 'entwine')
-	text = text.replace('placed', 'entwine')
-	text = text.replace('arched', 'entwine')
+	text = text.replace('containing', 'contain')
+	text = text.replace('consisting', 'consist')
+	text = text.replace('held', 'hold')
+	text = text.replace('implements', 'implement')
+	text = text.replace('slightly', 'slight')
+	text = text.replace('placed', 'place')
+	text = text.replace('arched', 'arch')
 	text = text.replace('ARMENIA', 'armenia')
 	text = text.replace('MAR', 'mars')
 	text = text.replace('CΛESΛRES', 'caesares')
@@ -291,7 +357,6 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-	pd.options.display.max_rows = 999
 
 	# min/max df tests
 	# cv = CountVectorizer(min_df=2, max_df=1.0, lowercase=True) 
@@ -304,9 +369,36 @@ if __name__ == '__main__':
 	# print(X.toarray())
 	# print(cv.stop_words_)
 
-	data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/Augustus_prepared.csv')
+	# #old data
+	data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
+	#data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_AR_EA1_cleaned_prepared.csv')
 	#data = pd.read_csv('old/xxx3.csv')
+	print(data.iloc[1239])
+	print(data.iloc[1114])
+	data = data.drop([1239, 1114], axis=0)
+	data = data[data['Denomination']=='Denarius']
+	data = data[data['Auction Type']=='Electronic Auction']
+	data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
 	data.info()
+	
+	# # new data
+	# import glob
+	# files = glob.glob("data_scraped/*/*prepared.csv")
+	# files = [
+	# 'data_scraped/Augustus_Den_EA1/Augustus_Den_EA1_prepared.csv',
+	# 'data_scraped/Augustus_Den_EA2/Augustus_Den_EA2_prepared.csv',
+	# 'data_scraped/Augustus_Den_EA3/Augustus_Den_EA3_prepared.csv',
+	# 'data_scraped/Augustus_Den_EA4/Augustus_Den_EA4_prepared.csv',
+	# ]
+	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	# data = data[~data['Denomination'].str.contains(r'Aureus')]
+	# print(data.shape)
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# data = data.drop(range(0,9), axis=0)
+	# print(data.shape)
+	# data.info()
 
 	# save this for later
 	data_nlp = data.copy(deep=True)
@@ -316,6 +408,7 @@ if __name__ == '__main__':
 	data.drop(['Auction Type'], axis=1, inplace=True)
 
 	# one hot encode 'Auction ID'
+	data['Auction ID'] = data['Auction ID'].apply(str)
 	data['is_Triton'] = data['Auction ID'].map(lambda x: True if 'Triton' in x else False)
 	data.drop(['Auction ID'], axis=1, inplace=True)
 
@@ -371,7 +464,10 @@ if __name__ == '__main__':
 	#data.drop(['Hour'], axis=1, inplace=True)
 
 	# non predictive
-	data.drop(['MCase'], axis=1, inplace=True)
+	try:
+		data.drop(['MCase'], axis=1, inplace=True)
+	except:
+		print('no good')
 
 	# one hot encode 'Mint'
 	#data.groupby('Mint').filter(lambda x: len(x)>10)
@@ -633,6 +729,19 @@ if __name__ == '__main__':
 
 	data.drop(columns=['Comments'], axis=1, inplace=True)
 	data.drop(columns=['Imagery'], axis=1, inplace=True)
+
+	try:
+		data.drop(['URL','Header','Notes','Image URL','Image Path','Moneyer'], 
+			axis=1, inplace=True)
+	except:
+		print('no url, etc to drop')
+
+	try:
+		data.drop(['Description'], 
+			axis=1, inplace=True)
+	except:
+		print('no desc to drop')
+
 	data.info()
 
 	Xb = data.values
@@ -673,14 +782,14 @@ if __name__ == '__main__':
 	#X = scaler.fit_transform(X)
 	#print(X)
 
-
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
 
 	scaler = StandardScaler()
 	X_train = scaler.fit_transform(X_train)
 	X_test = scaler.transform(X_test)
 
-	alphas = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10, 50, 1e2, 5e2, 1e3, 5e3, 1e4, 5e4, 1e5]
+	#alphas = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10, 50, 1e2, 5e2, 1e3, 5e3, 1e4, 5e4, 1e5]
+	alphas = [1]
 	for alpha in alphas:
 		est = Ridge(alpha=alpha)
 		cv_score = cross_val_score(est, X_train, y_train, cv=10, scoring='r2')
