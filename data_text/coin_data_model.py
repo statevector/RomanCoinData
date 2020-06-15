@@ -3,12 +3,14 @@ import numpy as np
 import pandas as pd
 
 from sklearn import base
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.linear_model import Ridge, Lasso
 from sklearn.feature_extraction.text import HashingVectorizer, CountVectorizer, TfidfVectorizer
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import cross_val_score, train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.neural_network import MLPRegressor
+#from sklearn.utils import shuffle
 
 #from sklearn.utils import shuffle
 #from sklearn.model_selection import train_test_split
@@ -352,52 +354,17 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 			X_trans.append(row)
 		return X_trans
 
-
+def keyword_check(words, keywords):
+    for word in words.split():
+        if word in keywords:
+            return True
+    return False
 
 
 if __name__ == '__main__':
 
 	# #old data
 	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# data = data[~data.duplicated()]
-	# data.info()
-
-	# #old data (AUREUS EA ONLY)
-	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	# print(data.iloc[1227])
-	# print(data.iloc[526])
-	# data = data.drop([1227, 526], axis=0)
-	# data = data[data['Denomination']=='Aureus']
-	# data = data[data['Auction Type']=='Electronic Auction']
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# # data.info()
-
-	# #old data (AUREUS PA ONLY)
-	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	# data = data.drop([954, 963, 1055], axis=0)
-	# data = data[data['Denomination']=='Aureus']
-	# data = data[data['Auction Type']=='Feature Auction']
-	# #data = data[~data.duplicated()]
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# # data.info()
-
-	# #old data (DENARIUS EA ONLY)
-	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	# print(data.iloc[1239])
-	# print(data.iloc[1114])
-	# data = data.drop([1239, 1114], axis=0)
-	# data = data[data['Denomination']=='Denarius']
-	# data = data[data['Auction Type']=='Electronic Auction']
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# # data.info()
-
-	# #old data (DENARIUS PA ONLY)
-	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	# data = data.drop([1001, 1000, 999, 1054], axis=0)
-	# data = data[data['Denomination']=='Denarius']
-	# data = data[data['Auction Type']=='Feature Auction']
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
 	# data.info()
 
 	# #old data (TOTAL)
@@ -411,108 +378,30 @@ if __name__ == '__main__':
 	# data.info()
 	# print(data.shape)
 
-
-
-	# # new data
-	# import glob
-	# files = glob.glob("data_scraped/*/*prepared.csv")
-	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	# data = data[~data.duplicated()]
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# data.info()
-
-	# # new data (AUREUS EA ONLY)
-	# import glob
-	# files = glob.glob("data_scraped/*/*prepared.csv")
-	# files = [
-	# 'data_scraped/Augustus_Aur_EA1/Augustus_Aur_EA1_prepared.csv',
-	# ]
-	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	# data = data[~data['Denomination'].str.contains(r'Denarius')]
-	# data['Auction ID'] = data['Auction ID'].astype(str)
-	# print(data.shape)
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# print(data.shape)
-	# data.info()
-
-	# # new data (AUREUS PA ONLY)
-	# import glob
-	# files = glob.glob("data_scraped/*/*prepared.csv")
-	# files = [
-    # 'data_scraped/Augustus_Aur_PA1/Augustus_Aur_PA1_prepared.csv'
-	# ]
-	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	# data = data[~data['Denomination'].str.contains(r'Denarius')]
-	# data['Auction ID'] = data['Auction ID'].astype(str)
-	# print(data.shape)
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# print(data.shape)
-	# data.info()
-
-	# # new data (DENARIUS EA ONLY)
-	# import glob
-	# files = glob.glob("data_scraped/*/*prepared.csv")
-	# files = [
-	# 'data_scraped/Augustus_Den_EA1/Augustus_Den_EA1_prepared.csv',
-	# 'data_scraped/Augustus_Den_EA2/Augustus_Den_EA2_prepared.csv',
-	# 'data_scraped/Augustus_Den_EA3/Augustus_Den_EA3_prepared.csv',
-	# 'data_scraped/Augustus_Den_EA4/Augustus_Den_EA4_prepared.csv',
-	# ]
-	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	# data = data[~data['Denomination'].str.contains(r'Aureus')]
-	# print(data.shape)
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# data = data.drop(range(0,9), axis=0)
-	# print(data.shape)
-	# data.info()
-
-	# # new data (DENARIUS PA ONLY)
-	# import glob
-	# files = glob.glob("data_scraped/*/*prepared.csv")
-	# files = [
-	# 'data_scraped/Augustus_Den_PA1/Augustus_Den_PA1_prepared.csv',
-	# 'data_scraped/Augustus_Den_PA2/Augustus_Den_PA2_prepared.csv',
-	# 'data_scraped/Augustus_Den_PA3/Augustus_Den_PA3_prepared.csv',
-	# ]
-	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	# data = data[~data['Denomination'].str.contains(r'Aureus')]
-	# print(data.shape)
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# data = data.drop(range(0, 5), axis=0)
-	# data = data.drop(range(6, 14), axis=0)
-	# data = data.drop([169, 149, 299], axis=0)
-	# print(data.shape)
-	# data.info()
-
-	# # new data (TOTAL)
+	# new data
 	import glob
 	files = glob.glob("data_scraped/*/*prepared.csv")
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	data['Auction ID'] = data['Auction ID'].astype(str)
-	data = data.drop([1127, 123, 98, 97, 48, 96, 95, 94, 93, 47, 
-		46, 92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
-		286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
-		1341, ], axis=0) #452, 432
-	print(data.shape)
 	data.info()
 
+	# # # new data (TOTAL)
+	# import glob
+	# files = glob.glob("data_scraped/*/*prepared.csv")
+	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# data['Auction ID'] = data['Auction ID'].astype(str)
 	# data = data.drop([1127, 123, 98, 97, 48, 96, 95, 94, 93, 47, 
 	# 	46, 92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
 	# 	286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
-	# 	1341, 452, 432], axis=0)
+	# 	1341, ], axis=0) #452, 432 # results in a higher r2 than otherwise
+	# print(data.shape)
+	# data.info()
+	# # data = data.drop([1127, 123, 98, 97, 48, 96, 95, 94, 93, 47, 
+	# # 	46, 92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
+	# # 	286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
+	# # 	1341, 452, 432], axis=0)
 
 
 
@@ -536,6 +425,8 @@ if __name__ == '__main__':
 	# one hot encode 'Auction ID'
 	data['Auction ID'] = data['Auction ID'].apply(str)
 	data['is_Triton'] = data['Auction ID'].map(lambda x: True if 'Triton' in x else False)
+	data['is_CNG'] = data['Auction ID'].apply(lambda x: True if 'CNG' in x else False)
+	# <-- drop first weekly values. Double check.
 	data.drop(['Auction ID'], axis=1, inplace=True)
 
 	# non predictive
@@ -550,7 +441,9 @@ if __name__ == '__main__':
 
 	# one hot encode 'Denomination'
 	data['is_Aureus'] = data['Denomination'].map(lambda x: True if 'Aureus' in x else False)
-	data.drop(['Denomination'], axis=1, inplace=True)
+	data['is_Denarius'] = data['Denomination'].map(lambda x: True if 'Denarius' in x else False)
+	data['is_Cistophorus'] = data['Denomination'].map(lambda x: True if 'Cistophorus' in x else False)
+	# <--- drop first sestertius. Double check.
 
 	# do manual stemming/lemmatization for now
 	data['Comments'] = data['Comments'].map(lambda x: x.lower())
@@ -568,13 +461,13 @@ if __name__ == '__main__':
 	#data.drop(columns=['Imagery'], axis=1, inplace=True)
 	#data['Imagery']
 
-	# impute missing 'Diameter' measurements (not sure why these are 'NaN' and not 'None')
-	diameter_mode = data['Diameter'].mode()[0]
-	data['Diameter'] = data['Diameter'].map(lambda x: diameter_mode if np.isnan(x) else x) 
+	# impute missing 'Diameter' measurements
+	diameter_map = data.groupby('Denomination')['Diameter'].transform(np.median)
+	data['Diameter'] = data['Diameter'].fillna(diameter_map)
 
 	# impute missing 'Weight' measurements
-	weight_mode = data['Weight'].mode()[0]
-	data['Weight'] = data['Weight'].map(lambda x: weight_mode if np.isnan(x) else x) 
+	weight_transformer = data.groupby('Denomination')['Weight'].transform(np.median)
+	data['Weight'] = data['Weight'].fillna(weight_transformer)
 
 	# assume die axis rotate left vs. rotate right has no effect on sale price
 	#print(data['Hour'].value_counts())
@@ -582,12 +475,12 @@ if __name__ == '__main__':
 	#print(data['Hour'].value_counts())
 
 	# impute missing 'Hour' measurements
-	hour_mode = data['Hour'].mode()[0]
-	data['Hour'] = data['Hour'].map(lambda x: hour_mode if np.isnan(x) else x).astype(np.bool)
-	
-	# make 'Hour' categorical
-	data = pd.get_dummies(data, prefix='is_Hour', columns=['Hour'], drop_first=True, dtype=np.bool) # drop true!
-	#data.drop(['Hour'], axis=1, inplace=True)
+	hour_transformer = data.groupby('Denomination')['Hour'].transform(np.median)
+	data['Hour'] = data['Hour'].fillna(hour_transformer)
+	data.drop('Hour', axis=1, inplace=True)
+	#data = pd.get_dummies(data, prefix='is_Hour', columns=['Hour'], drop_first=True, dtype=np.int) # drop true!
+
+	data.drop(['Denomination'], axis=1, inplace=True)
 
 	# non predictive
 	try:
@@ -604,7 +497,7 @@ if __name__ == '__main__':
 	#one hot encode 'Grade'
 	#print(data['Grade'].value_counts())
 	data['Grade'] = data['Grade'].map(consolidate_grades)
-	data = pd.get_dummies(data, prefix='is', columns=['Grade'], drop_first=True, dtype=np.bool)
+	data = pd.get_dummies(data, prefix='is', columns=['Grade'], drop_first=True, dtype=np.int)
 
 	# define the target vectors and log transform the target
 	# np.log helps a lot!
@@ -636,14 +529,14 @@ if __name__ == '__main__':
 	# add some features from 'Comments'
 	
 	# # keywords: tone
-	data['is_lustrous'] = data['Comments'].apply(lambda x: 
-		True if 'lust' in x else False)
-	data['is_toned'] = data['Comments'].apply(lambda x: 
-		True if 'tone' in x else False)
-	data['is_attractive'] = data['Comments'].apply(lambda x: 
-		True if 'attractive' in x else False)
-	data['is_iridescent'] = data['Comments'].apply(lambda x: 
-		True if 'iridescent' in x else False)
+	# data['is_lustrous'] = data['Comments'].apply(lambda x: 
+	# 	True if 'lust' in x else False)
+	# data['is_toned'] = data['Comments'].apply(lambda x: 
+	# 	True if 'tone' in x else False)
+	# data['is_attractive'] = data['Comments'].apply(lambda x: 
+	# 	True if 'attractive' in x else False)
+	# data['is_iridescent'] = data['Comments'].apply(lambda x: 
+	# 	True if 'iridescent' in x else False)
 	# data['is_gray'] = data['Comments'].apply(lambda x: 
 	# 	True if 'gray' in x else False)
 	# data['is_golden'] = data['Comments'].apply(lambda x: 
@@ -657,16 +550,22 @@ if __name__ == '__main__':
 	# 	True if 'rare' in x else False)
 
 	# adds 0.02 to r^2
-	data['is_very_rare'] = data['Comments'].apply(lambda x: 
-		any(word in x for word in ('extremely rare', 'very rare', 'unique', 'coinArchives')))
+	# data['is_very_rare'] = data['Comments'].apply(lambda x: 
+	# 	any(word in x for word in ('extremely rare', 'very rare', 'unique', 'coinArchives')))
 	#print(data['is_very_rare'].value_counts())
+
+	#rarity_keywords = ['extremely rare', 'very rare', 'unique', 'coinArchives']
+	#data['is_very_rare'] = data['Comments'].apply(lambda x: keyword_check(x, rarity_keywords))
 
 	# keywords: portrait
 
 	# sub 0.01 to r^2
-	data['has_facial_features'] = data['Comments'].apply(lambda x: 
-		any(word in x for word in ('eye', 'cheek', 'eyebrow', 'head', 'chin', 'forehead', 'jaw' ,'neck', 'nose')))
+	# data['has_facial_features'] = data['Comments'].apply(lambda x: 
+	# 	any(word in x for word in ('eye', 'cheek', 'eyebrow', 'head', 'chin', 'forehead', 'jaw' ,'neck', 'nose')))
 	#print(data['has_facial_features'].value_counts())
+
+	#portrait_keywords = ['eye', 'cheek', 'eyebrow', 'head', 'chin', 'forehead', 'jaw' ,'neck', 'nose']
+	#data['has_facial_features'] = data['Comments'].apply(lambda x: keyword_check(x.lower(), portrait_keywords))
 
 	# reduces r^2
 	#data['has_nice_portrait'] = data['Comments'].apply(lambda x: 
@@ -676,8 +575,8 @@ if __name__ == '__main__':
 	#  	True if 'on portrait' in x else False) # exclude scratches/marks/ etc on portrait
 
 	# sub 0.01 to r^2
-	data['is_centered'] = data['Comments'].apply(lambda x: 
-		True if 'center' in x and not 'off-center' in x else False)
+	# data['is_centered'] = data['Comments'].apply(lambda x: 
+	# 	True if 'center' in x and not 'off-center' in x else False)
 
 	#data['is_off_center'] = data['Comments'].apply(lambda x: 
 	# 	True if 'off-center' in x else False)
@@ -869,8 +768,10 @@ if __name__ == '__main__':
 		print('no desc to drop')
 
 	data.info()
-
-	Xb = data.values
+	print(data.mean())
+	
+	Xb = data.to_numpy(float)
+	#Xb = data.values
 
 
 	#from sklearn.pipeline import FeatureUnion
@@ -908,29 +809,36 @@ if __name__ == '__main__':
 	#X = scaler.fit_transform(X)
 	#print(X)
 
+
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
 
 	scaler = StandardScaler()
 	X_train = scaler.fit_transform(X_train)
 	X_test = scaler.transform(X_test)
 
-	print(X_train[2])
+	#print(X_train[2])
 
-	#alphas = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10, 50, 1e2, 5e2, 1e3, 5e3, 1e4, 5e4, 1e5]
-	alphas = [1]
-	for alpha in alphas:
-		est = Ridge(alpha=alpha)
-		cv_score = cross_val_score(est, X_train, y_train, cv=10, scoring='r2')
-		print('alpha: {}, cv score: {}'.format(alpha, cv_score.mean()))
+	# alphas = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10, 50, 1e2, 5e2, 1e3, 5e3, 1e4, 5e4, 1e5]
+	# for alpha in alphas:
+	# 	est = Ridge(alpha=alpha, random_state=42, max_iter=100000)
+	# 	cv_score = cross_val_score(est, X_train, y_train, cv=10, scoring='r2')
+	# 	print('alpha: {}, cv score: {}'.format(alpha, cv_score.mean()))
 
-	
-	#model = RandomForestRegressor(n_estimators=600, max_depth=6, max_features='auto').fit(X_train, y_train)
-	#x = pd.DataFrame(zip(X.columns, model.feature_importances_), columns=['feature', 'import'])
-	#pd.set_option('display.max_rows', None)
-	##print(x.sort_values(by=['coefficient']))
-	#print(x.sort_values(by=['import']))
+	# linear regression model with L1 regularization
+	ridge = Ridge(random_state=42, max_iter=100000)
+	# set grid search parameters
+	alphas = np.logspace(-2, 1, 100)
+	param_grid = {'alpha': alphas}
+	n_folds = 5
+	# perform grid search
+	clf = GridSearchCV(ridge, param_grid, cv=n_folds, scoring='r2', n_jobs=-1, verbose=True)
+	clf.fit(X_train, y_train)
+	# results
+	scores = clf.cv_results_['mean_test_score']
+	print(clf.best_score_)
 
-	model = Ridge(alpha=5, max_iter=1e8).fit(X_train, y_train)
+	# test model on unseen data
+	model = Ridge(alpha=1, max_iter=1e8).fit(X_train, y_train)
 	#print('coef: {}'.format(model.coef_))
 	#print('intercept: {}'.format(model.intercept_))
 
