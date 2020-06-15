@@ -146,6 +146,7 @@ def impute_strike(text, verbose=False):
 		for index, segment in enumerate(segments):
 			if 'mint' in segment:
 				pos = index + 1
+				break # exit on first match
 		segments.insert(pos, 'unlisted Struck')
 		text = '. '.join(segments)
 		if(verbose): 
@@ -162,6 +163,7 @@ def impute_mint(text, verbose=False):
 		for index, segment in enumerate(segments):
 			if 'Struck' in segment:
 				pos = index + 1
+				break # exit on first match
 		segments.insert(pos, 'unlisted mint')
 		text = '. '.join(segments)
 		if(verbose): 
@@ -178,6 +180,7 @@ def impute_moneyer(text, verbose=False):
 		for index, segment in enumerate(segments):
 			if 'mint' in segment:
 				pos = index + 1
+				break # exit on first match
 		segments.insert(pos, 'unlisted moneyer')
 		text = '. '.join(segments)
 		if(verbose): 
