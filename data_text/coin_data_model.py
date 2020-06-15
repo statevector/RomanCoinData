@@ -357,31 +357,105 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-
-	# min/max df tests
-	# cv = CountVectorizer(min_df=2, max_df=1.0, lowercase=True) 
-	# # here is just a simple list of 3 documents.
-	# corpus = ['one two three everywhere', 'four five six everywhere', 'seven eight nine everywhere']
-	# # below we call fit_transform on the corpus and get the feature names.
-	# X = cv.fit_transform(corpus)
-	# vocab = cv.get_feature_names()
-	# print(vocab)
-	# print(X.toarray())
-	# print(cv.stop_words_)
-
 	# #old data
-	data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	#data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_AR_EA1_cleaned_prepared.csv')
-	#data = pd.read_csv('old/xxx3.csv')
-	print(data.iloc[1239])
-	print(data.iloc[1114])
-	data = data.drop([1239, 1114], axis=0)
-	data = data[data['Denomination']=='Denarius']
-	data = data[data['Auction Type']=='Electronic Auction']
-	data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	data.info()
-	
+	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# data = data[~data.duplicated()]
+	# data.info()
+
+	# #old data (AUREUS EA ONLY)
+	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
+	# print(data.iloc[1227])
+	# print(data.iloc[526])
+	# data = data.drop([1227, 526], axis=0)
+	# data = data[data['Denomination']=='Aureus']
+	# data = data[data['Auction Type']=='Electronic Auction']
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# # data.info()
+
+	# #old data (AUREUS PA ONLY)
+	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
+	# data = data.drop([954, 963, 1055], axis=0)
+	# data = data[data['Denomination']=='Aureus']
+	# data = data[data['Auction Type']=='Feature Auction']
+	# #data = data[~data.duplicated()]
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# # data.info()
+
+	# #old data (DENARIUS EA ONLY)
+	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
+	# print(data.iloc[1239])
+	# print(data.iloc[1114])
+	# data = data.drop([1239, 1114], axis=0)
+	# data = data[data['Denomination']=='Denarius']
+	# data = data[data['Auction Type']=='Electronic Auction']
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# # data.info()
+
+	# #old data (DENARIUS PA ONLY)
+	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
+	# data = data.drop([1001, 1000, 999, 1054], axis=0)
+	# data = data[data['Denomination']=='Denarius']
+	# data = data[data['Auction Type']=='Feature Auction']
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# data.info()
+
+	# #old data (TOTAL)
+	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
+	# print(data.shape)
+	# data = data.drop([1227, 526], axis=0)
+	# data = data.drop([954, 963, 1055], axis=0)
+	# data = data.drop([1239, 1114], axis=0)
+	# data = data.drop([1001, 1000, 999, 1054], axis=0)
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# data.info()
+	# print(data.shape)
+
+
+
 	# # new data
+	# import glob
+	# files = glob.glob("data_scraped/*/*prepared.csv")
+	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	# data = data[~data.duplicated()]
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# data.info()
+
+	# # new data (AUREUS EA ONLY)
+	# import glob
+	# files = glob.glob("data_scraped/*/*prepared.csv")
+	# files = [
+	# 'data_scraped/Augustus_Aur_EA1/Augustus_Aur_EA1_prepared.csv',
+	# ]
+	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	# data = data[~data['Denomination'].str.contains(r'Denarius')]
+	# data['Auction ID'] = data['Auction ID'].astype(str)
+	# print(data.shape)
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# print(data.shape)
+	# data.info()
+
+	# # new data (AUREUS PA ONLY)
+	# import glob
+	# files = glob.glob("data_scraped/*/*prepared.csv")
+	# files = [
+    # 'data_scraped/Augustus_Aur_PA1/Augustus_Aur_PA1_prepared.csv'
+	# ]
+	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	# data = data[~data['Denomination'].str.contains(r'Denarius')]
+	# data['Auction ID'] = data['Auction ID'].astype(str)
+	# print(data.shape)
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# print(data.shape)
+	# data.info()
+
+	# # new data (DENARIUS EA ONLY)
 	# import glob
 	# files = glob.glob("data_scraped/*/*prepared.csv")
 	# files = [
@@ -399,6 +473,58 @@ if __name__ == '__main__':
 	# data = data.drop(range(0,9), axis=0)
 	# print(data.shape)
 	# data.info()
+
+	# # new data (DENARIUS PA ONLY)
+	# import glob
+	# files = glob.glob("data_scraped/*/*prepared.csv")
+	# files = [
+	# 'data_scraped/Augustus_Den_PA1/Augustus_Den_PA1_prepared.csv',
+	# 'data_scraped/Augustus_Den_PA2/Augustus_Den_PA2_prepared.csv',
+	# 'data_scraped/Augustus_Den_PA3/Augustus_Den_PA3_prepared.csv',
+	# ]
+	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	# data = data[~data['Denomination'].str.contains(r'Aureus')]
+	# print(data.shape)
+	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	# data = data.drop(range(0, 5), axis=0)
+	# data = data.drop(range(6, 14), axis=0)
+	# data = data.drop([169, 149, 299], axis=0)
+	# print(data.shape)
+	# data.info()
+
+	# # new data (TOTAL)
+	import glob
+	files = glob.glob("data_scraped/*/*prepared.csv")
+	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	data['Auction ID'] = data['Auction ID'].astype(str)
+	data = data.drop([1127, 123, 98, 97, 48, 96, 95, 94, 93, 47, 
+		46, 92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
+		286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
+		1341, ], axis=0) #452, 432
+	print(data.shape)
+	data.info()
+
+	# data = data.drop([1127, 123, 98, 97, 48, 96, 95, 94, 93, 47, 
+	# 	46, 92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
+	# 	286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
+	# 	1341, 452, 432], axis=0)
+
+
+
+
+
+
+
+
+
+
+
+	# =========
 
 	# save this for later
 	data_nlp = data.copy(deep=True)
@@ -708,15 +834,15 @@ if __name__ == '__main__':
 	
 
 
-	#comment_stops = ['a', 'an', 'and', 'as', 'from', 'in', 'of', 'off', 'on', 'the', 'to', 'under', 'with']
-	v1 = CountVectorizer(min_df=50)
-	X1 = v1.fit_transform(data['Comments'])
-	print('shape: {}'.format(X1.shape)) # (1268, ~92)
-	#print(X1)
-	#print(X1.toarray())
-	print('features: {}'.format(v1.get_feature_names()))
-	print('stop words: {}'.format(sorted(v1.stop_words_)))
-	X1 = X1.toarray()
+	# #comment_stops = ['a', 'an', 'and', 'as', 'from', 'in', 'of', 'off', 'on', 'the', 'to', 'under', 'with']
+	# v1 = CountVectorizer(min_df=50)
+	# X1 = v1.fit_transform(data['Comments'])
+	# print('shape: {}'.format(X1.shape)) # (1268, ~92)
+	# #print(X1)
+	# #print(X1.toarray())
+	# print('features: {}'.format(v1.get_feature_names()))
+	# print('stop words: {}'.format(sorted(v1.stop_words_)))
+	# X1 = X1.toarray()
 
 	# v2 = CountVectorizer(min_df=50)#, stop_words=comment_stops)
 	# X2 = v2.fit_transform(data['Imagery'])
@@ -787,6 +913,8 @@ if __name__ == '__main__':
 	scaler = StandardScaler()
 	X_train = scaler.fit_transform(X_train)
 	X_test = scaler.transform(X_test)
+
+	print(X_train[2])
 
 	#alphas = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10, 50, 1e2, 5e2, 1e3, 5e3, 1e4, 5e4, 1e5]
 	alphas = [1]
