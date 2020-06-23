@@ -215,6 +215,22 @@ def get_comments(text):
 	#print('post Remvove Grade:\n {}'.format(comments))
 	return comments
 
+def split_imagery(x):
+	x = x.split(' / ')
+	if len(x)!=2:
+		raise Exception('more than one split in entry {}'.format(x))
+	return x
+
+def clean_inscriptions(x):
+	symbols = ['-', ';', '•','“','”' ,'[', ']', '(', ')']
+	for symbol in symbols:
+		x = x.replace(symbol, '')
+	x = x.replace('Λ', 'A')
+	x = x.replace('/ ', ' ')
+	x = x.replace(' /', ' ')
+	return x
+
+
 if __name__ == '__main__':
 
 	# this is the right way to do it, but it will take time to validate and catch edge cases
@@ -255,6 +271,8 @@ if __name__ == '__main__':
 	df = pd.read_csv(input_file)
 	#print(df.info())
 	
+	df['Auction ID'] = df['Auction ID'].astype(str)
+
 	df['Emperor'] = df['Description'].apply(lambda x: get_emperor(x))
 	#print(df.info())
 
@@ -265,6 +283,7 @@ if __name__ == '__main__':
 	#print(df.info())
 
 	df['Diameter'] = df['Description'].apply(lambda x: get_diameter(x))
+	df['Diameter'] = df['Diameter'].astype(float)
 	#print(df.info())
 
 	df['Weight'] = df['Description'].apply(lambda x: get_weight(x))
@@ -286,6 +305,12 @@ if __name__ == '__main__':
 	#print(df.info())
 
 	df['Imagery'] = df['Description'].apply(lambda x: get_imagery(x))
+	df['Obverse'], df['Reverse'] = zip(*df['Imagery'].apply(split_imagery))
+	#print(df.info())
+
+	df['Inscriptions'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
+	df['Inscriptions'] = df['Inscriptions'].apply(clean_inscriptions)
+	df.drop('Imagery', axis=1, inplace=True)
 	#print(df.info())
 
 	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))

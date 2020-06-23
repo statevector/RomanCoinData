@@ -38,6 +38,7 @@ def format_abbreviations(text):
 	text = re.sub(r' C\.', ' C', text) # space to avoid BC.
 	text = re.sub(r'L\.', 'L', text)
 	text = re.sub(r'M\.', 'M', text)
+	text = re.sub(r'Mn\.', 'Mn', text) # Manius
 	text = re.sub(r'P\.', 'P', text)
 	text = re.sub(r'Q\.', 'Q', text)
 	text = re.sub(r'R\.', 'R', text)
@@ -273,6 +274,8 @@ if __name__ == '__main__':
 	# Augustus_Den_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Augustus\. Silver', 'Augustus. 27 BC-AD 14. AR Denarius', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'175mm', '17.5mm', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'OB / CIVIS / SERVATOS', 'OB/ CIVIS/ SERVATOS', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AMP /', 'AMP/', x)) # EA1, PA1, PA2
 	# Augustus_Den_EA2.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'6nh', '6h', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Nice VF', 'Good VF', x))
@@ -285,11 +288,15 @@ if __name__ == '__main__':
 	# Augustus_Den_PA1.csv
 	# <--- okay
 	# Augustus_Den_PA2.csv
-	# <--- okay
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'PAREN\[T\] /', 'PAREN[T]/', x)) # Triton XI, 767, 500
 	# Augustus_Den_PA3.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'3/91', '3.91', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'M[\.] DVRMIVS III\. VIR', 'M • DVRMIVS/ • III • VIR', x)) # FA, Triton X, 559
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'S•P•Q•R /', 'S•P•Q•R/', x)) # FA, CNG 75, 964
 	# Augustus_Ses_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x))
+
+
 
 	# clean and standardize the Description field
 	# ====================================

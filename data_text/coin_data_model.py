@@ -1,6 +1,7 @@
 
 import numpy as np
 import pandas as pd
+import re
 
 from sklearn import base
 from sklearn.linear_model import Ridge, Lasso
@@ -11,10 +12,6 @@ from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
 #from sklearn.utils import shuffle
-
-#from sklearn.utils import shuffle
-#from sklearn.model_selection import train_test_split
-#from sklearn.metrics import mean_squared_error
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
@@ -223,6 +220,106 @@ def stem_imagery(text):
 
 	return text
 
+def stem_comments_3(x):
+	x = x.lower()
+	x = x.replace('lustre', 'luster')
+	x = x.replace('lustrous', 'luster')
+	x = x.replace('toning', 'toned')
+	x = x.replace('iridescence', 'iridescent')
+	x = x.replace('grayish', 'gray')
+	x = x.replace('golden', 'gold')
+	x = x.replace('portraiture', 'portrait')
+	x = x.replace('centered', 'center')
+	# but not marks --> mark or scratches --> scratch. probably info in the plural form.
+	x = x.replace('roughness', 'rough')
+	x = x.replace('tooling', 'tooled')
+	x = x.replace('smoothing', 'smoothed')
+	x = x.replace('corroded', 'corrosion')
+	x = x.replace('porosity', 'porous')
+	x = x.replace('granularity', 'granular')
+	x = x.replace('pitting', 'pitted')
+	# 'cut' is implicit here; want to match with e.g. 'test cut on reverse/obverse'
+	x = x.replace('edge test', 'edge test cut') 
+	x = x.replace('surface test', 'surface test cut')
+	# consolidate
+	x = x.replace('on the reverse', 'on reverse')
+	x = x.replace('on the obverse', 'on obverse')
+	x = x.replace('struck', 'strike')
+	x = x.replace('striking', 'strike')
+	x = x.replace('weakness', 'weak')
+	x = x.replace('some chipping', 'chips')
+	 # standardize apostrophes?
+	x = x.replace('banker’s', 'banker')
+	x = x.replace('bankers’', 'bankers')
+	x = x.replace('bankers\'', 'bankers')
+	x = x.replace('cleaned', 'clean')
+	x = x.replace('cleaning', 'clean')
+	x = x.replace('mount', 'mounted')
+	x = x.replace('scraping', 'scrapes')
+	x = x.replace('chipped', 'chip')
+	x = x.replace('weakness', 'weak')
+	x = x.replace('graffito', 'graffiti')
+	x = x.replace('crystalized', 'crystal')
+	x = x.replace('crystallization', 'crystal')
+	x = x.replace('crystallized', 'crystal')
+	x = x.replace('coppery', 'copper')
+	x = x.replace('waviness', 'wavy')
+	# mis-spellings
+	x = x.replace('scracthes', 'scratches')
+	x = x.replace('granualar', 'granular')
+	x = x.replace('vareity', 'variety')
+	x = x.replace('scarse', 'rare')   
+	x = x.replace('bankerss', 'bankers')
+	x = x.replace('rightobverse', 'right obverse')
+	# actual word changes
+	x = x.replace('planchet', 'flan')
+	x = x.replace('lacquered', 'lacquer')
+	x = x.replace('lamination', 'delamination')
+	x = x.replace('reddish', 'red')
+	x = x.replace('rusty', 'rust')
+	x = x.replace('scarce', 'rare')
+	x = x.replace('earlobe', 'ear')
+	# feature consolidate
+	#x = x.replace('flan flaw', 'flan-flaw')
+	#x = x.replace('flan crack', 'flan-crack')
+	#x = x.replace('die rust', 'die-rust')
+	#x = x.replace('die break', 'die-break')
+	#x = x.replace('die break', 'die-break') # visually inspected
+	#x = x.replace('die breaks', 'die-breaks')
+	#x = x.replace('off center', 'off-center')
+	# regex
+	#x = re.sub(r'ed ', ' ', x)
+	#x = re.sub(r'ing ', ' ', x)
+	x = re.sub(r'ly ', ' ', x)
+	#x = re.sub(r'ed ', ' ', x)
+	#x = re.sub(r'ish ', ' ', x)
+	#x = re.sub(r'ness ', ' ', x)
+	#x = re.sub(r'ous ', ' ', x)
+	#x = re.sub(r'en ', ' ', x)
+	#x = re.sub(r'ity ', ' ', x)
+	#x = re.sub(r'es ', ' ', x)
+	# more regex
+	x = re.sub(r'’', '', x)
+	x = re.sub(r'’s', '', x)
+	x = re.sub(r'-', ' ', x)
+	x = re.sub(r'\/', ' ', x)
+	x = re.sub(r'\)', ' ', x)
+	x = re.sub(r'\(', ' ', x)    
+	return x
+
+
+def stem_comments_2(text):
+	text = re.sub(r'ed ', ' ', text)
+	text = re.sub(r'ing ', ' ', text)
+	text = re.sub(r'ly ', ' ', text)
+	text = re.sub(r'ed ', ' ', text)
+	text = re.sub(r'ish ', ' ', text)
+	text = re.sub(r'ness ', ' ', text)
+	text = re.sub(r'ous ', ' ', text)
+	text = re.sub(r'en ', ' ', text)
+	text = re.sub(r'ity ', ' ', text)
+	return text
+
 def stem_comments(text):
 	text = text.lower()
 
@@ -363,66 +460,47 @@ def keyword_check(words, keywords):
 
 if __name__ == '__main__':
 
-	# #old data
-	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	# data.info()
-
-	# #old data (TOTAL)
-	# data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_prepared/original/Augustus_prepared.csv')
-	# print(data.shape)
-	# data = data.drop([1227, 526], axis=0)
-	# data = data.drop([954, 963, 1055], axis=0)
-	# data = data.drop([1239, 1114], axis=0)
-	# data = data.drop([1001, 1000, 999, 1054], axis=0)
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# data.info()
-	# print(data.shape)
-
-	# new data
-	import glob
-	files = glob.glob("data_scraped/*/*prepared.csv")
-	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	data.info()
-
-	# # # new data (TOTAL)
-	# import glob
 	# files = glob.glob("data_scraped/*/*prepared.csv")
 	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	# data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	# data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
-	# data['Auction ID'] = data['Auction ID'].astype(str)
-	# data = data.drop([1127, 123, 98, 97, 48, 96, 95, 94, 93, 47, 
-	# 	46, 92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
-	# 	286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
-	# 	1341, ], axis=0) #452, 432 # results in a higher r2 than otherwise
+	# #data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	# #data = data[~data['Denomination'].str.contains(r'Cistophorus')]
 	# print(data.shape)
+	# print('INPUT DATASET: ')
 	# data.info()
-	# # data = data.drop([1127, 123, 98, 97, 48, 96, 95, 94, 93, 47, 
-	# # 	46, 92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
-	# # 	286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
-	# # 	1341, 452, 432], axis=0)
 
-
-
-
-
-
-
-
+	# #ew data (TOTAL)
+	import glob
+	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv")
+	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	data['Auction ID'] = data['Auction ID'].astype(str)
+	data = data.drop([1127, 123, 98, 97, 96, 95, 94, 93, 
+		92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
+		286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
+		1341, 452, 432, 48, 47, 46], axis=0)
+	print(data.shape)
+	data.info()
 
 
 
 	# =========
 
-	# save this for later
-	data_nlp = data.copy(deep=True)
+	# "non predictive"
+	#data.drop(['Moneyer'], axis=1, inplace=True)
+	#data.drop(['Struck', 'RIC'], axis=1, inplace=True)
 
-	# one hot encode 'Auction Type'
+	# =========
+
+	# non predictive
+	data.drop(['URL'], axis=1, inplace=True)
+
+	# one hot encode 'Auction Type' and drop
 	data['is_Feature_Auction'] = data['Auction Type'].map(lambda x: True if 'Feature Auction' in x else False)
 	data.drop(['Auction Type'], axis=1, inplace=True)
 
-	# one hot encode 'Auction ID'
+	# one hot encode 'Auction ID' and drop
 	data['Auction ID'] = data['Auction ID'].apply(str)
 	data['is_Triton'] = data['Auction ID'].map(lambda x: True if 'Triton' in x else False)
 	data['is_CNG'] = data['Auction ID'].apply(lambda x: True if 'CNG' in x else False)
@@ -436,30 +514,37 @@ if __name__ == '__main__':
 	data['Estimate'] = data['Estimate'].map(lambda x: np.log1p(x))
 	#data.drop(['Estimate'], axis=1, inplace=True)
 
+	# define the target vector
+	data['Sold'] = data['Sold'].map(lambda x: np.log1p(x))
+	y = data['Sold'].values
+	data.drop(['Sold'], axis=1, inplace=True)
+
+	# drop for now, but possibly predictive?
+	data.drop(['Header'], axis=1, inplace=True)
+
+	# drop for now, but possibly predictive?
+	data.drop(['Notes'], axis=1, inplace=True)
+
 	# non predictive
-	data.drop(['Nonstandard Lot', 'Emperor', 'Reign', 'Struck', 'RIC'], axis=1, inplace=True)
+	data.drop(['Nonstandard Lot'], axis=1, inplace=True)
+
+	# non predictive
+	data.drop(['Image URL'], axis=1, inplace=True)
+
+	# non predictive
+	data.drop(['Image Path'], axis=1, inplace=True)
+
+	# predictive, but irrelevant for Augustus only dataset?
+	data.drop(['Emperor'], axis=1, inplace=True)
+
+	# non predictive
+	data.drop(['Reign'], axis=1, inplace=True)
 
 	# one hot encode 'Denomination'
 	data['is_Aureus'] = data['Denomination'].map(lambda x: True if 'Aureus' in x else False)
 	data['is_Denarius'] = data['Denomination'].map(lambda x: True if 'Denarius' in x else False)
 	data['is_Cistophorus'] = data['Denomination'].map(lambda x: True if 'Cistophorus' in x else False)
 	# <--- drop first sestertius. Double check.
-
-	# do manual stemming/lemmatization for now
-	data['Comments'] = data['Comments'].map(lambda x: x.lower())
-	data['Comments'] = data['Comments'].map(stem_comments)
-	#words = count_unique_words(data['Comments'])
-	#print(words)
-	#data.drop(columns=['Comments'], axis=1, inplace=True)
-
-	# do manual stemming/lemmatization for now
-	#data['Imagery'] = data['Imagery'].map(lambda x: x.lower())
-	data['Imagery'] = data['Imagery'].map(stem_imagery)
-	#words = count_unique_words(data['Imagery'])
-	#print(words, len(words))
-	#quit()
-	#data.drop(columns=['Imagery'], axis=1, inplace=True)
-	#data['Imagery']
 
 	# impute missing 'Diameter' measurements
 	diameter_map = data.groupby('Denomination')['Diameter'].transform(np.median)
@@ -471,72 +556,57 @@ if __name__ == '__main__':
 
 	# assume die axis rotate left vs. rotate right has no effect on sale price
 	#print(data['Hour'].value_counts())
-	data['Hour'] = data['Hour'].map({1:11, 2:10, 3:9, 4:8, 5:7, 6:12})
+	#data['Hour'] = data['Hour'].map({1:11, 2:10, 3:9, 4:8, 5:7, 6:12})
 	#print(data['Hour'].value_counts())
 
-	# impute missing 'Hour' measurements
-	hour_transformer = data.groupby('Denomination')['Hour'].transform(np.median)
-	data['Hour'] = data['Hour'].fillna(hour_transformer)
-	data.drop('Hour', axis=1, inplace=True)
+	# impute missing 'Hour' measurements (drop now for simplicity)
+	#hour_transformer = data.groupby('Denomination')['Hour'].transform(np.median)
+	#data['Hour'] = data['Hour'].fillna(hour_transformer)
 	#data = pd.get_dummies(data, prefix='is_Hour', columns=['Hour'], drop_first=True, dtype=np.int) # drop true!
+	data.drop(['Hour'], axis=1, inplace=True)
 
 	data.drop(['Denomination'], axis=1, inplace=True)
 
-	# non predictive
-	try:
-		data.drop(['MCase'], axis=1, inplace=True)
-	except:
-		print('no good')
-
-	# one hot encode 'Mint'
-	#data.groupby('Mint').filter(lambda x: len(x)>10)
-	#print(data['Mint'].value_counts())
-	#data = pd.get_dummies(data, prefix='is', columns=['Mint'], drop_first=True, dtype=np.bool) # adds 0.02 to R^2
+	# drop for now, but possibly predictive?
 	data.drop(['Mint'], axis=1, inplace=True)
 
+	# drop for now, but possibly predictive?
+	data.drop(['Moneyer'], axis=1, inplace=True)
+
+	# drop for now, but possibly predictive?
+	data.drop(['Struck'], axis=1, inplace=True)
+
+	# figure this out
+	data.drop(['Obverse'], axis=1, inplace=True)
+
+	# figure this out
+	data.drop(['Reverse'], axis=1, inplace=True)
+
+	# figure this out
+	data.drop(['Inscriptions'], axis=1, inplace=True)
+
+	# drop for now, but possibly predictive?
+	data.drop(['RIC'], axis=1, inplace=True)
+
 	#one hot encode 'Grade'
-	#print(data['Grade'].value_counts())
 	data['Grade'] = data['Grade'].map(consolidate_grades)
 	data = pd.get_dummies(data, prefix='is', columns=['Grade'], drop_first=True, dtype=np.int)
 
-	# define the target vectors and log transform the target
-	# np.log helps a lot!
-	data['Sold'] = data['Sold'].map(lambda x: np.log1p(x))
-	y = data['Sold'].values
+	# figure this out
+	# do manual stemming/lemmatization for now
+	#data['Comments'] = data['Comments'].map(lambda x: x.lower())
+	data['Comments'] = data['Comments'].map(stem_comments)
+	#words = count_unique_words(data['Comments'])
+	#print(words)
+	#data.drop(columns=['Comments'], axis=1, inplace=True)
 
-	if(False):
-		import matplotlib.pyplot as plt
-		n, bins, _ = plt.hist(data['Sold'], 50)
-		plt.xlabel('Log(Sale Price [USD])')
-		plt.ylabel('Counts')
-		plt.title('Histogram of Coins')
-		#plt.xlim(40, 160)
-		#plt.ylim(0, 0.03)
-		plt.grid(True)
-		plt.show()
+	# keywords: tone
+	# ================
 
-	if(False):
-		from scipy.stats import boxcox
-		data = boxcox(data['Sold'], 0)
-		plt.hist(data)
-		plt.show()
-
-	data.drop(['Sold'], axis=1, inplace=True)
-
-	#data.info()
-	#quit()
-
-	# add some features from 'Comments'
-	
-	# # keywords: tone
-	# data['is_lustrous'] = data['Comments'].apply(lambda x: 
-	# 	True if 'lust' in x else False)
-	# data['is_toned'] = data['Comments'].apply(lambda x: 
-	# 	True if 'tone' in x else False)
-	# data['is_attractive'] = data['Comments'].apply(lambda x: 
-	# 	True if 'attractive' in x else False)
-	# data['is_iridescent'] = data['Comments'].apply(lambda x: 
-	# 	True if 'iridescent' in x else False)
+	#data['is_lustrous'] = data['Comments'].apply(lambda x: True if 'lust' in x.lower() else False)
+	data['is_toned'] = data['Comments'].apply(lambda x: True if 'tone' in x.lower() else False)
+	#data['is_attractive'] = data['Comments'].apply(lambda x: True if 'attractive' in x.lower() else False)
+	#data['is_iridescent'] = data['Comments'].apply(lambda x: True if 'iridescent' in x.lower() else False)
 	# data['is_gray'] = data['Comments'].apply(lambda x: 
 	# 	True if 'gray' in x else False)
 	# data['is_golden'] = data['Comments'].apply(lambda x: 
@@ -545,27 +615,18 @@ if __name__ == '__main__':
 	# 	True if 'cabinet' in x else False)
 
 	# keywords: rarity
+	# ================
 
-	#data['is_rare'] = data['Comments'].apply(lambda x: 
-	# 	True if 'rare' in x else False)
+	data['is_rare'] = data['Comments'].apply(lambda x: True if 'rare' in x.lower() else False)
 
-	# adds 0.02 to r^2
-	# data['is_very_rare'] = data['Comments'].apply(lambda x: 
-	# 	any(word in x for word in ('extremely rare', 'very rare', 'unique', 'coinArchives')))
-	#print(data['is_very_rare'].value_counts())
-
-	#rarity_keywords = ['extremely rare', 'very rare', 'unique', 'coinArchives']
-	#data['is_very_rare'] = data['Comments'].apply(lambda x: keyword_check(x, rarity_keywords))
+	# rarity_keywords = ['extremely rare', 'very rare', 'unique', 'coinArchives']
+	# data['is_very_rare'] = data['Comments'].apply(lambda x: keyword_check(x, rarity_keywords))
 
 	# keywords: portrait
+	# ================
 
-	# sub 0.01 to r^2
-	# data['has_facial_features'] = data['Comments'].apply(lambda x: 
-	# 	any(word in x for word in ('eye', 'cheek', 'eyebrow', 'head', 'chin', 'forehead', 'jaw' ,'neck', 'nose')))
-	#print(data['has_facial_features'].value_counts())
-
-	#portrait_keywords = ['eye', 'cheek', 'eyebrow', 'head', 'chin', 'forehead', 'jaw' ,'neck', 'nose']
-	#data['has_facial_features'] = data['Comments'].apply(lambda x: keyword_check(x.lower(), portrait_keywords))
+	portrait_keywords = ['eye', 'cheek', 'eyebrow', 'head', 'chin', 'forehead', 'jaw' ,'neck', 'nose']
+	data['has_facial_features'] = data['Comments'].apply(lambda x: keyword_check(x.lower(), portrait_keywords))
 
 	# reduces r^2
 	#data['has_nice_portrait'] = data['Comments'].apply(lambda x: 
@@ -582,6 +643,7 @@ if __name__ == '__main__':
 	# 	True if 'off-center' in x else False)
 	
 	# # keywords: die, flan
+	# ================
 
 	# data['has_broad_flan'] = data['Comments'].apply(lambda x:
 	# 	True if ('broad flan' in x) and not ('flanking' in x) else False)
@@ -599,6 +661,7 @@ if __name__ == '__main__':
 	# 	True if 'die-break' in x else False)
 
 	# # keywords: surface flaws
+	# ================
 
 	# data['has_surface_flaws'] = data['Comments'].apply(lambda x: 
 	# 	True if 'surface flaws' in x else False)
@@ -707,9 +770,6 @@ if __name__ == '__main__':
 
 
 
-	#from sklearn.utils import shuffle
-	#data = shuffle(data, random_state=422)
-	#print(data.columns)
 
 
 	# text formatting on the input data set
@@ -734,14 +794,14 @@ if __name__ == '__main__':
 
 
 	# #comment_stops = ['a', 'an', 'and', 'as', 'from', 'in', 'of', 'off', 'on', 'the', 'to', 'under', 'with']
-	# v1 = CountVectorizer(min_df=50)
-	# X1 = v1.fit_transform(data['Comments'])
-	# print('shape: {}'.format(X1.shape)) # (1268, ~92)
-	# #print(X1)
-	# #print(X1.toarray())
-	# print('features: {}'.format(v1.get_feature_names()))
-	# print('stop words: {}'.format(sorted(v1.stop_words_)))
-	# X1 = X1.toarray()
+	v1 = CountVectorizer(min_df=120, max_df=200, lowercase=False, stop_words=None)
+	X1 = v1.fit_transform(data['Comments'])
+	print('shape: {}'.format(X1.shape))
+	#print(X1)
+	#print(X1.toarray())
+	print('features: {}'.format(v1.get_feature_names()))
+	print('stop words: {}'.format(sorted(v1.stop_words_)))
+	X1 = X1.toarray()
 
 	# v2 = CountVectorizer(min_df=50)#, stop_words=comment_stops)
 	# X2 = v2.fit_transform(data['Imagery'])
@@ -752,26 +812,16 @@ if __name__ == '__main__':
 	#print('stop words: {}'.format(v2.stop_words_))
 	# X2 = X2.toarray()
 
-	data.drop(columns=['Comments'], axis=1, inplace=True)
-	data.drop(columns=['Imagery'], axis=1, inplace=True)
+	data.drop('Comments', axis=1, inplace=True)
+	#data.drop(columns=['Inscriptions'], axis=1, inplace=True)
+	#data.drop(columns=['Obverse'], axis=1, inplace=True)
+	#data.drop(columns=['Reverse'], axis=1, inplace=True)
 
-	try:
-		data.drop(['URL','Header','Notes','Image URL','Image Path','Moneyer'], 
-			axis=1, inplace=True)
-	except:
-		print('no url, etc to drop')
-
-	try:
-		data.drop(['Description'], 
-			axis=1, inplace=True)
-	except:
-		print('no desc to drop')
-
+	print('FEATURE MATRIX: ')
 	data.info()
-	print(data.mean())
 	
-	Xb = data.to_numpy(float)
-	#Xb = data.values
+	#Xb = data.to_numpy(float)
+	Xb = data.values
 
 
 	#from sklearn.pipeline import FeatureUnion
@@ -786,8 +836,8 @@ if __name__ == '__main__':
 	#data.join(data_ct, index='index')
 
 	# combine the baseline features with the language features
-	X = Xb
-	#X = np.hstack((Xb, X1))
+	#X = Xb
+	X = np.hstack((Xb, X1))
 	#X = np.hstack((Xb, X2))
 	#X = np.hstack((Xb, X1, X2))
 	
@@ -835,7 +885,7 @@ if __name__ == '__main__':
 	clf.fit(X_train, y_train)
 	# results
 	scores = clf.cv_results_['mean_test_score']
-	print(clf.best_score_)
+	print('xval r2: {}'.format(clf.best_score_))
 
 	# test model on unseen data
 	model = Ridge(alpha=1, max_iter=1e8).fit(X_train, y_train)
