@@ -27,7 +27,7 @@ stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
 			  'Brockage', 'brockage', 'Official Dies', 'Forgery', 
 			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation', 
 			  'IMITATION', 'INDIA', 'NGC encapsulation', 'ANACS', 
-			  'Restitution issue']
+			  'Restitution issue', 'ICG encapsulation', 'ICG slab']
 
 headers = {"User-Agent": 
 	"Analyzing Roman coins for a class project. \

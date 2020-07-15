@@ -8,21 +8,6 @@ pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
 pd.set_option('display.max_colwidth', -1)
 
-# convert all dash types (hyphen, en-, em-, minus, others?) to a
-# common dash to simplify analysis later
-# https://en.wikipedia.org/wiki/Dash#Similar_Unicode_characters
-# def format_dashes(text):
-# 	#text = text.encode('utf-8')
-# 	text = text.replace(u'\xa0', u' ')   # ???
-# 	text = text.replace(u'\u2010', u'-') # hyphen
-# 	text = text.replace(u'\u2012', u'-') # figure dash
-# 	text = text.replace(u'\u2013', u'-') # en-dash
-# 	text = text.replace(u'\u2014', u'-') # em-dash
-# 	text = text.replace(u'\u2015', u'-') # horizonal bar
-# 	text = text.replace(u'\u002D', u'-') # hyphen-minus
-# 	text = text.replace(u'\u00AD', u'-') # soft hyphen
-# 	text = text.replace(u'\u2212', u'-') # minus sign
-# 	return text
 
 def format_abbreviations(text):
 	text = re.sub(r'var\.', 'variation', text)
@@ -44,6 +29,7 @@ def format_abbreviations(text):
 	text = re.sub(r'R\.', 'R', text)
 	return text
 
+
 def format_measurements(text, verbose=False):
 	if verbose:
 		print('------------------------------------------------------')
@@ -56,12 +42,13 @@ def format_measurements(text, verbose=False):
 		print(text)
 	# scan text for the following regex patterns
 	patterns = [
-		r'\(.+mm.+[g|gm].+h\)\.', # case 1: complete string
-		r'\(.+mm.+[g|gm]\)\.',    # case 2: missing 'h' only
-		r'\(.+mm\)\.',            # case 3: missing 'g' and 'h' (no end space)
-		r'\(.+[g|gm].+h\)\.',     # case 4: missing 'mm' only
-		r'\(.+mm \)\.',           # case 5: missing 'g' and 'h' (with ending space)
-		r'\(.+[g|gm]\)\.',        # case 6: missing 'mm' and 'h'
+		r'\(.+mm.+gm?.+h\)\.', # case 1: complete string
+		r'\(.+mm.+gm?\)\.',    # case 2: missing 'h' only
+		r'\(.+mm\)\.',         # case 3: missing 'g' and 'h' (no end space)
+		r'\(.+gm?.+h\)\.',     # case 4: missing 'mm' only
+		r'\(.+mm \)\.',        # case 5: missing 'g' and 'h' (with ending space)
+		#r'\(.+gm?\)\.',       # case 6: missing 'mm' and 'h'
+		r'\(\S+\s+gm?\).'      # case 6: missing 'mm' and 'h'; same, but recoding using \S and \s.
 	]
 	for case, pattern in enumerate(patterns):
 		if verbose:
@@ -131,6 +118,7 @@ def format_measurements(text, verbose=False):
 			return text
 	raise Exception('No regex match. Unable to format measurements for {}'.format(text))
 
+
 def format_mint(text):
 	# mint with semicolon indicates proceeding moneyer
 	text = re.sub(r'mint\;', 'mint.', text)
@@ -154,6 +142,7 @@ def impute_strike(text, verbose=False):
 			print('post-strike text: {}'.format(text))
 	return text
 
+
 # impute 'mint' keyword if missing (goes before 'Stuck')
 def impute_mint(text, verbose=False):
 	if re.search(r'mint', text) is None:
@@ -171,6 +160,7 @@ def impute_mint(text, verbose=False):
 			print('post-mint text: {}'.format(text))
 	return text
 
+
 # impute 'moneyer' if missing (goes after 'mint' and before 'Struck')
 def impute_moneyer(text, verbose=False):
 	if re.search(r'moneyer', text) is None:
@@ -187,9 +177,6 @@ def impute_moneyer(text, verbose=False):
 		if(verbose): 
 			print('post-strike text: {}'.format(text))
 	return text
-
-
-
 
 
 if __name__ == '__main__':
@@ -224,6 +211,14 @@ if __name__ == '__main__':
 
 	# remove forgeries
 	df = df[~df['Description'].str.contains(r'forger')]
+
+	# remove Neronian artifacts (Damnatio?)
+	df = df[~df['Description'].str.contains(r'Hinged Æ Mirror')]
+	df = df[~df['Description'].str.contains(r'Æ “Cut” Sestertius')]
+	df = df[~df['Description'].str.contains(r'Æ Cut Sestertius')]
+	df = df[~df['Description'].str.contains(r'Æ Uniface Sestertius')]
+	# remove entries with uncertain RIC number
+	df = df[~df['Description'].str.contains(r'RIC I \?')]
 
 	# remove 'Affiliated Auctions' based on auction type
 	df = df[~df['Auction Type'].str.contains(r'Affiliated Auction')]
@@ -294,18 +289,31 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'M[\.] DVRMIVS III\. VIR', 'M • DVRMIVS/ • III • VIR', x)) # FA, Triton X, 559
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'S•P•Q•R /', 'S•P•Q•R/', x)) # FA, CNG 75, 964
 	# Augustus_Ses_EA1.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x)) # <--- should this be AUGUSTUS\.
 
+	# Nero_Aur_EA1.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(19mm 7\.13\)', '(19mm 7.13 g)', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO\.', 'Nero.', x))
+	# Nero_Aur_PA1.csv
+	# <--- okay
+	# Nero_Den_EA1.csv
+	# <--- okay
+	# Nero_Den_EA2.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO with Agrippina', 'Nero with Agrippina', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'RIC I 7; BMCRE 8; RSC 4\.', 'RIC I 7; BMCRE 8; RSC 4. Good Fine', x)) # <-- missing grade!
+	# Nero_Den_PA1.csv 
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'PONTIF • MAX •', ' / PONTIF • MAX •', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'young bare head right /  / ', ' young bare head right / ', x))
+	# Nero_Ses_EA1.csv
+	# <--- okay
+	# Nero_Ses_EA2.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'RIC I 388\. green patina', 'RIC I 7; RIC I 388. Fine, green patina', x)) # <-- missing grade!
+	# Nero_Ses_PA1.csv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Superb virtually as struck', 'Superb EF, virtually as struck', x)) # <-- missing grade!
 
 
 	# clean and standardize the Description field
-	# ====================================
-
-	#df['Description'] = df['Description'].apply(lambda x: format_dashes(x))
-	#print(df.info())
-
-	# df['Description'] = df['Description'].apply(lambda x: format_spaces(x))
-	#print(df.info())
+	# ===========================================
 
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
 	#print(df.info())

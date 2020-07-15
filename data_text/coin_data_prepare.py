@@ -15,18 +15,13 @@ emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho',
 
 denominations = ['Aureus', 'Denarius', 'Cistophorus', 'Sestertius']
 
-# order matters for search!
-grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 'Nice VF', 
-		'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 'Fine']
-
-# the general function
-# def get_keyword(text, keyword):
-# 	for segment in text.split('.'):
-# 		if keyword in segment:
-# 			return segment
-# 	return None
+# order matters; e.g., want to check for 'Superb EF' before 'EF'
+grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 'Choice VF', 
+		'Nice VF', 'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 
+		'Fine']
 
 def get_emperor(text):
+	#print(text)
 	for emperor in emperors:
 		if emperor in text:
 			return emperor
@@ -37,8 +32,8 @@ def get_reign(text):
 	for segment in text.split('.'):
 		if 'BC-AD' in segment:
 			return segment
-		#else if 'AD' in segment: # <--- i.e. post Augustus
-		#	return segment
+		if 'AD' in segment:
+			return segment
 	raise Exception('Reign not found in {}'.format(text))
 
 def get_denomination(text):
@@ -61,7 +56,10 @@ def get_diameter(text):
 			segment = segment.replace('mm', '')
 			segment = segment.strip()
 			#print(segment)
-			return float(segment)
+			try:
+				return float(segment)
+			except:
+				raise Exception('Bad Diameter in {}'.format(text))
 	raise Exception('Diameter keyword not found in {}'.format(text))
 
 def get_weight(text):
@@ -77,7 +75,10 @@ def get_weight(text):
 			segment = segment.replace('g', '')
 			segment = segment.strip()
 			#print(segment)
-			return float(segment)
+			try:
+				return float(segment)
+			except:
+				raise Exception('Bad Weight in {}'.format(text))
 	raise Exception('Weight keyword not found in {}'.format(text))
 
 def get_hour(text):
@@ -93,7 +94,10 @@ def get_hour(text):
 			segment = segment.replace('h', '')
 			segment = segment.strip()
 			#print(segment)
-			return int(segment)
+			try:
+				return int(segment)
+			except:
+				raise Exception('Bad Hour in {}'.format(text))
 	raise Exception('Hour keyword not found in {}'.format(text))
 
 # def get_mcase(text):
@@ -156,6 +160,7 @@ def get_RIC_number(text):
 	raise Exception('RIC number not found in {}'.format(text))
 
 def get_imagery(text, verbose=True):
+	print(text)
 	lower = text.find('Struck')
 	upper = text.find('RIC')
 	if upper<0:
@@ -164,7 +169,7 @@ def get_imagery(text, verbose=True):
 	if lower>0 and upper>0:
 		text = text[lower:upper]
 	else:
-		raise Exception('Unable to isolate \'imagery\' field in {}'.format(text))
+		raise Exception('Unable to isolate \"imagery\" field in {}'.format(text))
 	# assume the longest segment between 'Struck' and 'RIC' 
 	# fields contains the coin imagery content
 	segments = text.split('.')
@@ -174,6 +179,9 @@ def get_imagery(text, verbose=True):
 		if len(segment)>length:
 			imagery = segment
 			length = len(segment)
+	#print(' imagery: ', imagery)
+	if imagery == None:
+		raise Exception('Imagery Missing {}'.format(text))
 	return imagery
 
 def get_grade(text):
@@ -216,9 +224,14 @@ def get_comments(text):
 	return comments
 
 def split_imagery(x):
+	#print('imagery: {}'.format(x))
+	try:
+		x.split(' / ')
+	except:
+		raise Exception('unable to split imagery: {}'.format(x))
 	x = x.split(' / ')
 	if len(x)!=2:
-		raise Exception('more than one split in entry {}'.format(x))
+		raise Exception('more than one split in entry: {}'.format(x))
 	return x
 
 def clean_inscriptions(x):
@@ -305,6 +318,8 @@ if __name__ == '__main__':
 	#print(df.info())
 
 	df['Imagery'] = df['Description'].apply(lambda x: get_imagery(x))
+	#print(df.info())
+
 	df['Obverse'], df['Reverse'] = zip(*df['Imagery'].apply(split_imagery))
 	#print(df.info())
 
