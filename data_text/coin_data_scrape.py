@@ -71,7 +71,7 @@ def get_auction_type(data):
 	except Exception as error:
 		print(error)
 	try:
-		result = re.search(r'(The Coin Shop|Electronic Auction|Feature Auction|Affiliated Auction)', text)
+		result = re.search(r'(The Coin Shop|Electronic Auction|Feature Auction)', text)
 		if result is not None:
 			auction = str(result.group())
 			return auction
