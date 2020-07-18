@@ -416,17 +416,10 @@ if __name__ == '__main__':
 	# keywords: tone
 	# ==============
 
-	# # delete this
-	def tone_function(x):
-		x = x.replace('toned', 'tone')
-		x = x.replace('toning', 'tone') # don't want to do this.
-		return x
-	data['Comments'] = data['Comments'].apply(tone_function)
-	data['is_toned'] = data['Comments'].apply(lambda x: True if 'tone' in x.lower() else False)
-	# and replace with
-	#data['is_toned'] = data['Comments'].apply(lambda x: True if 'toned' in x.lower() else False)
+	data['is_toned'] = data['Comments'].apply(lambda x: True if 'toned' in x.lower() else False)
 
-	#data['is_lustrous'] = data['Comments'].apply(lambda x: bool(re.search(r'lustre|luster|lustrous', x.lower())))
+	# studied and no impact
+	data['is_lustrous'] = data['Comments'].apply(lambda x: bool(re.search(r'lustre|luster|lustrous', x.lower())))
 
 	# studied and no impact
 	#data['is_attractive'] = data['Comments'].apply(lambda x: True if 'attractive' in x.lower() else False)
@@ -438,7 +431,7 @@ if __name__ == '__main__':
 	#data['has_hue'] = data['Comments'].apply(lambda x: bool(re.search(r'irides|gray|gold|cabinet',x.lower())))
 
 	#text = text.replace('iridescence', 'iridescent')
-	#data['is_iridescent'] = data['Comments'].apply(lambda x: True if 'iridescent' in x.lower() else False)
+	data['is_iridescent'] = data['Comments'].apply(lambda x: True if 'iridescent' in x.lower() else False)
 
 	# studied and no impact
 	#data['is_gray'] = data['Comments'].apply(lambda x: True if 'gray' in x else False)
@@ -449,11 +442,13 @@ if __name__ == '__main__':
 	#text = text.replace('darkly', 'dark')
 	#data['is_dark'] = data['Comments'].apply(lambda x: True if 'dark' in x else False)
 
-	#data['is_cabinet_toned'] = data['Comments'].apply(lambda x: True if 'cabinet' in x else False)
+	data['is_cabinet_toned'] = data['Comments'].apply(lambda x: True if 'cabinet' in x else False)
 
-	# positive_words = ['wonderful', 'excellent', 'lovely', 'terrific', 'exceptional', 'extremely', 'artistic', 
-	# 	'beautiful', 'gorgeous', 'attractive', 'bold', 'excellent', 'amazing']
-	# data['has_positive_word'] = data['Comments'].apply(lambda x: keyword_check(x.lower(), positive_words))
+	positive_words = ['wonderful', 'excellent', 'lovely', 'terrific', 'exceptional', 'extremely', 'artistic', 
+	 	'beautiful', 'gorgeous', 'attractive', 'bold', 'excellent', 'amazing']
+	data['has_positive_word'] = data['Comments'].apply(lambda x: any(pos_word in positive_words for pos_word in x.lower().split()))
+	#data['has_positive_word'] = data['Comments'].apply(lambda x: 
+	#	bool(re.search(r'wonderful|excellent|lovely|terrific|exceptional|extremely|artistic|beautiful|gorgeous|attractive|bold|excellent|amazing', x.lower())))
 
 	# keywords: rarity
 	# ================
@@ -461,7 +456,7 @@ if __name__ == '__main__':
 	#data['is_rare'] = data['Comments'].apply(lambda x: True if 'rare' in x.lower() else False)
 	data['is_rare'] = data['Comments'].apply(lambda x: bool(re.search(r'rare|scarse|scarce', x.lower())))
 
-	#data['is_very_rare'] = data['Comments'].apply(lambda x: bool(re.search(r'extremely rare|very rare|unique|coinArchives', x.lower())))
+	data['is_very_rare'] = data['Comments'].apply(lambda x: bool(re.search(r'extremely rare|very rare|unique|coinArchives', x.lower())))
 
 	# keywords: portrait
 	# ================
@@ -522,7 +517,7 @@ if __name__ == '__main__':
 	# studied and no impact
 	#data['has_die_break'] = data['Comments'].apply(lambda x: True if 'die-break' in x else False)
 
-	#data['has_die_shift'] = data['Comments'].apply(lambda x: True if 'die-shift' in x else False) 
+	data['has_die_shift'] = data['Comments'].apply(lambda x: True if 'die-shift' in x else False) 
 
 	# studied and no impact
 	#data['has_die_rust'] = data['Comments'].apply(lambda x: True if 'die-rust' in x else False)
@@ -620,13 +615,12 @@ if __name__ == '__main__':
 
 	#data['keyword_reverse'] = data['Comments'].apply(lambda x: True if 'reverse' in x else False)
 
-	#data['keyword_obverse'] = data['Comments'].apply(lambda x: True if 'obverse' in x else False)
+	data['keyword_obverse'] = data['Comments'].apply(lambda x: True if 'obverse' in x else False)
 
 	# # studied and no impact
 	# data['keyword_cut'] = data['Comments'].apply(lambda x: True if 'cut' in x else False)
 
 	data.drop('Comments', axis=1, inplace=True)
-
 
 
 
