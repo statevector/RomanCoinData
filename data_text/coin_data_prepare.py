@@ -4,6 +4,7 @@ import re
 import sys
 import os
 import pandas as pd
+import numpy as np
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
@@ -48,7 +49,7 @@ def get_diameter(text):
 	for segment in text.split('.'):
 		#print(segment)
 		if 'unlisted Diameter' in segment:
-			return None
+			return np.nan
 		if 'Diameter' in segment:
 			#print(segment)
 			segment = segment.replace('@', '.')
@@ -67,7 +68,7 @@ def get_weight(text):
 	for segment in text.split('.'):
 		#print(segment)
 		if 'unlisted Weight' in segment:
-			return None
+			return np.nan
 		if 'Weight' in segment:
 			#print(segment)
 			segment = segment.replace('@', '.')
@@ -86,7 +87,7 @@ def get_hour(text):
 	for segment in text.split('.'):
 		#print(segment)
 		if 'unlisted Hour' in segment:
-			return None
+			return np.nan
 		if 'Hour' in segment:
 			#print(segment)
 			segment = segment.replace('@', '.')
@@ -312,6 +313,7 @@ if __name__ == '__main__':
 	#print(df.info())
 
 	df['Moneyer'] = df['Description'].apply(lambda x: get_moneyer(x))
+	df['Moneyer'] = df['Moneyer'].astype(str)
 	#print(df.info())
 
 	df['Struck'] = df['Description'].apply(lambda x: get_strike_date(x))

@@ -265,12 +265,18 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv")
+	import glob
+	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv")
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	data = data[~data['Denomination'].str.contains(r'Aureus')]
-	data['Auction ID'] = data['Auction ID'].astype(str)
+	#data = data[~data['Denomination'].str.contains(r'Sestertius')]
+	#data = data[~data['Denomination'].str.contains(r'Cistophorus')]
+	#data = data[~data['Denomination'].str.contains(r'Aureus')]
+	#
+	data = data[data['Denomination'].str.contains(r'Sestertius')]
+	# shuffle dataframe here
+	#data = data[0:500] # r2 of 0.87
+	#data = data[501:] # r2 of 0.79
+	#
 	print(data.shape)
 	print('INPUT DATASET: ')
 	data.info()
@@ -279,7 +285,6 @@ if __name__ == '__main__':
 	# import glob
 	# files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv")
 	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# data['Auction ID'] = data['Auction ID'].astype(str)
 	# print(data.shape)
 	# data.info()
 
@@ -293,6 +298,7 @@ if __name__ == '__main__':
 	data.drop(['Auction Type'], axis=1, inplace=True)
 
 	# one hot encode 'Auction ID' and drop
+	data['Auction ID'] = data['Auction ID'].astype(str)
 	data['is_Triton'] = data['Auction ID'].map(lambda x: True if 'Triton' in x else False)
 	data['is_CNG'] = data['Auction ID'].apply(lambda x: True if 'CNG' in x else False)
 	# <-- drop first weekly values. Double check.

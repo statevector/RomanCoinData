@@ -302,13 +302,14 @@ if __name__ == '__main__':
 	# Nero_Aur_PA1.csv
 	# <--- okay
 	# Nero_Den_EA1.csv
-	# <--- okay
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(18mm 328 g 5h\)', '(18mm 3.28 g 5h)', x))
 	# Nero_Den_EA2.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO\,? with Agrippina', 'Nero with Agrippina', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO and AGRIPPINA JR', 'Nero and Agrippina Jr', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'RIC I 7; BMCRE 8; RSC 4\.', 'RIC I 7; BMCRE 8; RSC 4. Good Fine', x)) # <-- missing grade!
 	# Nero_Den_PA1.csv 
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Struck AD 60-61. PONTIF • MAX', 'Struck AD 60-61. NERO CAESAR AUG IMP / PONTIF • MAX', x)) # missing obv
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(352 g 5h\)', '(3.52 g 5h)', x))
 	# Nero_Ses_EA1.csv
 	# <--- okay
 	# Nero_Ses_EA2.csv
