@@ -1,0 +1,14 @@
+../data_emperors/
+../data_raw/
+../data_sorted/
+.ipynb_checkpoints/
+aug.txt
+baseline/
+data_html/
+data_scraped/
+jupyter/
+note.txt
+old/
+overlap_tests/
+run_tests_cnn.txt
+server.txt
