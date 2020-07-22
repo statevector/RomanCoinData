@@ -46,16 +46,34 @@ def count_unique_words(series):
 	return word_list.sort_values(ascending=False)
 
 def consolidate_grades(text):
+	#
+	# Augustus
 	# Near Fine      5
-	# Fine          72
-	# Good Fine     26
-	# Near VF      106
-	# VF           511 # <--- choice VF?
-	# Good VF      316
-	# Near EF      104
-	# EF           103
+	# Fine          99
+	# Good Fine     35
+	# Near VF      128
+	# VF           586
+	# Good VF      354
+	# Choice VF      1
+	# Near EF      119
+	# EF           116
 	# Superb EF     17
-	# Choice EF      6
+	# Choice EF      8
+	#
+	# Nero
+	# Near Fine     17
+	# Fine         130
+	# Good Fine     38
+	# Near VF      146
+	# VF           358
+	# Good VF      180
+	# Choice VF      2
+	# Near EF       46
+	# EF            34
+	# Superb EF      4
+	# Choice EF      0
+	if 'Choice VF' in text:
+		return 'Near EF'
 	if 'Near Fine' in text:
 		return 'Fine'
 	if 'Superb EF' in text:
@@ -247,29 +265,14 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-	# files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv")
-	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# #data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	# #data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	# #data = data[~data['Denomination'].str.contains(r'Aureus')]
-	# data['Auction ID'] = data['Auction ID'].astype(str)
-	# print(data.shape)
-	# print('INPUT DATASET: ')
-	# data.info()
-
-	# new data (TOTAL)
-	import glob
-	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Augustus*/*prepared.csv")
+	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv")
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	data = data[~data['Denomination'].str.contains(r'Sestertius')]
 	data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	data = data.sort_values(['Auction ID','Auction Lot'], ascending=True)
+	data = data[~data['Denomination'].str.contains(r'Aureus')]
 	data['Auction ID'] = data['Auction ID'].astype(str)
-	data = data.drop([1127, 123, 98, 97, 96, 95, 94, 93, 
-		92, 91, 90, 296, 295, 294, 293, 292, 291, 290, 289, 287, 
-		286, 285, 284, 283, 1239, 1248, 1263, 1285, 1286, 1287, 1340, 
-		1341, 452, 432, 48, 47, 46], axis=0)
 	print(data.shape)
+	print('INPUT DATASET: ')
 	data.info()
 
 	# nero data
@@ -757,7 +760,7 @@ if __name__ == '__main__':
 	# linear regression model with L2 regularization
 	ridge = Ridge(random_state=42, max_iter=100000)
 	# set grid search parameters
-	alphas = np.logspace(-2, 1, 100)
+	alphas = np.logspace(-2, 3, 100)
 	param_grid = {'alpha': alphas}
 	n_folds = 5
 	# perform grid search
@@ -770,7 +773,7 @@ if __name__ == '__main__':
 	print('best alpha: {}'.format(alpha))
 
 	# test model on unseen data
-	model = Ridge(alpha=1, max_iter=1e8).fit(X_train, y_train)
+	model = Ridge(alpha=alpha, max_iter=1e8).fit(X_train, y_train)
 	#print('coef: {}'.format(model.coef_))
 	#print('intercept: {}'.format(model.intercept_))
 	y_train_pred = model.predict(X_train)

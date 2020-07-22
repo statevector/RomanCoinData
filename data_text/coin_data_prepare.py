@@ -16,14 +16,14 @@ emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho',
 denominations = ['Aureus', 'Denarius', 'Cistophorus', 'Sestertius']
 
 # order matters; e.g., want to check for 'Superb EF' before 'EF'
-grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 'Choice VF', 
-		'Nice VF', 'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 
-		'Fine']
+grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 
+		'Choice VF', 'Nice VF', 'Good VF', 'Near VF', 'VF', 
+		'Good Fine', 'Near Fine', 'Fine']
 
 def get_emperor(text):
 	#print(text)
 	for emperor in emperors:
-		if emperor in text:
+		if emperor in text.split('.')[0]:
 			return emperor
 	raise Exception('Emperor not found in {}'.format(text))
 
@@ -160,7 +160,7 @@ def get_RIC_number(text):
 	raise Exception('RIC number not found in {}'.format(text))
 
 def get_imagery(text, verbose=True):
-	print(text)
+	#print(text)
 	lower = text.find('Struck')
 	upper = text.find('RIC')
 	if upper<0:

@@ -258,6 +258,10 @@ if __name__ == '__main__':
 	df = df[df['Description'].str.contains(r'RIC ')]
 	print(df.shape)
 
+	# remove coins that haven't been cleaned
+	df = df[~df['Description'].str.contains(r'Uncleaned')]
+	print(df.shape)
+
 	# correct edge cases 
 	# ==================
 
@@ -294,16 +298,17 @@ if __name__ == '__main__':
 	# Nero_Aur_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(19mm 7\.13\)', '(19mm 7.13 g)', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO\.', 'Nero.', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'/  / PONTIF • MAX', '/ PONTIF • MAX •', x))
 	# Nero_Aur_PA1.csv
 	# <--- okay
 	# Nero_Den_EA1.csv
 	# <--- okay
 	# Nero_Den_EA2.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO with Agrippina', 'Nero with Agrippina', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO\,? with Agrippina', 'Nero with Agrippina', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO and AGRIPPINA JR', 'Nero and Agrippina Jr', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'RIC I 7; BMCRE 8; RSC 4\.', 'RIC I 7; BMCRE 8; RSC 4. Good Fine', x)) # <-- missing grade!
 	# Nero_Den_PA1.csv 
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'PONTIF • MAX •', ' / PONTIF • MAX •', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'young bare head right /  / ', ' young bare head right / ', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Struck AD 60-61. PONTIF • MAX', 'Struck AD 60-61. NERO CAESAR AUG IMP / PONTIF • MAX', x)) # missing obv
 	# Nero_Ses_EA1.csv
 	# <--- okay
 	# Nero_Ses_EA2.csv
