@@ -91,94 +91,6 @@ if __name__ == '__main__':
 	y = np.array(y)
 	print('y.shape: {}'.format(y.shape))
 
-
-
-
-	# # isolate image with greatest number of 
-	# # rows to define whitespace padding
-	# maxrows = 128
-	# print('maxrows: {}'.format(maxrows))
-
-	# #halfcols = data['Columns'].max()//2
-	# #print('halfcols: {}'.format(halfcols))
-
-	# resize = False
-
-	# build feature matrices for obverse and reverse images
-	# X1 = []
-	# X2 = []
-	# y = []
-	
-	# for idx, path in enumerate(paths):
-
-	# 	# crop image top in pixels
-	# 	if(rows>maxrows):
-	# 		#img = img[0:maxrows, :, :]
-	# 		img = img[0:maxrows, :]
-	# 	print('cropped    ', img.shape)
-
-	# 	# pad image top in pixels
-	# 	if(rows<maxrows):
-	# 		top_pad = maxrows - rows
-	# 		#print(maxrows, rows, top_pad)
-	# 		WHITE = [255, 255, 255]
-	# 		img = cv2.copyMakeBorder(img, top_pad, 0, 0, 0,  cv2.BORDER_CONSTANT, value=WHITE)
-	# 	print('padded     ', img.shape)
-	# 	#cv2.imshow('title', img)
-	# 	#cv2.waitKey(0)
-
-	# 	#ipdb.set_trace()
-
-	# 	# grab obverse
-	# 	#######img1 = img[:, :cols//2, :]
-	# 	img1 = img[:, :cols//2]
-	# 	print('obverse    ', img1.shape)
-	# 	#cv2.imshow('title', imgr1)
-	# 	#cv2.waitKey(0)
-
-	# 	# resize obverse image
-	# 	if(resize):
-	# 		img1 = cv2.resize(img1, (32, 32), interpolation=cv2.INTER_AREA)
-	# 		print('obv. R     ', img1.shape)
-	# 		#cv2.imshow('title', img1)
-	# 		#cv2.waitKey(0)
-
-	# 	# grab reverse
-	# 	#######img2 = img[:, cols//2:, :]
-	# 	img2 = img[:, cols//2:]
-	# 	print('reverse    ', img2.shape)
-	# 	#cv2.imshow('title', img2)
-	# 	#cv2.waitKey(0)
-
-	# 	# resize reverse image
-	# 	if(resize):
-	# 		img2 = cv2.resize(img2, (32, 32), interpolation=cv2.INTER_AREA)
-	# 		print('rev. R     ', img2.shape)
-	# 		cv2.imshow('title', img2)
-	# 		cv2.waitKey(0)
-
-	# 	X2.append(img2)
-	# 	X1.append(img1)
-	# 	y.append(data['Sold'].iloc[idx])
-		
-	# 	print('-------------------------')
-
-	# convert to numpy array and reshape for keras model
-
-	# X1 = np.stack(X1, axis=0)
-	# print('X1.shape: {}'.format(X1.shape))
-
-	# X2 = np.stack(X2, axis=0)
-	# print('X2.shape: {}'.format(X2.shape))
-
-	# y = np.array(y)
-	# print('y.shape: {}'.format(y.shape))
-
-	# # temp assign
-	# X = X1
-	# X2 = None
-
-
 	# shuffle data ...
 	randomize = np.arange(X.shape[0])
 	print(randomize.shape)
@@ -247,10 +159,6 @@ if __name__ == '__main__':
 			if i>=4: 
 				plt.close('all')
 				break
-
-
-
-
 
 	# flatten inputs for baseline tests
 	# X_train_b = X_train.reshape(len(X_train),-1)
