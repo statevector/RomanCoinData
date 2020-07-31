@@ -18,8 +18,8 @@ from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 
 # gpu run
-gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpu_devices[0], True)
+#gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+#tf.config.experimental.set_memory_growth(gpu_devices[0], True)
 
 def rmse(y_true, y_pred):
 	return K.sqrt(K.mean(K.square(y_pred - y_true), axis=-1))
@@ -29,14 +29,26 @@ def r2(y_true, y_pred):
 	SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
 	return 1 - SS_res/(SS_tot + K.epsilon())
 
+def consolidate_grades(text):
+	if 'Choice VF' in text:
+		return 'Near EF'
+	if 'Near Fine' in text:
+		return 'Fine'
+	if 'Superb EF' in text:
+		return 'Good_EF'
+	if 'Choice EF' in text:
+		return 'Good_EF'
+	if 'FDC' in text:
+		return 'Good_EF'
+	return text
+
 if __name__ == '__main__':
 
-	files = glob.glob("/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv")
+	#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+	location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+	files = glob.glob(location)
 	print(files)
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	#data = data[['Image Path', 'Sold']]
-	#data.info()
-	#paths = data['Image Path'].values
 	print(data.shape)
 	print('INPUT DATASET: ')
 	data.info()
@@ -44,12 +56,12 @@ if __name__ == '__main__':
 	# convert images to grayscale for faster training
 	use_gray = False
 	
+	# load image data
 	X = []
-	y = []
 	for index, row in data.iterrows():
 		
 		#if index > 30: continue
-		#print(row)
+		print('reading image: {}'.format(index))
 
 		# load image
 		img = cv2.imread(row['Image Path'])
@@ -98,16 +110,107 @@ if __name__ == '__main__':
 		#cv2.waitKey(0)
 
 		X.append(img1)
-		y.append(row['Sold'])
-
 
 	X = np.stack(X, axis=0)
 	print('X.shape: {}'.format(X.shape))
 
-	y = np.array(y)
+
+	# load text data
+	# ==============
+
+	data = data[['Auction Type', 'Estimate', 'Sold', 'Denomination', 'Diameter', 'Weight', 'Grade']]
+
+	# one hot encode 'Auction Type' and drop
+	data['is_Feature_Auction'] = data['Auction Type'].map(lambda x: True if 'Feature Auction' in x else False)
+	data.drop(['Auction Type'], axis=1, inplace=True)
+
+	# transform to be symmetric (big model improvement!)
+	data['Estimate'] = data['Estimate'].map(lambda x: np.log1p(x))
+	data.drop(['Estimate'], axis=1, inplace=True)
+
+	# define the target vector
+	data['Sold'] = data['Sold'].map(lambda x: np.log1p(x))
+	#data = data[data['Sold']<data['Sold'].quantile(0.95)] # drop high-end outliers
+	y = data['Sold'].values
+	data.drop(['Sold'], axis=1, inplace=True)
+
+	# impute missing 'Diameter' measurements
+	diameter_map = data.groupby('Denomination')['Diameter'].transform(np.median)
+	data['Diameter'] = data['Diameter'].fillna(diameter_map)
+
+	# impute missing 'Weight' measurements
+	weight_transformer = data.groupby('Denomination')['Weight'].transform(np.median)
+	data['Weight'] = data['Weight'].fillna(weight_transformer)
+
+	# one hot encode 'Denomination'
+	data['is_Aureus'] = data['Denomination'].map(lambda x: True if 'Aureus' in x else False)
+	data['is_Denarius'] = data['Denomination'].map(lambda x: True if 'Denarius' in x else False)
+	#data['is_Cistophorus'] = data['Denomination'].map(lambda x: True if 'Cistophorus' in x else False)
+	data['is_Sestertius'] = data['Denomination'].map(lambda x: True if 'Sestertius' in x else False)
+	data.drop(['Denomination'], axis=1, inplace=True)
+
+	# one hot encode 'Grade'
+	data['Grade'] = data['Grade'].map(consolidate_grades)
+	data = pd.get_dummies(data, prefix='is', columns=['Grade'], drop_first=False, dtype=np.int)
+
+	data.info()
+	
+	# model text data
+	# ===============
+
+	Xt = data.values
+	print(Xt.shape)
+
+	# shuffle data for training
+	randomize = np.arange(Xt.shape[0])
+	print(randomize.shape)
+	np.random.shuffle(randomize)
+	Xt = Xt[randomize]
+	y = y[randomize]
+
+	n_train = int(0.80 * Xt.shape[0])
+	Xt_train, Xt_test = Xt[:n_train, :], Xt[n_train:, :]
+	y_train, y_test = y[:n_train], y[n_train:]
+
+	# baseline model
+	model = Sequential()
+	model.add(Dense(64, activation='relu', input_shape = Xt_train.shape[1:]))
+	#model.add(Dropout(rate=0.10))
+	model.add(Dense(32, activation='relu'))
+	#model.add(Dropout(rate=0.10))
+	model.add(Dense(16, activation='relu'))
+	#model.add(Dropout(rate=0.5))
+	model.add(Dense(8, activation='relu'))
+	#model.add(Dropout(rate=0.5))
+	model.add(Dense(4, activation='relu'))
+	#model.add(Dropout(rate=0.5))
+	model.add(Dense(1))
+	adam = optimizers.Adam(lr=0.001)
+	mse = losses.MeanSquaredError()
+	model.compile(loss=mse, optimizer=adam, metrics=[r2, rmse])
+	print(model.summary())
+	history = model.fit(Xt_train, y_train, batch_size=256, epochs=400, verbose=1, validation_data=(Xt_test, y_test))
+	score = model.evaluate(Xt_test, y_test, verbose=0)
+	print('Test loss:', score[0])
+	print('Test accuracy:', score[1])
+
+	# =========
+
+	quit()
+
+
+
+
+
+
+
+	#y = np.log1p(data['Sold'])
+	#y = np.array(y)
 	print('y.shape: {}'.format(y.shape))
 
-	# shuffle data ...
+
+
+	# shuffle data for training
 	randomize = np.arange(X.shape[0])
 	print(randomize.shape)
 	np.random.shuffle(randomize)
@@ -125,11 +228,6 @@ if __name__ == '__main__':
 
 	X_test = X_test.astype('float32')
 	X_test /= 255.
-
-	# NORMALIZE Y
-	y_train = np.log(y_train)
-	y_test = np.log(y_test)
-
 	
 	print('x_train shape:', X_train.shape)
 	print('x_test shape:', X_test.shape)
@@ -224,7 +322,7 @@ if __name__ == '__main__':
 	#model.add(Dense(8, activation='relu'))
 	#model.add(Dense(4, activation='relu'))
 	model.add(Dense(1)) # possible to add regularization
-	sgd = optimizers.SGD(learning_rate=0.0001, momentum=0.0, nesterov=False)
+	#sgd = optimizers.SGD(learning_rate=0.0001, momentum=0.0, nesterov=False)
 	adam = optimizers.Adam(learning_rate=0.0005)
 	mse = losses.MeanSquaredError()
 	print(adam)
