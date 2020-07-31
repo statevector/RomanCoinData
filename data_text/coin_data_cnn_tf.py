@@ -31,26 +31,28 @@ def r2(y_true, y_pred):
 
 if __name__ == '__main__':
 
-
 	files = glob.glob("/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv")
 	print(files)
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[['Image Path', 'Sold']]
 	#data.info()
-	paths = data['Image Path'].values
+	#paths = data['Image Path'].values
+	print(data.shape)
+	print('INPUT DATASET: ')
+	data.info()
 
 	# convert images to grayscale for faster training
-	use_gray=True
+	use_gray = False
 	
 	X = []
 	y = []
-	for idx, path in enumerate(paths):
-
+	for index, row in data.iterrows():
+		
 		#if index > 30: continue
-		print(path)
+		#print(row)
 
 		# load image
-		img = cv2.imread(path)
+		img = cv2.imread(row['Image Path'])
 		rows, cols, channels = img.shape
 		print('original   ', img.shape)
 
@@ -75,7 +77,7 @@ if __name__ == '__main__':
 		dim = (width, height)
 
 		# resize image
-		img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+		img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 		print('resized    ', img.shape)
 		#cv2.imshow('resized', img)
 		#cv2.waitKey(0)
@@ -96,7 +98,7 @@ if __name__ == '__main__':
 		#cv2.waitKey(0)
 
 		X.append(img1)
-		y.append(data['Sold'].iloc[idx])
+		y.append(row['Sold'])
 
 
 	X = np.stack(X, axis=0)
@@ -160,7 +162,7 @@ if __name__ == '__main__':
 	train_datagen = datagen.fit(X_train)
 
 	# plot a 3x3 grid of normalized images (sanity check)
-	test_generator = True
+	test_generator = False
 	if(test_generator):
 		for i, (X_batch, y_batch) in enumerate(datagen.flow(X_train, y_train, batch_size=9)):
 			print('i=', i, X_batch.shape)
@@ -229,8 +231,7 @@ if __name__ == '__main__':
 	model.compile(loss=mse, optimizer=adam, metrics=[r2, rmse])
 	print(model.summary())
 
-	history = model.fit(X_train, y_train, batch_size=256, epochs=100, verbose=1, 
-		validation_data=(X_test, y_test))
+	history = model.fit(X_train, y_train, batch_size=256, epochs=100, verbose=1, validation_data=(X_test, y_test))
 
 	# # keras run parameters
 	# batch_size = 64 # 1/100 the data
@@ -239,7 +240,7 @@ if __name__ == '__main__':
 	#history = model.fit_generator(
 	#	datagen.flow(X_train, y_train, shuffle=True, batch_size=256),
 	#	validation_data=(X_test, y_test),
-	#	steps_per_epoch=X_train.shape[0]/32, 
+	#	steps_per_epoch=X_train.shape[0]/256, 
 	#	epochs=100, 
 	#	use_multiprocessing=True, 
 	#	verbose=1)
