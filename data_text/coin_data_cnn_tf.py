@@ -163,6 +163,8 @@ if __name__ == '__main__':
 				plt.close('all')
 				break
 
+	#quit()
+	
 	# flatten inputs for baseline tests
 	# X_train_b = X_train.reshape(len(X_train),-1)
 	# X_test_b = X_test.reshape(len(X_test),-1)
@@ -221,7 +223,7 @@ if __name__ == '__main__':
 	#history = model.fit_generator(
 	#	datagen.flow(X_train, y_train, shuffle=True, batch_size=256),
 	#	validation_data=(X_test, y_test),
-	#	steps_per_epoch=X_train.shape[0]//256, 
+	#	steps_per_epoch=X_train.shape[0]/32, 
 	#	epochs=100, 
 	#	use_multiprocessing=True, 
 	#	verbose=1)
@@ -229,6 +231,3 @@ if __name__ == '__main__':
 	# score = model.evaluate(X_test, y_test, verbose=0)
 	# print('Test loss:', score[0])
 	# print('Test accuracy:', score[1])
-
-
-
