@@ -39,6 +39,8 @@ if __name__ == '__main__':
 	#data.info()
 	paths = data['Image Path'].values
 
+	# convert images to grayscale for faster training
+	use_gray=True
 	
 	X = []
 	y = []
@@ -53,12 +55,18 @@ if __name__ == '__main__':
 		print('original   ', img.shape)
 
 		# convert to gray scale
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-		print('gray       ', img.shape)
-		#cv2.imshow('gray', img)
-		#cv2.waitKey(0)
+		if use_gray:
+			img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+			print('gray       ', img.shape)
+			#cv2.imshow('gray', img)
+			#cv2.waitKey(0)
+		else:
+			# images are saved in RGB format, but cv2 reads them as BRG
+			img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+			#cv2.imshow('RGB', img)
+			#cv2.waitKey(0)
 
-		# resize image to consistent row-shape
+		# compute new dimensions for resized image
 		maxrows = 128
 		scale_percent = float(maxrows/rows) # percent of original size
 		#print(scale_percent)
@@ -72,8 +80,11 @@ if __name__ == '__main__':
 		#cv2.imshow('resized', img)
 		#cv2.waitKey(0)
 
-		# grab obverse
-		img1 = img[:, :img.shape[1]//2]
+		# grab only obverse
+		if use_gray:
+			img1 = img[:, :img.shape[1]//2]
+		else:
+			img1 = img[:, :img.shape[1]//2, :]
 		print('obverse    ', img1.shape)
 		#cv2.imshow('obverse', img1)
 		#cv2.waitKey(0)
@@ -140,15 +151,16 @@ if __name__ == '__main__':
 	    #rescale=1./255)
 	    )
 
-	# make rank 4 tensors for datagen
-	X_train = X_train.reshape((*X_train.shape,1))
-	X_test = X_test.reshape((*X_test.shape,1))
+	# make rank 4 tensors for datagen fit
+	if use_gray:
+		X_train = X_train.reshape((*X_train.shape, 1))
+		X_test = X_test.reshape((*X_test.shape, 1))
 
 	# compute quantities required for featurewise normalization
 	train_datagen = datagen.fit(X_train)
 
 	# plot a 3x3 grid of normalized images (sanity check)
-	test_generator = False
+	test_generator = True
 	if(test_generator):
 		for i, (X_batch, y_batch) in enumerate(datagen.flow(X_train, y_train, batch_size=9)):
 			print('i=', i, X_batch.shape)
@@ -156,8 +168,12 @@ if __name__ == '__main__':
 				print('j=', j, x.shape)
 				# subplot(nrows, ncols, index, **kwargs)
 				plt.subplot(3, 3, j+1)
-				x = x.reshape(128, 128)
-				plt.imshow(x, cmap='gray', vmin=0, vmax=1)
+				if use_gray:
+					x = x.reshape(128, 128) # for plotting
+					plt.imshow(x, cmap='gray', vmin=0, vmax=1)
+				else:
+					x = x.reshape(128, 128, 3)
+					plt.imshow(x)
 			plt.show()
 			if i>=4: 
 				plt.close('all')
@@ -231,3 +247,26 @@ if __name__ == '__main__':
 	# score = model.evaluate(X_test, y_test, verbose=0)
 	# print('Test loss:', score[0])
 	# print('Test accuracy:', score[1])
+
+
+# # define two sets of inputs
+# inputA = Input(shape=(32,))
+# inputB = Input(shape=(128,))
+# # the first branch operates on the first input
+# x = Dense(8, activation="relu")(inputA)
+# x = Dense(4, activation="relu")(x)
+# x = Model(inputs=inputA, outputs=x)
+# # the second branch opreates on the second input
+# y = Dense(64, activation="relu")(inputB)
+# y = Dense(32, activation="relu")(y)
+# y = Dense(4, activation="relu")(y)
+# y = Model(inputs=inputB, outputs=y)
+# # combine the output of the two branches
+# combined = concatenate([x.output, y.output])
+# # apply a FC layer and then a regression prediction on the
+# # combined outputs
+# z = Dense(2, activation="relu")(combined)
+# z = Dense(1, activation="linear")(z)
+# # our model will accept the inputs of the two branches and
+# # then output a single value
+# model = Model(inputs=[x.input, y.input], outputs=z)
