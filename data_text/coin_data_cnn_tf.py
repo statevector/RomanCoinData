@@ -3,6 +3,7 @@ import pandas as pd
 import cv2
 import os
 import glob
+import sys
 
 from matplotlib import pyplot
 import ipdb
@@ -18,8 +19,8 @@ from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 
 # gpu run
-#gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-#tf.config.experimental.set_memory_growth(gpu_devices[0], True)
+gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(gpu_devices[0], True)
 
 def rmse(y_true, y_pred):
 	return K.sqrt(K.mean(K.square(y_pred - y_true), axis=-1))
@@ -122,6 +123,7 @@ def prep_text_data(X):
 	X['is_Good_EF'] = X['Grade'].map(lambda x: True if 'Good EF' in x else False)
 	X.drop(['Grade'], axis=1, inplace=True)
 	# print
+	X = X.astype("float32")
 	X.info()
 	return np.array(X)
 
@@ -195,33 +197,36 @@ def define_combined_model(input_shapeA, input_shapeB):
 	# the first branch operates on the first input
 	x = Dense(64, activation='relu')(inputA)
 	#x = Dropout(rate=0.10)(x)
-	#x = Dense(32, activation="relu")(x)
-	#x = Dense(16, activation="relu")(x)
-	#x = Dense(8, activation="relu")(x)
-	#x = Dense(4, activation="relu")(x)
+	x = Dense(32, activation="relu")(x)
+	x = Dense(16, activation="relu")(x)
+	x = Dense(8, activation="relu")(x)
+	x = Dense(4, activation="relu")(x)
 	x = Model(inputs=inputA, outputs=x)
+	#print(x)
 
 	# the second branch opreates on the second input	
 	y = Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same')(inputB)
 	y = MaxPooling2D(pool_size=(3, 3))(y)
 	y = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(y)
 	y = MaxPooling2D(pool_size=(3, 3))(y)
-	#y = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(y)
-	#y = MaxPooling2D(pool_size=(3, 3))
+	y = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(y)
+	y = MaxPooling2D(pool_size=(3, 3))(y)
 	y = Flatten()(y)
 	y = Model(inputs=inputB, outputs=y)
+	#print(y)
 
 	# combine the output of the two branches
 	combined = concatenate([x.output, y.output])
 	# apply a FC layer and then a regression prediction on the
-	
+	#print(combined.shape)
+
 	# combined outputs
 	z = Dense(64, activation='relu')(combined)
 	#model.add(Dropout(rate=0.10))
-	#z = Dense(32, activation="relu")(z)
-	#z = Dense(16, activation="relu")(z)
-	#z = Dense(8, activation="relu")(z)
-	#z = Dense(4, activation="relu")(z)
+	z = Dense(32, activation="relu")(z)
+	z = Dense(16, activation="relu")(z)
+	z = Dense(8, activation="relu")(z)
+	z = Dense(4, activation="relu")(z)
 	#z = Dense(2, activation="relu")(z)
 	z = Dense(1)(z)
 	
@@ -229,8 +234,8 @@ def define_combined_model(input_shapeA, input_shapeB):
 	# then output a single value
 	model = Model(inputs=[x.input, y.input], outputs=z)
 	
-	#opt = optimizers.SGD(lr=0.0001, momentum=0.0, nesterov=False)
-	opt = optimizers.Adam(lr=0.001)
+	#opt = optimizers.SGD(learning_rate=0.0001, momentum=0.0, nesterov=False)
+	opt = optimizers.Adam(learning_rate=0.0005)
 	mse = losses.MeanSquaredError()
 	model.compile(loss=mse, optimizer=opt, metrics=[r2, rmse])
 
@@ -252,7 +257,7 @@ def define_text_model(input_shape):
 	model.add(Dense(1))
 	# compile model
 	#opt = optimizers.SGD(lr=0.0001, momentum=0.0, nesterov=False)
-	opt = optimizers.Adam(lr=0.001)
+	opt = optimizers.Adam(learning_rate=0.001)
 	mse = losses.MeanSquaredError()
 	model.compile(loss=mse, optimizer=opt, metrics=[r2, rmse])
 	return model
@@ -294,8 +299,8 @@ def summarize_diagnostics(history):
 	pyplot.plot(history.history['val_r2'], color='orange', label='test')
 	# save plot to file
 	filename = sys.argv[0].split('/')[-1]
-	#pyplot.savefig(filename + '_plot.png')
-	#pyplot.show()
+	pyplot.savefig(filename + '_plot.png')
+	pyplot.show()
 	pyplot.close()
 
 # data augmentation
@@ -470,8 +475,8 @@ if __name__ == '__main__':
 	if(True):
 
 		# load dataset
-		#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
-		location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Augustus*/*prepared.csv'
+		#location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
 		X_image, X_text, y = load_data(location)
 
 		assert(X_image.shape[0] == X_text.shape[0])
@@ -519,7 +524,7 @@ if __name__ == '__main__':
 		)
 		
 		# evaluate model
-		loss, r2, rmse = model.evaluate([Xi_test, Xt_test], y_test)
+		loss, r2, rmse = model.evaluate([Xt_test, Xi_test], y_test)
 		print('Test loss: {}'.format(loss))
 		print('Test R^2:  {}'.format(r2))
 		print('Test RMSE: {}'.format(rmse))
