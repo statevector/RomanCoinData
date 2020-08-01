@@ -9,8 +9,8 @@ import ipdb
 
 #from tensorflow import keras
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Flatten
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Dense, Dropout, Flatten, Input, concatenate
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import backend as K
@@ -48,10 +48,9 @@ def load_text_data(loc, verbose=False):
 	#print(files)
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	data.info()
-	# data fields to select for text model
-	data = data[['Auction Type', 'Estimate', 'Sold', 'Denomination', 'Diameter', 'Weight', 'Grade']]
-	y = data['Sold'] # series
-	X = data.drop('Sold', axis=1) # dataframe
+	# text model data fields
+	X = data[['Auction Type', 'Estimate', 'Denomination', 'Diameter', 'Weight', 'Grade']]
+	y = data['Sold']
 	return X, y
 
 def load_image_data(loc, verbose=False):
@@ -60,15 +59,23 @@ def load_image_data(loc, verbose=False):
 	#print(files)
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	data.info()
-	# data fields to select for text model
-	data = data[['Image Path' ,'Sold']]
-	y = data['Sold'] # series
-	X = data.drop('Sold', axis=1) # dataframe
+	# image model data fields
+	X = data[['Image Path']]
+	y = data['Sold']
 	return X, y
 
-def load_dataset(files):
-	pass
-	#return trainX1, trainX2, trainY, testX1, testX2, testY
+def load_data(loc):
+	# load files into a single dataframe
+	files = glob.glob(loc)
+	#print(files)
+	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
+	data.info()
+	# image model data fields
+	X_image = data[['Image Path']]
+	# text model data fields
+	X_text = data[['Auction Type', 'Estimate', 'Denomination', 'Diameter', 'Weight', 'Grade']]
+	y = data['Sold']
+	return X_image, X_text, y
 
 def build_train_test_sets(X, y, train_size=0.80, random_state=42):
 	# shuffle order of inputs to ensure reproducibility
@@ -85,9 +92,7 @@ def build_train_test_sets(X, y, train_size=0.80, random_state=42):
 	y_train, y_test = y.iloc[:n_train], y.iloc[n_train:]
 	return X_train, y_train, X_test, y_test
 
-def prep_text_data(X, y):
-	# transform target to be symmetric
-	y = y.map(lambda x: np.log1p(x))
+def prep_text_data(X):
 	# one hot encode 'Auction Type' and drop
 	X['is_Feature_Auction'] = X['Auction Type'].map(lambda x: True if 'Feature Auction' in x else False)
 	X.drop(['Auction Type'], axis=1, inplace=True)
@@ -118,11 +123,9 @@ def prep_text_data(X, y):
 	X.drop(['Grade'], axis=1, inplace=True)
 	# print
 	X.info()
-	return np.array(X), np.array(y)
+	return np.array(X)
 
-def prep_image_data(X, y, use_gray=False):
-	# transform target to be symmetric
-	y = y.map(lambda x: np.log1p(x))
+def prep_image_data(X, use_gray=False):
 	# build feature matrix from image paths
 	image_array = []
 	for index, row in X.iterrows():
@@ -176,31 +179,61 @@ def prep_image_data(X, y, use_gray=False):
 	# normalize to range 0-1
 	X = X / 255.0
 	# return normalized images
-	return np.array(X), np.array(y)
+	return np.array(X)
 
+def prep_target(y):
+	# transform target to be symmetric
+	y = y.apply(lambda x: np.log1p(x))
+	return np.array(y)
 
-def define_combined_model():
+def define_combined_model(input_shapeA, input_shapeB):
+
 	# define two sets of inputs
-	inputA = Input(shape=(32,))
-	inputB = Input(shape=(128,))
+	inputA = Input(shape=input_shapeA)
+	inputB = Input(shape=input_shapeB)
+
 	# the first branch operates on the first input
-	x = Dense(8, activation="relu")(inputA)
-	x = Dense(4, activation="relu")(x)
+	x = Dense(64, activation='relu')(inputA)
+	#x = Dropout(rate=0.10)(x)
+	#x = Dense(32, activation="relu")(x)
+	#x = Dense(16, activation="relu")(x)
+	#x = Dense(8, activation="relu")(x)
+	#x = Dense(4, activation="relu")(x)
 	x = Model(inputs=inputA, outputs=x)
-	# the second branch opreates on the second input
-	y = Dense(64, activation="relu")(inputB)
-	y = Dense(32, activation="relu")(y)
-	y = Dense(4, activation="relu")(y)
+
+	# the second branch opreates on the second input	
+	y = Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same')(inputB)
+	y = MaxPooling2D(pool_size=(3, 3))(y)
+	y = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(y)
+	y = MaxPooling2D(pool_size=(3, 3))(y)
+	#y = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(y)
+	#y = MaxPooling2D(pool_size=(3, 3))
+	y = Flatten()(y)
 	y = Model(inputs=inputB, outputs=y)
+
 	# combine the output of the two branches
 	combined = concatenate([x.output, y.output])
 	# apply a FC layer and then a regression prediction on the
+	
 	# combined outputs
-	z = Dense(2, activation="relu")(combined)
-	z = Dense(1, activation="linear")(z)
+	z = Dense(64, activation='relu')(combined)
+	#model.add(Dropout(rate=0.10))
+	#z = Dense(32, activation="relu")(z)
+	#z = Dense(16, activation="relu")(z)
+	#z = Dense(8, activation="relu")(z)
+	#z = Dense(4, activation="relu")(z)
+	#z = Dense(2, activation="relu")(z)
+	z = Dense(1)(z)
+	
 	# our model will accept the inputs of the two branches and
 	# then output a single value
 	model = Model(inputs=[x.input, y.input], outputs=z)
+	
+	#opt = optimizers.SGD(lr=0.0001, momentum=0.0, nesterov=False)
+	opt = optimizers.Adam(lr=0.001)
+	mse = losses.MeanSquaredError()
+	model.compile(loss=mse, optimizer=opt, metrics=[r2, rmse])
+
 	return model
 
 
@@ -327,8 +360,10 @@ if __name__ == '__main__':
 		# split data into train, test sets
 		X_train, y_train, X_test, y_test = build_train_test_sets(X, y)
 		# prepare train, test data
-		X_train, y_train = prep_text_data(X_train, y_train) # this should be a transformer class
-		X_test, y_test = prep_text_data(X_test, y_test)
+		X_train = prep_text_data(X_train) # this should be a transformer class
+		X_test = prep_text_data(X_test)
+		y_train = prep_target(y_train)
+		y_test = prep_target(y_test)
 		# define text model
 		input_shape = X_train.shape[1:]
 		model = define_text_model(input_shape)
@@ -347,6 +382,7 @@ if __name__ == '__main__':
 		# print learning curves
 		summarize_diagnostics(history)
 
+
 	# run image model
 	if(False):
 		# load image dataset
@@ -357,8 +393,10 @@ if __name__ == '__main__':
 		X_train, y_train, X_test, y_test = build_train_test_sets(X, y)
 		# prepare train, test data
 		X_train.shape
-		X_train, y_train = prep_image_data(X_train, y_train) # this should be a transformer class
-		X_test, y_test = prep_image_data(X_test, y_test)
+		X_train = prep_image_data(X_train) # this should be a transformer class
+		X_test = prep_image_data(X_test)
+		y_train = prep_target(y_train)
+		y_test = prep_target(y_test)
 		print('x_train shape:', X_train.shape)
 		print('x_test shape:', X_test.shape)
 		print('y_train shape:', y_train.shape)
@@ -383,7 +421,7 @@ if __name__ == '__main__':
 
 
 	# run image model with data augmentation
-	if(True):
+	if(False):
 		# load image dataset
 		#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
 		location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
@@ -392,8 +430,10 @@ if __name__ == '__main__':
 		X_train, y_train, X_test, y_test = build_train_test_sets(X, y)
 		# prepare train, test data
 		X_train.shape
-		X_train, y_train = prep_image_data(X_train, y_train) # this should be a transformer class
-		X_test, y_test = prep_image_data(X_test, y_test)
+		X_train = prep_image_data(X_train) # this should be a transformer class
+		X_test = prep_image_data(X_test)
+		y_train = prep_target(y_train)
+		y_test = prep_target(y_test)
 		print('x_train shape:', X_train.shape)
 		print('x_test shape:', X_test.shape)
 		print('y_train shape:', y_train.shape)
@@ -426,6 +466,65 @@ if __name__ == '__main__':
 		summarize_diagnostics(history)
 
 
+	# run combined model
+	if(True):
 
+		# load dataset
+		#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		X_image, X_text, y = load_data(location)
+
+		assert(X_image.shape[0] == X_text.shape[0])
+		assert(X_image.shape[0] == y.shape[0])
+
+		# split data into train, test sets
+		# shuffle order of inputs to ensure reproducibility
+		randomize = np.arange(X_image.shape[0])
+		np.random.seed(42)
+		np.random.shuffle(randomize)
+		# break into training and test sets
+		train_size = 0.80
+		n_train = int(train_size * X_image.shape[0])
+		#
+		X_image = X_image.iloc[randomize]
+		Xi_train, Xi_test = X_image.iloc[:n_train, :], X_image.iloc[n_train:, :]
+		#
+		X_text = X_text.iloc[randomize]
+		Xt_train, Xt_test = X_text.iloc[:n_train, :], X_text.iloc[n_train:, :]
+		#
+		y = y.iloc[randomize]
+		y_train, y_test = y.iloc[:n_train], y.iloc[n_train:]
+
+		# prepare train, test data
+		Xi_train = prep_image_data(Xi_train)
+		Xi_test = prep_image_data(Xi_test)
+		
+		Xt_train = prep_text_data(Xt_train)
+		Xt_test = prep_text_data(Xt_test)
+
+		y_train = prep_target(y_train)
+		y_test = prep_target(y_test)
+
+		# define text model
+		input_shapeA = Xt_train.shape[1:]
+		input_shapeB = Xi_train.shape[1:]
+		model = define_combined_model(input_shapeA, input_shapeB)
+		
+		# fit model
+		history = model.fit([Xt_train, Xi_train], y_train, 
+			batch_size=256, 
+			epochs=100, 
+			verbose=1, 
+			validation_data=([Xt_test, Xi_test], y_test)
+		)
+		
+		# evaluate model
+		loss, r2, rmse = model.evaluate([Xi_test, Xt_test], y_test)
+		print('Test loss: {}'.format(loss))
+		print('Test R^2:  {}'.format(r2))
+		print('Test RMSE: {}'.format(rmse))
+		
+		# print learning curves
+		summarize_diagnostics(history)
 
 
