@@ -77,11 +77,11 @@ def consolidate_grades(text):
 	if 'Near Fine' in text:
 		return 'Fine'
 	if 'Superb EF' in text:
-		return 'Good_EF'
+		return 'Good EF'
 	if 'Choice EF' in text:
-		return 'Good_EF'
+		return 'Good EF'
 	if 'FDC' in text:
-		return 'Good_EF'
+		return 'Good EF'
 	return text
 
 def stem_imagery(text):
@@ -266,13 +266,31 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 if __name__ == '__main__':
 
 	import glob
-	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv")
+	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv")
+	print(files)
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[~data['Denomination'].str.contains(r'Sestertius')]
 	#data = data[~data['Denomination'].str.contains(r'Cistophorus')]
 	#data = data[~data['Denomination'].str.contains(r'Aureus')]
+	#data = data[~data['Denomination'].str.contains(r'Denarius')]
 	#
-	data = data[data['Denomination'].str.contains(r'Sestertius')]
+	#data = data[data['Denomination'].str.contains(r'Sestertius')] # both look good
+	#data = data[data['Denomination'].str.contains(r'Aureus')] # looks good, nero drops from 88 to 81, data.drop([164], axis=0, inplace=True)
+	#data = data[data['Denomination'].str.contains(r'Cistophorus')] # looks good
+	#data = data[data['Denomination'].str.contains(r'Denarius')] # much lower... ~75 aug, all over the place (nero), why?
+
+	# Augustus Den PA
+	#data.drop([275], axis=0, inplace=True)
+	#data.drop([284], axis=0, inplace=True)
+	#data.drop([377], axis=0, inplace=True)
+
+	# shuffle data ...
+	randomize = np.arange(data.shape[0])
+	print(randomize.shape)
+	np.random.seed(42)
+	np.random.shuffle(randomize)
+	data = data.iloc[randomize]
+
 	# shuffle dataframe here
 	#data = data[0:500] # r2 of 0.87
 	#data = data[501:] # r2 of 0.79
@@ -309,6 +327,7 @@ if __name__ == '__main__':
 
 	# transform to be symmetric (big model improvement!)
 	data['Estimate'] = data['Estimate'].map(lambda x: np.log1p(x))
+	#data.drop(['Estimate'], axis=1, inplace=True)
 
 	# define the target vector
 	data['Sold'] = data['Sold'].map(lambda x: np.log1p(x))
@@ -338,7 +357,8 @@ if __name__ == '__main__':
 	data.drop(['Image Path'], axis=1, inplace=True)
 
 	# predictive, but irrelevant for Augustus only dataset
-	#data['is_Augustus'] = data['Emperor'].map(lambda x: True if 'Augustus' in x else False)
+	data['is_Augustus'] = data['Emperor'].map(lambda x: True if 'Augustus' in x else False)
+	data['is_Nero'] = data['Emperor'].map(lambda x: True if 'Nero' in x else False)
 	data.drop(['Emperor'], axis=1, inplace=True)
 
 	# non predictive
@@ -348,7 +368,7 @@ if __name__ == '__main__':
 	data['is_Aureus'] = data['Denomination'].map(lambda x: True if 'Aureus' in x else False)
 	data['is_Denarius'] = data['Denomination'].map(lambda x: True if 'Denarius' in x else False)
 	data['is_Cistophorus'] = data['Denomination'].map(lambda x: True if 'Cistophorus' in x else False)
-	# <--- drop first sestertius. Double check.
+	data['is_Sestertius'] = data['Denomination'].map(lambda x: True if 'Sestertius' in x else False)
 
 	# impute missing 'Diameter' measurements
 	diameter_map = data.groupby('Denomination')['Diameter'].transform(np.median)
@@ -413,7 +433,15 @@ if __name__ == '__main__':
 
 	# one hot encode 'Grade'
 	data['Grade'] = data['Grade'].map(consolidate_grades)
-	data = pd.get_dummies(data, prefix='is', columns=['Grade'], drop_first=True, dtype=np.int)
+	data['is_Fine'] = data['Grade'].map(lambda x: True if 'Fine' in x else False)
+	data['is_Good_Fine'] = data['Grade'].map(lambda x: True if 'Good Fine' in x else False)
+	data['is_Near_VF'] = data['Grade'].map(lambda x: True if 'Near VF' in x else False)
+	data['is_VF'] = data['Grade'].map(lambda x: True if 'VF' in x else False)
+	data['is_Good_VF'] = data['Grade'].map(lambda x: True if 'Good VF' in x else False)
+	data['is_Near_EF'] = data['Grade'].map(lambda x: True if 'Near EF' in x else False)
+	data['is_EF'] = data['Grade'].map(lambda x: True if 'EF' in x else False) # drop
+	data['is_Good_EF'] = data['Grade'].map(lambda x: True if 'Good EF' in x else False)
+	data.drop(['Grade'], axis=1, inplace=True)
 
 	# figure this out
 	# do manual stemming/lemmatization for now
@@ -717,6 +745,7 @@ if __name__ == '__main__':
 
 
 	print('FEATURE MATRIX: ')
+	data = data.astype(float)
 	data.info()
 	
 	#Xb = data.to_numpy(float)
