@@ -265,18 +265,22 @@ def define_text_model(input_shape):
 
 def define_cnn_model(input_shape):
 	model = Sequential()
-	model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same', input_shape=input_shape))
-	model.add(MaxPooling2D(pool_size=(3, 3)))
-	model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same'))
-	model.add(MaxPooling2D(pool_size=(3, 3)))
+	model.add(Conv2D(24, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same', input_shape=input_shape))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+	#model.add(Dropout(rate=0.10))
+	model.add(Conv2D(48, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+	#model.add(Dropout(rate=0.10))
 	#model.add(Conv2D(4, kernel_size=(3, 3), activation='relu', padding='same'))
 	#model.add(MaxPooling2D(pool_size=(3, 3)))
+	#model.add(Dropout(rate=0.10))
 	model.add(Flatten())
 	model.add(Dense(64, activation='relu'))
 	model.add(Dense(32, activation='relu'))
 	#model.add(Dense(16, activation='relu'))
 	#model.add(Dense(8, activation='relu'))
 	#model.add(Dense(4, activation='relu'))
+	#model.add(Dropout(rate=0.10))
 	model.add(Dense(1))
 	# compile model
 	#opt = optimizers.SGD(lr=0.0001, momentum=0.0, nesterov=False)
@@ -313,7 +317,7 @@ def define_generator(X_train, use_gray=False):
 		rotation_range=10., # 20., # 90.,
 		width_shift_range=0.1, # 20% total width
 		height_shift_range=0.1, # 20% total height
-		horizontal_flip=True,
+		horizontal_flip=False,
 		vertical_flip=False,
 		#shear_range=0.9,
 		#zoom_range=0.1, # 10%
@@ -389,7 +393,7 @@ if __name__ == '__main__':
 
 
 	# run image model
-	if(False):
+	if(True):
 		# load image dataset
 		#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
 		location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
@@ -472,7 +476,7 @@ if __name__ == '__main__':
 
 
 	# run combined model
-	if(True):
+	if(False):
 
 		# load dataset
 		location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Augustus*/*prepared.csv'
