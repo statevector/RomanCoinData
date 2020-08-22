@@ -93,6 +93,26 @@ def build_train_test_sets(X, y, train_size=0.80, random_state=42):
 	y_train, y_test = y.iloc[:n_train], y.iloc[n_train:]
 	return X_train, y_train, X_test, y_test
 
+def build_train_val_test_sets(X, y, train_size=0.60, val_size=0.20, random_state=42):
+	# shuffle order of inputs to ensure reproducibility
+	randomize = np.arange(X.shape[0])
+	#print('randomized array shape: {}'.format(randomize.shape))
+	np.random.seed(random_state)
+	np.random.shuffle(randomize)
+	#print('randomized array shape: {}'.format(randomize.shape))
+	X = X.iloc[randomize]
+	y = y.iloc[randomize]
+	# break into training, validation, and test sets
+	n_train = int(train_size * X.shape[0])
+	#print(n_train)
+	n_val = int(val_size * X.shape[0])
+	#print(n_val)
+	#n_test = int((1 - train_size - val_size) * X.shape[0])
+	X_train, X_val, X_test = X.iloc[:n_train], X.iloc[n_train:n_train+n_val], X.iloc[n_train+n_val:]
+	y_train, y_val, y_test = y.iloc[:n_train], y.iloc[n_train:n_train+n_val], y.iloc[n_train+n_val:]
+	#print(n_train + n_val + n_test)
+	return X_train, y_train, X_val, y_val, X_test, y_test
+
 def prep_text_data(X):
 	# one hot encode 'Auction Type' and drop
 	X['is_Feature_Auction'] = X['Auction Type'].map(lambda x: True if 'Feature Auction' in x else False)
@@ -298,27 +318,28 @@ def define_cnn_model(input_shape):
 	# model.add(Dense(64, activation='relu'))
 	# model.add(Dense(1))#, kernel_regularizer='l1'))
 
-	model.add(Conv2D(64, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same', input_shape=input_shape))
-	model.add(MaxPooling2D(pool_size=(4, 4)))
-	#model.add(Dropout(rate=0.10))
-	model.add(Conv2D(128, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same'))
-	model.add(MaxPooling2D(pool_size=(4, 4)))
-	#model.add(Dropout(rate=0.10))
-	model.add(Conv2D(256, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same'))
-	model.add(MaxPooling2D(pool_size=(4, 4)))
-	#model.add(Dropout(rate=0.10))
-	model.add(Conv2D(512, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same'))
+	model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1), activation='relu', padding='same', input_shape=input_shape))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
-	#model.add(Dropout(rate=0.50))
+	#model.add(Dropout(rate=0.10))
+	model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1), activation='relu', padding='same'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+	#model.add(Dropout(rate=0.10))
+	model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1), activation='relu', padding='same'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+	#model.add(Dropout(rate=0.10))
+	model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1), activation='relu', padding='same'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+	#model.add(Dropout(rate=0.10))
 	model.add(Flatten())
 	model.add(Dense(32, activation='relu'))
 	model.add(Dense(64, activation='relu'))
 	model.add(Dense(128, activation='relu'))
+	#model.add(Dense(256, activation='relu'))
 	model.add(Dense(1))#, kernel_regularizer='l2'))
 
 	# compile model
-	#opt = optimizers.SGD(lr=0.0001, momentum=0.0, nesterov=False)
-	opt = optimizers.Adam(lr=0.001)
+	#opt = optimizers.SGD(lr=0.005, momentum=0.0, nesterov=False)
+	opt = optimizers.Adam(lr=0.0001)
 	mse = losses.MeanSquaredError()
 	model.compile(loss=mse, optimizer=opt, metrics=[r2, rmse])
 	return model
@@ -430,7 +451,7 @@ if __name__ == '__main__':
 
 
 	# run image model
-	if(True):
+	if(False):
 		# load image dataset
 		location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Aug*/*prepared.csv'
 		#location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
@@ -457,6 +478,52 @@ if __name__ == '__main__':
 			epochs=300, 
 			verbose=1, 
 			validation_data=(X_test, y_test)
+		)
+		# evaluate model
+		loss, r2, rmse = model.evaluate(X_test, y_test)
+		print('Test loss: {}'.format(loss))
+		print('Test R^2:  {}'.format(r2))
+		print('Test RMSE: {}'.format(rmse))
+		# print learning curves
+		summarize_diagnostics(history)
+
+
+	# run image model using dedicated test set
+	if(True):
+		# load image dataset
+		location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Aug*/*prepared.csv'
+		#location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		X, y = load_image_data(location)
+		print(X.shape)
+		# split data into train, test sets
+		X_train, y_train, X_val, y_val, X_test, y_test = build_train_val_test_sets(X, y)
+		#print(X_train.shape)
+		#print(X_val.shape)
+		#print(X_test.shape)
+		#quit()
+		# prepare train, test data
+		X_train = prep_image_data(X_train) # this should be a transformer class
+		X_val = prep_image_data(X_val)
+		X_test = prep_image_data(X_test)
+		y_train = prep_target(y_train)
+		y_val = prep_target(y_val)
+		y_test = prep_target(y_test)
+		print('x_train shape:', X_train.shape)
+		print('x_val shape:', X_val.shape)
+		print('x_test shape:', X_test.shape)
+		print('y_train shape:', y_train.shape)
+		print('y_val shape:', y_val.shape)
+		print('y_test shape:', y_test.shape)
+		# define CNN model
+		input_shape = X_train.shape[1:]
+		model = define_cnn_model(input_shape)
+		model.summary()
+		# fit model
+		history = model.fit(X_train, y_train, 
+			batch_size=96, 
+			epochs=128, 
+			verbose=1, 
+			validation_data=(X_val, y_val)
 		)
 		# evaluate model
 		loss, r2, rmse = model.evaluate(X_test, y_test)
