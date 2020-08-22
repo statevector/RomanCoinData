@@ -193,69 +193,84 @@ def define_combined_model(input_shapeA, input_shapeB):
 	# define two sets of inputs
 	inputA = Input(shape=input_shapeA)
 	inputB = Input(shape=input_shapeB)
+	print(input_shapeA)
 
 	# the first branch operates on the first input
-	x = Dense(64, activation='relu')(inputA)
+	#x = Dense(1, activation='relu')(inputA)
 	#x = Dropout(rate=0.10)(x)
-	x = Dense(32, activation="relu")(x)
-	x = Dense(16, activation="relu")(x)
-	x = Dense(8, activation="relu")(x)
-	x = Dense(4, activation="relu")(x)
-	x = Model(inputs=inputA, outputs=x)
+	#x = Dense(32, activation="relu")(x)
+	#x = Dense(16, activation="relu")(x)
+	#x = Dense(8, activation="relu")(x)
+	#x = Dense(4, activation="relu")(x)
+	#print(x.shape)
+	#x = Model(inputs=inputA, outputs=x)
 	#print(x)
 
-	# the second branch opreates on the second input	
-	y = Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same')(inputB)
-	y = MaxPooling2D(pool_size=(3, 3))(y)
-	y = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(y)
-	y = MaxPooling2D(pool_size=(3, 3))(y)
-	y = Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same')(y)
-	y = MaxPooling2D(pool_size=(3, 3))(y)
+	# # the second branch opreates on the second input
+	# y = Conv2D(24, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(inputB)
+	# y = MaxPooling2D(pool_size=(2, 2))(y)
+	# y = Conv2D(48, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	# y = MaxPooling2D(pool_size=(2, 2))(y)
+	# y = Conv2D(64, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	# y = MaxPooling2D(pool_size=(2, 2))(y)
+	# y = Conv2D(80, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	# y = MaxPooling2D(pool_size=(2, 2))(y)
+	# y = Conv2D(96, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	# y = MaxPooling2D(pool_size=(2, 2))(y)
+	# y = Conv2D(112, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	# y = MaxPooling2D(pool_size=(4, 4))(y)
+	# y = Flatten()(y)
+	# print(y.shape)
+	# y = Model(inputs=inputB, outputs=y)
+	# #print(y)
+
+	# the second branch opreates on the second input
+	y = Conv2D(64, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(inputB)
+	y = MaxPooling2D(pool_size=(2, 2))(y)
+	y = Conv2D(64, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	y = MaxPooling2D(pool_size=(2, 2))(y)
+	y = Conv2D(128, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	y = MaxPooling2D(pool_size=(2, 2))(y)
+	y = Conv2D(128, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	y = MaxPooling2D(pool_size=(2, 2))(y)
+	y = Conv2D(256, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	y = MaxPooling2D(pool_size=(2, 2))(y)
+	y = Conv2D(256, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	y = MaxPooling2D(pool_size=(2, 2))(y)
+	y = Conv2D(128, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
+	y = MaxPooling2D(pool_size=(2, 2))(y)
+	y = Conv2D(1, kernel_size=(5, 5), activation='relu', strides=(1, 1), padding='same')(y)
 	y = Flatten()(y)
+	print(y.shape)
 	y = Model(inputs=inputB, outputs=y)
 	#print(y)
-
 	# combine the output of the two branches
-	combined = concatenate([x.output, y.output])
-	# apply a FC layer and then a regression prediction on the
+	combined = concatenate([inputA, y.output])
+	print(combined.shape)
 	#print(combined.shape)
-
-	# combined outputs
-	z = Dense(64, activation='relu')(combined)
+	# apply FC layer and then a regression prediction on combined outputs
+	z = Dense(32, activation='relu')(combined)
 	#model.add(Dropout(rate=0.10))
-	z = Dense(32, activation="relu")(z)
-	z = Dense(16, activation="relu")(z)
-	z = Dense(8, activation="relu")(z)
-	z = Dense(4, activation="relu")(z)
-	#z = Dense(2, activation="relu")(z)
-	z = Dense(1)(z)
-	
-	# our model will accept the inputs of the two branches and
-	# then output a single value
-	model = Model(inputs=[x.input, y.input], outputs=z)
-	
+	z = Dense(64, activation="relu")(z)
+	#z = Dense(128, activation="relu")(z)
+	#model.add(Dropout(rate=0.10))
+	z = Dense(1, kernel_regularizer='l1')(z) #  activation='relu'
+	# accept the inputs of the two branches and output a single value
+	model = Model(inputs=[inputA, y.input], outputs=z)
 	#opt = optimizers.SGD(learning_rate=0.0001, momentum=0.0, nesterov=False)
-	opt = optimizers.Adam(learning_rate=0.0005)
+	opt = optimizers.Adam(learning_rate=0.01) # way too small 0.000005)
 	mse = losses.MeanSquaredError()
 	model.compile(loss=mse, optimizer=opt, metrics=[r2, rmse])
-
 	return model
 
 
 def define_text_model(input_shape):
 	model = Sequential()
-	model.add(Dense(64, activation='relu', input_shape = input_shape))
+	model.add(Dense(64, activation='relu', input_shape=input_shape))
 	#model.add(Dropout(rate=0.10))
 	model.add(Dense(32, activation='relu'))
 	#model.add(Dropout(rate=0.10))
-	model.add(Dense(16, activation='relu'))
-	#model.add(Dropout(rate=0.5))
-	model.add(Dense(8, activation='relu'))
-	#model.add(Dropout(rate=0.5))
-	model.add(Dense(4, activation='relu'))
-	#model.add(Dropout(rate=0.5))
 	model.add(Dense(1))
-	# compile model
 	#opt = optimizers.SGD(lr=0.0001, momentum=0.0, nesterov=False)
 	opt = optimizers.Adam(learning_rate=0.001)
 	mse = losses.MeanSquaredError()
@@ -265,26 +280,45 @@ def define_text_model(input_shape):
 
 def define_cnn_model(input_shape):
 	model = Sequential()
-	model.add(Conv2D(24, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same', input_shape=input_shape))
+
+	# model.add(Conv2D(24, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same', input_shape=input_shape))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	# #model.add(Dropout(rate=0.20))
+	# model.add(Conv2D(48, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same'))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	# #model.add(Dropout(rate=0.20))
+	# model.add(Conv2D(64, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same'))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	# #model.add(Dropout(rate=0.20))
+	# model.add(Conv2D(64, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same'))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	# #model.add(Dropout(rate=0.20))
+	# model.add(Flatten())
+	# model.add(Dense(32, activation='relu'))
+	# model.add(Dense(64, activation='relu'))
+	# model.add(Dense(1))#, kernel_regularizer='l1'))
+
+	model.add(Conv2D(64, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same', input_shape=input_shape))
+	model.add(MaxPooling2D(pool_size=(4, 4)))
+	#model.add(Dropout(rate=0.10))
+	model.add(Conv2D(128, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same'))
+	model.add(MaxPooling2D(pool_size=(4, 4)))
+	#model.add(Dropout(rate=0.10))
+	model.add(Conv2D(256, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same'))
+	model.add(MaxPooling2D(pool_size=(4, 4)))
+	#model.add(Dropout(rate=0.10))
+	model.add(Conv2D(512, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
-	#model.add(Dropout(rate=0.10))
-	model.add(Conv2D(48, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same'))
-	model.add(MaxPooling2D(pool_size=(2, 2)))
-	#model.add(Dropout(rate=0.10))
-	#model.add(Conv2D(4, kernel_size=(3, 3), activation='relu', padding='same'))
-	#model.add(MaxPooling2D(pool_size=(3, 3)))
-	#model.add(Dropout(rate=0.10))
+	#model.add(Dropout(rate=0.50))
 	model.add(Flatten())
-	model.add(Dense(64, activation='relu'))
 	model.add(Dense(32, activation='relu'))
-	#model.add(Dense(16, activation='relu'))
-	#model.add(Dense(8, activation='relu'))
-	#model.add(Dense(4, activation='relu'))
-	#model.add(Dropout(rate=0.10))
-	model.add(Dense(1))
+	model.add(Dense(64, activation='relu'))
+	model.add(Dense(128, activation='relu'))
+	model.add(Dense(1))#, kernel_regularizer='l2'))
+
 	# compile model
 	#opt = optimizers.SGD(lr=0.0001, momentum=0.0, nesterov=False)
-	opt = optimizers.Adam(lr=0.0005)
+	opt = optimizers.Adam(lr=0.001)
 	mse = losses.MeanSquaredError()
 	model.compile(loss=mse, optimizer=opt, metrics=[r2, rmse])
 	return model
@@ -296,11 +330,13 @@ def summarize_diagnostics(history):
 	pyplot.title('Mean Square Error Loss')
 	pyplot.plot(history.history['loss'], color='blue', label='train')
 	pyplot.plot(history.history['val_loss'], color='orange', label='test')
+	pyplot.ylim(0, 2)
 	# plot accuracy
 	pyplot.subplot(212)
 	pyplot.title('R-squared')
 	pyplot.plot(history.history['r2'], color='blue', label='train')
 	pyplot.plot(history.history['val_r2'], color='orange', label='test')
+	pyplot.ylim(0, 1)
 	# save plot to file
 	filename = sys.argv[0].split('/')[-1]
 	pyplot.savefig(filename + '_plot.png')
@@ -314,13 +350,13 @@ def define_generator(X_train, use_gray=False):
 		#featurewise_center=True,
 		#featurewise_std_normalization=True,
 		#zca_whitening=True,
-		rotation_range=10., # 20., # 90.,
-		width_shift_range=0.1, # 20% total width
-		height_shift_range=0.1, # 20% total height
-		horizontal_flip=False,
-		vertical_flip=False,
+		rotation_range=20., # 20., # 90.,
+		width_shift_range=0.2, # 20% total width
+		height_shift_range=0.2, # 20% total height
+		horizontal_flip=True,
+		#vertical_flip=True,
 		#shear_range=0.9,
-		#zoom_range=0.1, # 10%
+		zoom_range=0.2, # 10%
 		fill_mode='constant'
 		#rescale=1./255)
 	)
@@ -363,8 +399,8 @@ if __name__ == '__main__':
 	# run text model
 	if(False):
 		# load text dataset
-		#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
-		location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		#location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
 		X, y = load_text_data(location)
 		# split data into train, test sets
 		X_train, y_train, X_test, y_test = build_train_test_sets(X, y)
@@ -376,10 +412,11 @@ if __name__ == '__main__':
 		# define text model
 		input_shape = X_train.shape[1:]
 		model = define_text_model(input_shape)
+		model.summary()
 		# fit model
 		history = model.fit(X_train, y_train, 
-			batch_size=256, 
-			epochs=100, 
+			batch_size=128, 
+			epochs=200, 
 			verbose=1, 
 			validation_data=(X_test, y_test)
 		)
@@ -395,8 +432,8 @@ if __name__ == '__main__':
 	# run image model
 	if(True):
 		# load image dataset
-		#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
-		location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Aug*/*prepared.csv'
+		#location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
 		X, y = load_image_data(location)
 		# split data into train, test sets
 		X_train, y_train, X_test, y_test = build_train_test_sets(X, y)
@@ -413,10 +450,11 @@ if __name__ == '__main__':
 		# define CNN model
 		input_shape = X_train.shape[1:]
 		model = define_cnn_model(input_shape)
+		model.summary()
 		# fit model
 		history = model.fit(X_train, y_train, 
-			batch_size=256, 
-			epochs=100, 
+			batch_size=128, 
+			epochs=300, 
 			verbose=1, 
 			validation_data=(X_test, y_test)
 		)
@@ -432,8 +470,8 @@ if __name__ == '__main__':
 	# run image model with data augmentation
 	if(False):
 		# load image dataset
-		#location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
-		location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		location = '/home/cwillis/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
+		#location = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv'
 		X, y = load_image_data(location)
 		# split data into train, test sets
 		X_train, y_train, X_test, y_test = build_train_test_sets(X, y)
@@ -454,16 +492,17 @@ if __name__ == '__main__':
 		datagen = define_generator(X_train)
 		# plot augmented images
 		generate_examples(X_train, y_train)
+		#valgen = ImageDataGenerator()
+		model.summary()
 		# fit model using data generator
 		history = model.fit_generator(
 			datagen.flow(X_train, y_train, 
 				shuffle=True, 
-				batch_size=256
+				batch_size=128
 			),
 			validation_data=(X_test, y_test),
-			steps_per_epoch=X_train.shape[0]/256, 
-			epochs=100, 
-			use_multiprocessing=True, 
+			steps_per_epoch=X_train.shape[0]/128, 
+			epochs=300, 
 			verbose=1
 		)
 		# evaluate model
@@ -518,10 +557,11 @@ if __name__ == '__main__':
 		input_shapeA = Xt_train.shape[1:]
 		input_shapeB = Xi_train.shape[1:]
 		model = define_combined_model(input_shapeA, input_shapeB)
-		
+		model.summary()
+
 		# fit model
 		history = model.fit([Xt_train, Xi_train], y_train, 
-			batch_size=256, 
+			batch_size=128, 
 			epochs=100, 
 			verbose=1, 
 			validation_data=([Xt_test, Xi_test], y_test)
