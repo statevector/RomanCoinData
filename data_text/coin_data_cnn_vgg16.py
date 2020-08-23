@@ -170,20 +170,21 @@ if __name__ == '__main__':
 	#print(base_model.layers[-1].output)
 	# add new classifier layers
 	x = Flatten()(base_model.layers[-1].output)
-	#x = Dense(32, activation='relu')(x)
-	#x = Dense(1024, activation='relu')(x)
+	x = Dense(32, activation='relu')(x)
+	x = Dense(64, activation='relu')(x)
+	x = Dense(64, activation='relu')(x)
 	x = Dense(1, activation='linear')(x)
 	# define new model
 	model = Model(inputs=base_model.inputs, outputs=x)
 	# compile new model
-	#opt = optimizers.SGD(lr=0.005, momentum=0.0, nesterov=False)
+	#opt = optimizers.SGD(lr=0.0001, momentum=0.3, nesterov=True)
 	opt = optimizers.Adam(lr=0.0001)
 	mse = losses.MeanSquaredError()
 	model.compile(loss=mse, optimizer=opt, metrics=[r2, rmse])
 	model.summary()
 	# fit
 	history = model.fit(X_train, y_train, 
-		batch_size=32, 
+		batch_size=64, 
 		epochs=128, 
 		verbose=1, 
 		validation_data=(X_val, y_val)
