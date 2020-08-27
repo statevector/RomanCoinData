@@ -266,7 +266,7 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 if __name__ == '__main__':
 
 	import glob
-	files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv")
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv')
 	print(files)
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[~data['Denomination'].str.contains(r'Sestertius')]
@@ -792,71 +792,45 @@ if __name__ == '__main__':
 	X_train = scaler.fit_transform(X_train)
 	X_test = scaler.transform(X_test)
 
-	# linear regression model with L2 regularization
-	ridge = Ridge(random_state=42, max_iter=100000)
-	# set grid search parameters
-	alphas = np.logspace(-2, 3, 100)
-	param_grid = {'alpha': alphas}
-	n_folds = 5
-	# perform grid search
-	clf = GridSearchCV(ridge, param_grid, cv=n_folds, scoring='r2', n_jobs=-1, verbose=True)
+	# initialize linear regression model with L2 regularization
+	linear = Ridge(random_state=42, max_iter=1e5)
+	# set grid search parameters: alpha*sigma_i |x_i|^2
+	param_grid = {'alpha': np.logspace(-2, 3, 100)}
+	# initialize the grid search meta-estimator
+	clf = GridSearchCV(linear, param_grid, cv=5, scoring='r2', n_jobs=-1, verbose=True)
+	# perform grid search (break into train into train and validation sets automatically based on cv=k)
 	clf.fit(X_train, y_train)
-	# results
-	scores = clf.cv_results_['mean_test_score']
-	print('xval r2: {}'.format(clf.best_score_))
-	alpha = clf.best_params_['alpha']
-	print('best alpha: {}'.format(alpha))
+	# print results
+	print('train r2: {}'.format(clf.best_score_))
+	#print('best alpha: {}'.format(clf.best_params_['alpha']))
+	# test model on the unseen data 
+	y_pred = clf.predict(X_test) # predict calls the estimator with the best found parameters
+	print('test r2: {}'.format(r2_score(y_test, y_pred)))
+	#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
 
-	# test model on unseen data
-	model = Ridge(alpha=alpha, max_iter=1e8).fit(X_train, y_train)
-	#print('coef: {}'.format(model.coef_))
-	#print('intercept: {}'.format(model.intercept_))
-	y_train_pred = model.predict(X_train)
-	print('train r2: {}'.format(r2_score(y_train, y_train_pred)))
-	#print('train rmse: {}'.format(np.sqrt(mean_squared_error(y_train, y_train_pred))))
-	y_test_pred = model.predict(X_test)
-	print('test r2: {}'.format(r2_score(y_test, y_test_pred)))
-	#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_test_pred))))
-
-	# linear regression model with L1 regularization
-	ridge = Lasso(random_state=42, max_iter=100000)
-	# set grid search parameters
-	alphas = np.logspace(-5, -2, 100)
-	param_grid = {'alpha': alphas}
-	n_folds = 5
-	# perform grid search
-	clf = GridSearchCV(ridge, param_grid, cv=n_folds, scoring='r2', n_jobs=-1, verbose=True)
+	# initialize linear regression model with L1 regularization
+	linear = Lasso(random_state=42, max_iter=1e5)
+	# set grid search parameters: alpha*sigma_i |x_i|
+	param_grid = {'alpha': np.logspace(-5, -2, 100)}
+	# initialize the grid search meta-estimator
+	clf = GridSearchCV(linear, param_grid, cv=5, scoring='r2', n_jobs=-1, verbose=True)
+	# perform grid search 
 	clf.fit(X_train, y_train)
-	# results
-	scores = clf.cv_results_['mean_test_score']
-	print('xval r2: {}'.format(clf.best_score_))
-	alpha = clf.best_params_['alpha']
-	print('best alpha: {}'.format(alpha))
-
+	# print results
+	print('train r2: {}'.format(clf.best_score_))
+	#print('best alpha: {}'.format(clf.best_params_['alpha']))
 	# test model on unseen data
-	model = Lasso(alpha=alpha, max_iter=1e8).fit(X_train, y_train)
-	#print('coef: {}'.format(model.coef_))
-	#print('intercept: {}'.format(model.intercept_))
-	#x = pd.DataFrame(zip(X.columns, model.coef_), columns=['feature', 'coefficient'])
-	y_train_pred = model.predict(X_train)
-	print('train r2: {}'.format(r2_score(y_train, y_train_pred)))
-	#print('train rmse: {}'.format(np.sqrt(mean_squared_error(y_train, y_train_pred))))
-	y_test_pred = model.predict(X_test)
-	print('test r2: {}'.format(r2_score(y_test, y_test_pred)))
-	#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_test_pred))))
+	y_pred = clf.predict(X_test) # predict calls the estimator with the best found parameters
+	print('test r2: {}'.format(r2_score(y_test, y_pred)))
+	#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
 
 	# how do our predictions compare to the test set values?
 	#for y, yp in zip(y_test, y_test_pred):
 	#	print(int(np.exp(y)), int(np.exp(yp)))
 
-	# build standardized residuals (i.e. the "pulls")
-	res_train_std = (y_train_pred - y_train)/np.std(y_train_pred - y_train)
-	res_test_std = (y_test_pred - y_test)/np.std(y_test_pred - y_test)
-
 	if(False):
 		import matplotlib.pyplot as plt
-		plt.scatter(y_train_pred, res_train_std, c = "blue", marker = "s", label = "Training data")
-		plt.scatter(y_test_pred, res_test_std, c = "lightgreen", marker = "s", label = "Validation data")
+		plt.scatter(y_pred, y_test-y_pred, c = "lightgreen", marker = "s", label = "Test data")
 		plt.title("Linear Regression")
 		plt.xlabel("Predicted values")
 		plt.ylabel("Standardized Residuals")
@@ -868,6 +842,8 @@ if __name__ == '__main__':
 
 	if(False):
 		import matplotlib.pyplot as plt
+		# build standardized residuals (i.e. the "pulls")
+		res_test_std = (y_pred - y_test)/np.std(y_pred - y_test)
 		n, bins, _ = plt.hist(res_test_std, 50)
 		plt.xlabel('Residuals')
 		plt.ylabel('Counts')
