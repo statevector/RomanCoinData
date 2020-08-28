@@ -308,6 +308,27 @@ if __name__ == '__main__':
 
 	# =========
 
+	from datetime import datetime
+
+	def read_dates():
+		files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv')
+		data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
+		#data = data.sort_values(by='Auction ID', ascending=False)
+		data = data[~data['Auction ID'].str.contains('Post-Sale Information')]
+		date_dict = dict(zip(data['Auction ID'], data['Auction Date']))
+		return date_dict
+
+	def id_to_date_map(x, date_dict):
+		for a_id, a_date in date_dict.items():
+			#print(x)
+			if str(x) == str(a_id):
+				return datetime.strptime(a_date, '%B %d, %Y').year
+		raise Exception('Auction date not found for Auction ID {}'.format(x))
+
+	date_dict = read_dates()
+
+	# =========
+
 	# non predictive
 	data.drop(['URL'], axis=1, inplace=True)
 
@@ -315,18 +336,23 @@ if __name__ == '__main__':
 	data['is_Feature_Auction'] = data['Auction Type'].map(lambda x: True if 'Feature Auction' in x else False)
 	data.drop(['Auction Type'], axis=1, inplace=True)
 
-	# one hot encode 'Auction ID' and drop
+	# one hot encode 'Auction ID'
 	data['Auction ID'] = data['Auction ID'].astype(str)
 	data['is_Triton'] = data['Auction ID'].map(lambda x: True if 'Triton' in x else False)
 	data['is_CNG'] = data['Auction ID'].apply(lambda x: True if 'CNG' in x else False)
 	# <-- drop first weekly values. Double check.
+
+	# minor improvement (~2%)
+	data['Auction Year'] = data['Auction ID'].map(lambda x: id_to_date_map(x, date_dict))
+	#print(data['Auction Year'].value_counts())
 	data.drop(['Auction ID'], axis=1, inplace=True)
 
-	# non predictive
+	# non-predictive
 	data.drop(['Auction Lot'], axis=1, inplace=True)
 
 	# transform to be symmetric (big model improvement!)
 	data['Estimate'] = data['Estimate'].map(lambda x: np.log1p(x))
+	#y = data['Estimate'].values
 	#data.drop(['Estimate'], axis=1, inplace=True)
 
 	# define the target vector
@@ -337,13 +363,13 @@ if __name__ == '__main__':
 
 	# studied and no impact
 	#data['has_Header'] = data['Header'].apply(lambda x: False if x=='No Header' else True)
-	#print(data['has_Header'].value_counts())	
+	#print(data['has_Header'].value_counts())
 	#data['len_Header'] = data['Header'].apply(lambda x: len(x))
 	data.drop(['Header'], axis=1, inplace=True)
 
 	# studied and no impact
 	#data['has_Notes'] = data['Notes'].apply(lambda x: False if x=='No Notes' else True)
-	#print(data['has_Notes'].value_counts())	
+	#print(data['has_Notes'].value_counts())
 	#data['len_Notes'] = data['Notes'].apply(lambda x: len(x))
 	data.drop(['Notes'], axis=1, inplace=True)
 
