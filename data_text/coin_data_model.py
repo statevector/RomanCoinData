@@ -1,6 +1,7 @@
 
 import numpy as np
 import pandas as pd
+from datetime import datetime
 
 import re
 import glob
@@ -265,9 +266,9 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-	import glob
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv')
-	print(files)
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Den_*/*prepared.csv')
+	print('Loaded files: \n{}'.format(files))
+
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[~data['Denomination'].str.contains(r'Sestertius')]
 	#data = data[~data['Denomination'].str.contains(r'Cistophorus')]
@@ -284,20 +285,19 @@ if __name__ == '__main__':
 	#data.drop([284], axis=0, inplace=True)
 	#data.drop([377], axis=0, inplace=True)
 
-	# shuffle data ...
-	randomize = np.arange(data.shape[0])
-	print(randomize.shape)
-	np.random.seed(42)
-	np.random.shuffle(randomize)
-	data = data.iloc[randomize]
+	# # shuffle data ...
+	# randomize = np.arange(data.shape[0])
+	# print(randomize.shape)
+	# np.random.seed(42)
+	# np.random.shuffle(randomize)
+	# data = data.iloc[randomize]
 
 	# shuffle dataframe here
 	#data = data[0:500] # r2 of 0.87
 	#data = data[501:] # r2 of 0.79
 	#
-	print(data.shape)
 	print('INPUT DATASET: ')
-	data.info()
+	print(data.shape)
 
 	# nero data
 	# import glob
@@ -308,10 +308,9 @@ if __name__ == '__main__':
 
 	# =========
 
-	from datetime import datetime
-
 	def read_dates():
 		files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv')
+		print('Loaded files: \n{}'.format(files))
 		data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
 		#data = data.sort_values(by='Auction ID', ascending=False)
 		data = data[~data['Auction ID'].str.contains('Post-Sale Information')]
@@ -326,6 +325,35 @@ if __name__ == '__main__':
 		raise Exception('Auction date not found for Auction ID {}'.format(x))
 
 	date_dict = read_dates()
+
+
+	# =========
+
+	def read_centers():
+		files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_Den_*_centering.csv')
+		print('Loaded files: \n{}'.format(files))
+		data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
+		#data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_Den_PA1_centering.csv')
+		center_dict = dict(zip(data['Image URL'], data['Centered']))
+		return center_dict
+
+	def url_to_center_map(x, center_dict):
+		center = None
+		try:
+			center = center_dict.get(x)
+		except:
+			raise Exception('Centering not found for Auction URL {}'.format(x))
+		if center is not None:
+				return center
+		else:
+			raise Exception('No center mapping exists for {}'.format(x))
+
+	center_dict = read_centers()
+
+	# =========
+
+	#data = data[data['Diameter']>data['Diameter'].quantile(0.0001)] # drop low-end outliers
+	#data = data[data['Diameter']>10]
 
 	# =========
 
@@ -357,6 +385,8 @@ if __name__ == '__main__':
 
 	# define the target vector
 	data['Sold'] = data['Sold'].map(lambda x: np.log1p(x))
+	#print(data.Sold.mean())
+	#print(data.old.std())
 	#data = data[data['Sold']<data['Sold'].quantile(0.95)] # drop high-end outliers
 	y = data['Sold'].values
 	data.drop(['Sold'], axis=1, inplace=True)
@@ -375,6 +405,15 @@ if __name__ == '__main__':
 
 	# non predictive
 	data.drop(['Nonstandard Lot'], axis=1, inplace=True)
+
+	# predictive!
+	data['Centered'] = data['Image URL'].map(lambda x: url_to_center_map(x, center_dict))
+	#print(data['Centered'].value_counts())
+	data['is_centered_perfect'] = data['Centered'].map(lambda x: True if 'perfect' in x else False)
+	data['is_centered_well'] = data['Centered'].map(lambda x: True if 'well' in x else False)
+	data['is_centered_average'] = data['Centered'].map(lambda x: True if 'average' in x else False)
+	data['is_centered_poor'] = data['Centered'].map(lambda x: True if 'poor' in x else False)
+	data.drop(['Centered'], axis=1, inplace=True)
 
 	# non predictive
 	data.drop(['Image URL'], axis=1, inplace=True)
@@ -771,9 +810,12 @@ if __name__ == '__main__':
 
 
 	print('FEATURE MATRIX: ')
+	print(data.shape)
 	data = data.astype(float)
 	data.info()
 	
+	print(data.describe().T)
+
 	#Xb = data.to_numpy(float)
 	Xb = data.values
 	#Xb = data
@@ -794,7 +836,6 @@ if __name__ == '__main__':
 	#X = np.hstack((Xb, X2))
 	#X = np.hstack((Xb, X1, X2))
 	
-	print(X.shape)
 	#print(X)
 
 	# poly = PolynomialFeatures(degree=2, interaction_only=False)
