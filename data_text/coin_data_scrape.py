@@ -71,7 +71,7 @@ def get_auction_type(data):
 	except Exception as error:
 		print(error)
 	try:
-		result = re.search(r'(The Coin Shop|Electronic Auction|Feature Auction)', text)
+		result = re.search(r'(The Coin Shop|Electronic Auction|Feature Auction|Affiliated Auction)', text)
 		if result is not None:
 			auction = str(result.group())
 			return auction
@@ -87,7 +87,7 @@ def get_auction_ID(data):
 	auc = get_auction_type(data)
 	try:
 		if auc == 'Affiliated Auction':
-			result = re.search(r'Nomos (\d|\w)+, ', text)
+			result = re.search(r'Nomos (\d+|\d+ & \d+), ', text)
 		if auc == 'Feature Auction':
 			result = re.search(r'(CNG|Nomos|Triton) (\d|\w)+, ', text)
 		if auc == 'Electronic Auction':
