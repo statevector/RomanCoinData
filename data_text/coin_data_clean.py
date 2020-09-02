@@ -8,7 +8,6 @@ pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
 pd.set_option('display.max_colwidth', -1)
 
-
 def format_abbreviations(text):
 	text = re.sub(r'var\.', 'variation', text)
 	text = re.sub(r'cf\.', 'confer', text)
@@ -29,26 +28,27 @@ def format_abbreviations(text):
 	text = re.sub(r'R\.', 'R', text)
 	return text
 
-
-def format_measurements(text, verbose=False):
-	if verbose:
-		print('------------------------------------------------------')
-	# prepend measurement fields for easy extraction later
+def format_denomination(text, verbose=False):
+	# add separation period
 	text = re.sub(r'AV Aureus', 'AV Aureus.', text)
 	text = re.sub(r'AR Denarius', 'AR Denarius.', text)
 	text = re.sub(r'AR Cistophorus', 'AR Cistophorus.', text)
 	text = re.sub(r'Æ Sestertius', 'Æ Sestertius.', text)
+	return text
+
+def format_measurements(text, verbose=False):
+	if verbose:
+		print('------------------------------------------------------')
 	if verbose:
 		print(text)
 	# scan text for the following regex patterns
 	patterns = [
-		r'\(.+mm.+gm?.+h\)\.', # case 1: complete string
-		r'\(.+mm.+gm?\)\.',    # case 2: missing 'h' only
-		r'\(.+mm\)\.',         # case 3: missing 'g' and 'h' (no end space)
-		r'\(.+gm?.+h\)\.',     # case 4: missing 'mm' only
-		r'\(.+mm \)\.',        # case 5: missing 'g' and 'h' (with ending space)
-		#r'\(.+gm?\)\.',       # case 6: missing 'mm' and 'h'
-		r'\(\S+\s+gm?\).'      # case 6: missing 'mm' and 'h'; same, but recoding using \S and \s.
+		r'\(.+mm.+gm?.+h\)\.?', # case 1: complete string (sometimes final . is missing)
+		r'\(.+mm.+gm?\)\.',     # case 2: missing 'h' only
+		r'\(.+mm\)\.',          # case 3: missing 'g' and 'h' (no end space)
+		r'\(.+gm?.+h\)\.',      # case 4: missing 'mm' only
+		r'\(.+mm \)\.',         # case 5: missing 'g' and 'h' (with ending space)
+		r'\(\S+\s+gm?\s?\).'    # case 6: missing 'mm' and 'h'; using \S and \s
 	]
 	for case, pattern in enumerate(patterns):
 		if verbose:
@@ -116,67 +116,38 @@ def format_measurements(text, verbose=False):
 			if verbose:
 				print(text)
 			return text
-	raise Exception('No regex match. Unable to format measurements for {}'.format(text))
-
+	raise Exception('No regex match for measurements in text: {}'.format(text))
 
 def format_mint(text):
 	# mint with semicolon indicates proceeding moneyer
-	text = re.sub(r'mint\;', 'mint.', text)
+	# e.g. Rome mint; C. Marius C. f. moneyer.
+	text = re.sub(r'mint;', 'mint.', text)
 	return text
 
-
-# impute 'Stuck' keyword if missing (goes after 'mint')
-def impute_strike(text, verbose=False):
-	if re.search(r'Struck ', text) is None:
+def impute_feature(text, keyword, tagword, verbose=False):
+	if re.search(keyword, text) is None:
 		if(verbose): 
-			print('pre-strike text: {}'.format(text))
+			print('before {} insert:\n{}'.format(keyword, text))
 		pos = -1
 		segments = text.split('. ')
 		for index, segment in enumerate(segments):
-			if 'mint' in segment:
+			if tagword in segment:
 				pos = index + 1
-				break # exit on first match
-		segments.insert(pos, 'unlisted Struck')
+				# exit on first match
+				break 
+		segments.insert(pos, 'unlisted'+' '+keyword)
 		text = '. '.join(segments)
 		if(verbose): 
-			print('post-strike text: {}'.format(text))
+			print('after {} insert:\n{}'.format(keyword, text))
 	return text
 
-
-# impute 'mint' keyword if missing (goes before 'Stuck')
-def impute_mint(text, verbose=False):
-	if re.search(r'mint', text) is None:
-		if(verbose): 
-			print('pre-mint text: {}'.format(text))
-		pos = -1
-		segments = text.split('. ')
-		for index, segment in enumerate(segments):
-			if 'Struck' in segment:
-				pos = index + 1
-				break # exit on first match
-		segments.insert(pos, 'unlisted mint')
-		text = '. '.join(segments)
-		if(verbose): 
-			print('post-mint text: {}'.format(text))
+def format_grade(text):
+	# Good VF toned --> Good VF. Comments: toned
+	text = re.sub(r'EF ', 'EF. ', text)
+	text = re.sub(r'VF ', 'VF. ', text)
+	text = re.sub(r'Fine ', 'Fine. ', text)
 	return text
 
-
-# impute 'moneyer' if missing (goes after 'mint' and before 'Struck')
-def impute_moneyer(text, verbose=False):
-	if re.search(r'moneyer', text) is None:
-		if(verbose): 
-			print('pre-moneyer text: {}'.format(text))
-		pos = -1
-		segments = text.split('. ')
-		for index, segment in enumerate(segments):
-			if 'mint' in segment:
-				pos = index + 1
-				break # exit on first match
-		segments.insert(pos, 'unlisted moneyer')
-		text = '. '.join(segments)
-		if(verbose): 
-			print('post-strike text: {}'.format(text))
-	return text
 
 
 if __name__ == '__main__':
@@ -232,6 +203,7 @@ if __name__ == '__main__':
 
 	# remove any As denomination that snuck in
 	df = df[~df['Description'].str.contains(r'AE As')]
+	df = df[~df['Description'].str.contains(r'Æ As')]
 	print(df.shape)
 
 	# *I think* these are provincial coins
@@ -324,19 +296,22 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
 	#print(df.info())
 
+	df['Description'] = df['Description'].apply(lambda x: format_denomination(x))
+	#print(df.info())
+
 	df['Description'] = df['Description'].apply(lambda x: format_measurements(x))
 	#print(df.info())
 
 	df['Description'] = df['Description'].apply(lambda x: format_mint(x))
 	#print(df.info())
 
-	df['Description'] = df['Description'].apply(lambda x: impute_strike(x))
+	# impute possible missing keywords
+	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='mint', tagword='Hour'))
+	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='moneyer', tagword='mint'))
+	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='Struck', tagword='moneyer'))
 	#print(df.info())
 
-	df['Description'] = df['Description'].apply(lambda x: impute_mint(x))
-	#print(df.info())
-
-	df['Description'] = df['Description'].apply(lambda x: impute_moneyer(x))
+	df['Description'] = df['Description'].apply(lambda x: format_grade(x))
 	#print(df.info())
 
 	print(df.info())
