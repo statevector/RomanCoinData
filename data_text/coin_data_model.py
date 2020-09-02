@@ -266,51 +266,39 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Den_*/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
-
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[~data['Denomination'].str.contains(r'Sestertius')]
 	#data = data[~data['Denomination'].str.contains(r'Cistophorus')]
 	#data = data[~data['Denomination'].str.contains(r'Aureus')]
 	#data = data[~data['Denomination'].str.contains(r'Denarius')]
+	#data = data[~data['Comments'].str.contains(r'test cut')]
+
 	#
 	#data = data[data['Denomination'].str.contains(r'Sestertius')] # both look good
 	#data = data[data['Denomination'].str.contains(r'Aureus')] # looks good, nero drops from 88 to 81, data.drop([164], axis=0, inplace=True)
 	#data = data[data['Denomination'].str.contains(r'Cistophorus')] # looks good
 	#data = data[data['Denomination'].str.contains(r'Denarius')] # much lower... ~75 aug, all over the place (nero), why?
 
+	#data = data[:177]
+	#data = data[:900]
+	#data = data[:1800]
+	random_state = 42 # try running for different values to check stability of denarius data
+	
 	# Augustus Den PA
 	#data.drop([275], axis=0, inplace=True)
 	#data.drop([284], axis=0, inplace=True)
 	#data.drop([377], axis=0, inplace=True)
 
-	# # shuffle data ...
-	# randomize = np.arange(data.shape[0])
-	# print(randomize.shape)
-	# np.random.seed(42)
-	# np.random.shuffle(randomize)
-	# data = data.iloc[randomize]
-
-	# shuffle dataframe here
-	#data = data[0:500] # r2 of 0.87
-	#data = data[501:] # r2 of 0.79
-	#
 	print('INPUT DATASET: ')
 	print(data.shape)
 
-	# nero data
-	# import glob
-	# files = glob.glob("/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero*/*prepared.csv")
-	# data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	# print(data.shape)
-	# data.info()
-
 	# =========
 
-	def read_dates():
-		files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv')
-		print('Loaded files: \n{}'.format(files))
+	def read_dates(directory):
+		files = glob.glob(directory)
+		print('Loaded date files: \n{}'.format(files))
 		data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
 		#data = data.sort_values(by='Auction ID', ascending=False)
 		data = data[~data['Auction ID'].str.contains('Post-Sale Information')]
@@ -324,14 +312,14 @@ if __name__ == '__main__':
 				return datetime.strptime(a_date, '%B %d, %Y').year
 		raise Exception('Auction date not found for Auction ID {}'.format(x))
 
-	date_dict = read_dates()
-
+	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv'
+	date_dict = read_dates(directory)
 
 	# =========
 
-	def read_centers():
-		files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_Den_*_centering.csv')
-		print('Loaded files: \n{}'.format(files))
+	def read_centers(directory):
+		files = glob.glob(directory)
+		print('Loaded center files: \n{}'.format(files))
 		data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
 		#data = pd.read_csv('/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_Den_PA1_centering.csv')
 		center_dict = dict(zip(data['Image URL'], data['Centered']))
@@ -348,12 +336,18 @@ if __name__ == '__main__':
 		else:
 			raise Exception('No center mapping exists for {}'.format(x))
 
-	center_dict = read_centers()
+	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_*_centering.csv'
+	center_dict = read_centers(directory)
 
 	# =========
 
 	#data = data[data['Diameter']>data['Diameter'].quantile(0.0001)] # drop low-end outliers
 	#data = data[data['Diameter']>10]
+
+	#print(data.Sold.mean())
+	#print(data.old.std())
+	
+	#data = data[data['Sold']<data['Sold'].quantile(0.99)] # drop high-end outliers
 
 	# =========
 
@@ -385,9 +379,6 @@ if __name__ == '__main__':
 
 	# define the target vector
 	data['Sold'] = data['Sold'].map(lambda x: np.log1p(x))
-	#print(data.Sold.mean())
-	#print(data.old.std())
-	#data = data[data['Sold']<data['Sold'].quantile(0.95)] # drop high-end outliers
 	y = data['Sold'].values
 	data.drop(['Sold'], axis=1, inplace=True)
 
@@ -406,14 +397,15 @@ if __name__ == '__main__':
 	# non predictive
 	data.drop(['Nonstandard Lot'], axis=1, inplace=True)
 
-	# predictive!
-	data['Centered'] = data['Image URL'].map(lambda x: url_to_center_map(x, center_dict))
-	#print(data['Centered'].value_counts())
-	data['is_centered_perfect'] = data['Centered'].map(lambda x: True if 'perfect' in x else False)
-	data['is_centered_well'] = data['Centered'].map(lambda x: True if 'well' in x else False)
-	data['is_centered_average'] = data['Centered'].map(lambda x: True if 'average' in x else False)
-	data['is_centered_poor'] = data['Centered'].map(lambda x: True if 'poor' in x else False)
-	data.drop(['Centered'], axis=1, inplace=True)
+	# semi-predictive
+	if(False):
+		data['Centered'] = data['Image URL'].map(lambda x: url_to_center_map(x, center_dict))
+		#print(data['Centered'].value_counts())
+		data['is_centered_perfect'] = data['Centered'].map(lambda x: True if 'perfect' in x else False)
+		data['is_centered_well'] = data['Centered'].map(lambda x: True if 'well' in x else False)
+		data['is_centered_average'] = data['Centered'].map(lambda x: True if 'average' in x else False)
+		data['is_centered_poor'] = data['Centered'].map(lambda x: True if 'poor' in x else False)
+		data.drop(['Centered'], axis=1, inplace=True)
 
 	# non predictive
 	data.drop(['Image URL'], axis=1, inplace=True)
@@ -853,7 +845,14 @@ if __name__ == '__main__':
 	#X = scaler.fit_transform(X)
 	#print(X)
 
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+
+	# bins = np.linspace(3, 10, 12)
+	# print(bins)
+	# y_binned = np.digitize(y, bins)
+	# print(y_binned)
+
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=random_state)#, stratify=data['is_Augustus'])
+	print(X_train.shape)
 
 	scaler = StandardScaler()
 	X_train = scaler.fit_transform(X_train)
@@ -890,6 +889,19 @@ if __name__ == '__main__':
 	y_pred = clf.predict(X_test) # predict calls the estimator with the best found parameters
 	print('test r2: {}'.format(r2_score(y_test, y_pred)))
 	#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
+
+	# initialize mlp with L2 regularization
+	if(False):
+		mlp = MLPRegressor(random_state=42, max_iter=10000)
+		param_grid = {'alpha': np.logspace(-1, 1, 10)}
+		clf = GridSearchCV(mlp, param_grid, cv=5, scoring='r2', n_jobs=-1, verbose=True)
+		clf.fit(X_train, y_train)
+		print('best alpha: {}'.format(clf.best_params_['alpha']))
+		print('train r2: {}'.format(clf.best_score_))
+		y_pred = clf.predict(X_test)
+		print('test r2: {}'.format(r2_score(y_test, y_pred)))
+		#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
+
 
 	# how do our predictions compare to the test set values?
 	#for y, yp in zip(y_test, y_test_pred):

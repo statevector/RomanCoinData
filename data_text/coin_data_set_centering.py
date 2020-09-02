@@ -9,9 +9,15 @@ if __name__ == '__main__':
 	import glob
 	#files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Den_EA1/*prepared.csv')
 	#files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Den_EA2/*prepared.csv')
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Den_PA1/*prepared.csv')
-	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	data = data[data['Denomination'].str.contains(r'Denarius')]
+	#files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Den_PA1/*prepared.csv')
+	#files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Aur_EA1/*prepared.csv')
+	#files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Aur_PA1/*prepared.csv')
+	#files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Ses_EA1/*prepared.csv')
+	#files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Ses_EA2/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Nero_Ses_PA1/*prepared.csv')
+
+	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
+	#data = data[data['Denomination'].str.contains(r'Denarius')]
 	print(data.info())
 
 	# 1. Perfect centering:
@@ -57,6 +63,11 @@ if __name__ == '__main__':
 	df = pd.DataFrame(lod)
 	#df.to_csv('data_centered/Nero_Den_EA1_centering.csv', index=False)
 	#df.to_csv('data_centered/Nero_Den_EA2_centering.csv', index=False)
-	df.to_csv('data_centered/Nero_Den_PA1_centering.csv', index=False)
+	#df.to_csv('data_centered/Nero_Den_PA1_centering.csv', index=False)
+	#df.to_csv('data_centered/Nero_Aur_EA1_centering.csv', index=False)
+	#df.to_csv('data_centered/Nero_Aur_PA1_centering.csv', index=False)
+	#df.to_csv('data_centered/Nero_Ses_EA1_centering.csv', index=False)
+	#df.to_csv('data_centered/Nero_Ses_EA2_centering.csv', index=False)
+	df.to_csv('data_centered/Nero_Ses_PA1_centering.csv', index=False)
 	#print(pd.get_dummies(df))
 
