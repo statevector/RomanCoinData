@@ -12,7 +12,7 @@ pd.set_option('display.max_colwidth', -1)
 
 emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho', 
 			'Vespasian', 'Domitian', 'Trajan', 'Hadrian', 
-			'Antoninus Pius', 'Marcus Aurelius']
+			'Antoninus Pius', 'Marcus Aurelius', 'Faustina Senior']
 
 denominations = ['Aureus', 'Denarius', 'Cistophorus', 'Sestertius']
 
@@ -158,32 +158,45 @@ def get_RIC_number(text):
 	result = re.search(r'RIC', text) 
 	if result is not None:
 		return result.group(0)
+	result = re.search(r'[Uu]npublished|[Uu]nique', text)
+	print(result)
+	if result is not None:
+		return 'RIC Unique'
 	raise Exception('RIC number not found in {}'.format(text))
+
+# def get_imagery(text, verbose=True):
+# 	#print(text)
+# 	lower = text.find('Struck')
+# 	upper = text.find('RIC')
+# 	if upper<0:
+# 		upper = text.find('BMCRE') # backup
+# 	# isolate text
+# 	if lower>0 and upper>0:
+# 		text = text[lower:upper]
+# 	else:
+# 		raise Exception('Unable to isolate \"imagery\" field in {}'.format(text))
+# 	# assume the longest segment between 'Struck' and 'RIC' 
+# 	# fields contains the coin imagery content
+# 	segments = text.split('.')
+# 	length = 0
+# 	imagery = None
+# 	for segment in segments:
+# 		if len(segment)>length:
+# 			imagery = segment
+# 			length = len(segment)
+# 	#print(' imagery: ', imagery)
+# 	if imagery == None:
+# 		raise Exception('Imagery Missing {}'.format(text))
+# 	return imagery
+
 
 def get_imagery(text, verbose=True):
 	#print(text)
-	lower = text.find('Struck')
-	upper = text.find('RIC')
-	if upper<0:
-		upper = text.find('BMCRE') # backup
-	# isolate text
-	if lower>0 and upper>0:
-		text = text[lower:upper]
-	else:
-		raise Exception('Unable to isolate \"imagery\" field in {}'.format(text))
-	# assume the longest segment between 'Struck' and 'RIC' 
-	# fields contains the coin imagery content
-	segments = text.split('.')
-	length = 0
-	imagery = None
-	for segment in segments:
-		if len(segment)>length:
-			imagery = segment
-			length = len(segment)
-	#print(' imagery: ', imagery)
-	if imagery == None:
-		raise Exception('Imagery Missing {}'.format(text))
-	return imagery
+	for segment in text.split('.'):
+		if ' / ' in segment:
+			return segment
+	raise Exception('Imagery not found in {}'.format(text))
+
 
 def get_grade(text):
 	#print(text)
@@ -198,42 +211,70 @@ def get_grade(text):
 				return grade
 	raise Exception('Grade not found in {}'.format(text))
 
-def get_comments(text):
-	# isolate the comments section. We know it
-	# occurs AFTER the RIC number.
-	comments = None
-	#print('pre Isolate RIC:\n {}'.format(text))
-	lower = text.find('RIC') # add ACIP; RSC; BMCRE as backups
-	if lower<0:
-		lower = text.find('BMCRE')		
-	if lower>0:
-		comments = text[lower:]
-	else:
-		exit('Error: RIC not identified in {}'.format(text))
-		return None
-	#print('post Isolate RIC:\n {}'.format(comments))
-	# remove RIC clause
-	comments = comments.split('.')
-	comments = comments[1:] 
-	comments = ' '.join(comments)
-	#print('post Remvove RIC:\n {}'.format(comments))
-	# remove grade if present
-	for grade in grades:
-		if grade in comments:
-			comments = comments.replace(grade, '')
-	#print('post Remvove Grade:\n {}'.format(comments))
-	return comments
+# def get_comments(text):
+# 	# isolate the comments section. We know it
+# 	# occurs AFTER the RIC number.
+# 	comments = None
+# 	#print('pre Isolate RIC:\n {}'.format(text))
+# 	lower = text.find('RIC') # add ACIP; RSC; BMCRE as backups
+# 	if lower<0:
+# 		lower = text.find('BMCRE')		
+# 	if lower>0:
+# 		comments = text[lower:]
+# 	else:
+# 		exit('Error: RIC number missing in {}'.format(text))
+# 		return None
+# 	#print('post Isolate RIC:\n {}'.format(comments))
+# 	# remove RIC clause
+# 	comments = comments.split('.')
+# 	comments = comments[1:] 
+# 	comments = ' '.join(comments)
+# 	#print('post Remvove RIC:\n {}'.format(comments))
+# 	# remove grade if present
+# 	for grade in grades:
+# 		if grade in comments:
+# 			comments = comments.replace(grade, '')
+# 	#print('post Remvove Grade:\n {}'.format(comments))
+# 	return comments
 
-def split_imagery(x):
-	#print('imagery: {}'.format(x))
+
+def get_comments(text, verbose=True):
+	#print(text)
+	for segment in text.split('.'):
+		if 'Comments' in segment:
+			return segment
+	raise Exception('Comments not found in {}'.format(text))
+
+# def split_imagery(x):
+# 	print('imagery: {}'.format(x))
+# 	y=[]
+# 	try:
+# 		y = x.split(' / ')
+# 	except:
+# 		raise Exception('unable to split imagery: {}'.format(x))
+# 	print(y)
+# 	if len(y)!=2:
+# 		raise Exception('more than one split in entry: {}'.format(x))
+# 	return x
+
+
+
+def split_imagery(a, b):
+	#print('---------------')
+	#print('text: {}'.format(a))
+	#print('imagery: {}'.format(b))
+	y=[]
 	try:
-		x.split(' / ')
+		y = b.split(' / ')
 	except:
-		raise Exception('unable to split imagery: {}'.format(x))
-	x = x.split(' / ')
-	if len(x)!=2:
-		raise Exception('more than one split in entry: {}'.format(x))
-	return x
+		raise Exception('unable to split imagery: {}'.format(a))
+	#print(y)
+	if len(y)!=2:
+		raise Exception('more than one split in entry: {}'.format(a))
+	return y
+
+
+
 
 def clean_inscriptions(x):
 	symbols = ['-', ';', '•','“','”' ,'[', ']', '(', ')']
@@ -327,8 +368,18 @@ if __name__ == '__main__':
 	df['Imagery'] = df['Description'].apply(lambda x: get_imagery(x))
 	#print(df.info())
 
-	df['Obverse'], df['Reverse'] = zip(*df['Imagery'].apply(split_imagery))
+	df['Obverse'], df['Reverse'] = zip(*df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1))
+
+	# rev1 --->>>>>
+	#df['Obverse'] = df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1)
 	#print(df.info())
+	# rev1 --->>>>>
+
+	# original --->>>>>
+	#df['Obverse'], df['Reverse'] = zip(*df['Imagery'].apply(split_imagery))
+	#print(df.info())
+	# original --->>>>>
+
 
 	df['Inscriptions'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
 	df['Inscriptions'] = df['Inscriptions'].apply(clean_inscriptions)

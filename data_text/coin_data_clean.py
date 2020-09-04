@@ -44,7 +44,7 @@ def format_denomination(text, verbose=False):
 	text = re.sub(r'AV Aureus', 'AV Aureus.', text)
 	text = re.sub(r'AR Denarius', 'AR Denarius.', text)
 	text = re.sub(r'AR Cistophorus', 'AR Cistophorus.', text)
-	text = re.sub(r'Æ Sestertius', 'Æ Sestertius.', text)
+	text = re.sub(r'(Æ|AE) Sestertius', 'AE Sestertius.', text)
 	return text
 
 def format_measurements(text, verbose=False):
@@ -153,12 +153,14 @@ def impute_feature(text, keyword, tagword, verbose=False):
 	return text
 
 def format_grade(text):
-	# Good VF toned --> Good VF. Comments: toned
-	text = re.sub(r'EF ', 'EF. Comments: ', text)
-	text = re.sub(r'VF ', 'VF. Comments: ', text)
-	text = re.sub(r'Fine ', 'Fine. Comments: ', text)
+	# "Good VF toned --> Good VF. Comments: toned"
+	# "EF. --> EF. Comments:"
+	# use ? to grab cases where no comments exist, just the grade
+	text = re.sub(r' FDC\.?', ' FDC, Grade. Comments,', text)
+	text = re.sub(r' EF\.?', ' EF, Grade. Comments,', text)
+	text = re.sub(r' VF\.?', ' VF, Grade. Comments,', text)
+	text = re.sub(r' Fine\.?', ' Fine, Grade. Comments,', text)
 	return text
-
 
 
 
@@ -192,66 +194,14 @@ if __name__ == '__main__':
 		#print(stop, df.shape)
 	print('post-selection shape: {}'.format(df.shape))
 
-	# remove 'Affiliated Auctions' based on auction type
+	# remove Affiliated Auctions (these non-standard formatting)
 	df = df[~df['Auction Type'].str.contains(r'Affiliated Auction')]
 	print('post-selection shape: {}'.format(df.shape))
 
-
-
-
-	# # remove forgeries
-	# df = df[~df['Description'].str.contains(r'forger')]
-
-	# # remove Neronian artifacts (Damnatio?)
-	# df = df[~df['Description'].str.contains(r'Hinged Æ Mirror')]
-	# df = df[~df['Description'].str.contains(r'Æ “Cut” Sestertius')]
-	# df = df[~df['Description'].str.contains(r'Æ Cut Sestertius')]
-	# df = df[~df['Description'].str.contains(r'Æ Uniface Sestertius')]
-	# # remove entries with uncertain RIC number
-	# df = df[~df['Description'].str.contains(r'RIC I \?')]
-
-
-	# # remove 'Affiliated Auctions' based on keyword
-	# df = df[~df['Description'].str.contains(r'\(Silver')]
-	# print(df.shape)
-	# df = df[~df['Description'].str.contains(r'\(Gold')]
-	# print(df.shape)
-
-	# # remove any As denomination that snuck in
-	# df = df[~df['Description'].str.contains(r'AE As')]
-	# df = df[~df['Description'].str.contains(r'Æ As')]
-	# print(df.shape)
-
-	# *I think* these are provincial coins
-	# df = df[~df['Description'].str.contains(r'ZEUGITANA')]
-	#df = df[~df['Description'].str.contains(r'BYZACIUM')]
-	#df = df[~df['Description'].str.contains(r'SPAIN Gades')]
-	# df = df[~df['Description'].str.contains(r'THESSALY')]
-	#df = df[~df['Description'].str.contains(r'LYCIAN LEAGUE')]
-	# df = df[~df['Description'].str.contains(r'NUMIDIA')]
-	# df = df[~df['Description'].str.contains(r'SELEUCIS')]
-	# print(df.shape)
-
-	# # as far as I can tell these are non-standard (provincial?) sestertii
-	# df = df[~df['Description'].str.contains(r'Æ \"Sestertius\"')]
-	# df = df[~df['Description'].str.contains(r'Æ \“Sestertius\”')]
-	# print(df.shape)
-	# # ... as are these
-	# df = df[~df['Description'].str.contains(r'Dupondius\?')]
-	# df = df[~df['Description'].str.contains(r'Sestertius\?')]
-	# df = df[~df['Description'].str.contains(r'Tetrassarion')]
-	# print(df.shape)
-
-	# # no RIC number present? Only to isolate good Sestertii
-	# df = df[df['Description'].str.contains(r'RIC ')]
-	# print(df.shape)
-
-	# # remove coins that haven't been cleaned
-	# df = df[~df['Description'].str.contains(r'Uncleaned')]
-	# print(df.shape)
-
 	# correct edge cases 
 	# ==================
+
+	# AUGUSTUS
 
 	# Augustus_Aur_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'BC- AD', 'BC-AD', x))
@@ -283,6 +233,7 @@ if __name__ == '__main__':
 	# Augustus_Ses_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x)) # <--- should this be AUGUSTUS\.
 
+	# NERO
 
 	# Nero_Aur_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(19mm 7\.13\)', '(19mm 7.13 g)', x))
@@ -307,20 +258,30 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Superb virtually as struck', 'Superb EF, virtually as struck', x)) # <-- missing grade!
 
 
+	# PIUS
 
 	# Pius_Aur_EA1.htm
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'ANTONINUS PIUS', 'Antoninus Pius', x))
-
-	# --Pius_Aur_PA1.htm (unable to find auction type) (144) unable to find auction id
-	# --Pius_Den_EA1.htm
-	# --Pius_Den_EA2.htm
-	# --Pius_Den_EA3.htm
-	# --Pius_Den_PA1.htm (unable to find auction type) (36)
-	# --Pius_Ses_EA1.htm
-	# --Pius_Ses_EA2.htm
-	# --Pius_Ses_EA3.htm
-	# --Pius_Ses_PA1.htm
-
+	# Pius_Aur_PA1.htm
+	# <--- okay
+	# Pius_Den_EA1.htm
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Struck AD 143-144\. AD 138-161', 'Antoninus Pius. AD 138-161', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'in ancient gold pendant mount', '', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(18mm 3\.\.23 g 12h\)', '(18mm 3.23 g 12h)', x))
+	# Pius_Den_EA2.htm
+	# <--- okay
+	# Pius_Den_EA3.htm
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'/ PRIMI / DECEN / COS IIII', '/ PRIMI | DECEN | COS IIII', x))
+	# Pius_Den_PA1.htm
+	# <--- okay
+	# Pius_Ses_EA1.htm
+	# <--- okay
+	# Pius_Ses_EA2.htm
+	# <--- okay
+	# Pius_Ses_EA3.htm
+	# <--- okay
+	# Pius_Ses_PA1.htm
+	# <--- okay
 
 
 
@@ -329,22 +290,20 @@ if __name__ == '__main__':
 
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
 	#print(df.info())
-
 	df['Description'] = df['Description'].apply(lambda x: format_denomination(x))
 	#print(df.info())
-
 	df['Description'] = df['Description'].apply(lambda x: format_measurements(x))
 	#print(df.info())
-
 	df['Description'] = df['Description'].apply(lambda x: format_mint(x))
 	#print(df.info())
-
 	# impute possible missing keywords
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='mint', tagword='Hour'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='moneyer', tagword='mint'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='Struck', tagword='moneyer'))
-	#print(df.info())
+	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword=' / ', tagword='Struck'))
+	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='RIC', tagword='/'))
 
+	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_grade(x))
 	#print(df.info())
 
