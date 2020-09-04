@@ -36,10 +36,16 @@ AE As
 Æ As
 # as far as I can tell these are non-standard (provincial?) sestertii
 Æ \"Sestertius\"
-Æ \“Sestertius\”
+Æ “Sestertius”
 # ... as are these
 Dupondius\?
 Sestertius\?
 Tetrassarion
 Uncleaned
+360 Degree Photo
+# provincial sestertii
+CYPRUS
+Dupondius
+Æ “Medallion”
+Æ Medallion
 # keep last line here so we don't cut off last letter of previous word during read
