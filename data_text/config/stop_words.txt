@@ -1,0 +1,45 @@
+CHF
+Lot of
+Quinarius
+Fourrée
+fourrée
+Fourée
+Brockage
+brockage
+Official Dies
+Forgery
+forgery
+bezel
+electrotype
+MIXED
+imitation
+IMITATION
+INDIA
+NGC encapsulation
+ANACS
+Restitution issue
+ICG encapsulation
+ICG slab
+# remove forgeries
+forger
+# remove strange Neronian artifacts (Damnatio?)
+Hinged Æ Mirror
+Æ “Cut” Sestertius
+Æ Cut Sestertius
+Æ Uniface Sestertius
+# remove entries with uncertain RIC number
+RIC I \?
+# remove 'Affiliated Auctions' based on keyword formatting
+\(Silver
+\(Gold
+AE As
+Æ As
+# as far as I can tell these are non-standard (provincial?) sestertii
+Æ \"Sestertius\"
+Æ \“Sestertius\”
+# ... as are these
+Dupondius\?
+Sestertius\?
+Tetrassarion
+Uncleaned
+# keep last line here so we don't cut off last letter of previous word during read

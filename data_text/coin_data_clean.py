@@ -16,13 +16,6 @@ pd.set_option('display.max_colwidth', -1)
 #def get_positions(x, character):
 #	return [pos for (pos, char) in enumerate(x) if char == character]
 
-# eliminate observations that contain the following words
-stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
-			  'Brockage', 'brockage', 'Official Dies', 'Forgery', 
-			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation', 
-			  'IMITATION', 'INDIA', 'NGC encapsulation', 'ANACS', 
-			  'Restitution issue', 'ICG encapsulation', 'ICG slab']
-
 def is_nonstandard_lot(text):
 	return any(word in text for word in stop_words)
 
@@ -184,41 +177,50 @@ if __name__ == '__main__':
 	fullname = os.path.join(outdir, outname)
 
 	df = pd.read_csv(input_file)
-	print(df.shape)
 	#print(df.info())
+	print('pre-selection shape: {}'.format(df.shape))
 
-	# remove entries tagged as non-standard
-	df = df[~df['Nonstandard Lot']]
-	print(df.shape)
-	
-	# remove additional non-standard cases
-	# ====================================
+	# load stop words
+	stop_words = []
+	with open('config/stop_words.txt', mode='r', encoding='utf-8') as f:
+		# drop trailing \n for each line and skip lines that start with #
+		stop_words = [re.compile(line[:-1]) for line in f if '#' not in line]
 
-	# remove forgeries
-	df = df[~df['Description'].str.contains(r'forger')]
-
-	# remove Neronian artifacts (Damnatio?)
-	df = df[~df['Description'].str.contains(r'Hinged Æ Mirror')]
-	df = df[~df['Description'].str.contains(r'Æ “Cut” Sestertius')]
-	df = df[~df['Description'].str.contains(r'Æ Cut Sestertius')]
-	df = df[~df['Description'].str.contains(r'Æ Uniface Sestertius')]
-	# remove entries with uncertain RIC number
-	df = df[~df['Description'].str.contains(r'RIC I \?')]
+	# remove non-standard coins from data
+	for stop in stop_words:
+		df = df[~df['Description'].str.contains(stop, regex=True)]
+		#print(stop, df.shape)
+	print('post-selection shape: {}'.format(df.shape))
 
 	# remove 'Affiliated Auctions' based on auction type
 	df = df[~df['Auction Type'].str.contains(r'Affiliated Auction')]
-	print(df.shape)
+	print('post-selection shape: {}'.format(df.shape))
 
-	# remove 'Affiliated Auctions' based on keyword
-	df = df[~df['Description'].str.contains(r'\(Silver')]
-	print(df.shape)
-	df = df[~df['Description'].str.contains(r'\(Gold')]
-	print(df.shape)
 
-	# remove any As denomination that snuck in
-	df = df[~df['Description'].str.contains(r'AE As')]
-	df = df[~df['Description'].str.contains(r'Æ As')]
-	print(df.shape)
+
+
+	# # remove forgeries
+	# df = df[~df['Description'].str.contains(r'forger')]
+
+	# # remove Neronian artifacts (Damnatio?)
+	# df = df[~df['Description'].str.contains(r'Hinged Æ Mirror')]
+	# df = df[~df['Description'].str.contains(r'Æ “Cut” Sestertius')]
+	# df = df[~df['Description'].str.contains(r'Æ Cut Sestertius')]
+	# df = df[~df['Description'].str.contains(r'Æ Uniface Sestertius')]
+	# # remove entries with uncertain RIC number
+	# df = df[~df['Description'].str.contains(r'RIC I \?')]
+
+
+	# # remove 'Affiliated Auctions' based on keyword
+	# df = df[~df['Description'].str.contains(r'\(Silver')]
+	# print(df.shape)
+	# df = df[~df['Description'].str.contains(r'\(Gold')]
+	# print(df.shape)
+
+	# # remove any As denomination that snuck in
+	# df = df[~df['Description'].str.contains(r'AE As')]
+	# df = df[~df['Description'].str.contains(r'Æ As')]
+	# print(df.shape)
 
 	# *I think* these are provincial coins
 	# df = df[~df['Description'].str.contains(r'ZEUGITANA')]
@@ -230,23 +232,23 @@ if __name__ == '__main__':
 	# df = df[~df['Description'].str.contains(r'SELEUCIS')]
 	# print(df.shape)
 
-	# as far as I can tell these are non-standard (provincial?) sestertii
-	df = df[~df['Description'].str.contains(r'Æ \"Sestertius\"')]
-	df = df[~df['Description'].str.contains(r'Æ \“Sestertius\”')]
-	print(df.shape)
-	# ... as are these
-	df = df[~df['Description'].str.contains(r'Dupondius\?')]
-	df = df[~df['Description'].str.contains(r'Sestertius\?')]
-	df = df[~df['Description'].str.contains(r'Tetrassarion')]
-	print(df.shape)
+	# # as far as I can tell these are non-standard (provincial?) sestertii
+	# df = df[~df['Description'].str.contains(r'Æ \"Sestertius\"')]
+	# df = df[~df['Description'].str.contains(r'Æ \“Sestertius\”')]
+	# print(df.shape)
+	# # ... as are these
+	# df = df[~df['Description'].str.contains(r'Dupondius\?')]
+	# df = df[~df['Description'].str.contains(r'Sestertius\?')]
+	# df = df[~df['Description'].str.contains(r'Tetrassarion')]
+	# print(df.shape)
 
-	# no RIC number present? Only to isolate good Sestertii
-	df = df[df['Description'].str.contains(r'RIC ')]
-	print(df.shape)
+	# # no RIC number present? Only to isolate good Sestertii
+	# df = df[df['Description'].str.contains(r'RIC ')]
+	# print(df.shape)
 
-	# remove coins that haven't been cleaned
-	df = df[~df['Description'].str.contains(r'Uncleaned')]
-	print(df.shape)
+	# # remove coins that haven't been cleaned
+	# df = df[~df['Description'].str.contains(r'Uncleaned')]
+	# print(df.shape)
 
 	# correct edge cases 
 	# ==================
