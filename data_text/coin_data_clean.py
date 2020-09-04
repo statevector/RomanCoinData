@@ -8,6 +8,24 @@ pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
 pd.set_option('display.max_colwidth', -1)
 
+# remove whitespace
+#import re
+#pattern = re.compile(r'\s+')
+#sentence = re.sub(pattern, '', sentence)
+
+#def get_positions(x, character):
+#	return [pos for (pos, char) in enumerate(x) if char == character]
+
+# eliminate observations that contain the following words
+stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
+			  'Brockage', 'brockage', 'Official Dies', 'Forgery', 
+			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation', 
+			  'IMITATION', 'INDIA', 'NGC encapsulation', 'ANACS', 
+			  'Restitution issue', 'ICG encapsulation', 'ICG slab']
+
+def is_nonstandard_lot(text):
+	return any(word in text for word in stop_words)
+
 def format_abbreviations(text):
 	text = re.sub(r'var\.', 'variation', text)
 	text = re.sub(r'cf\.', 'confer', text)

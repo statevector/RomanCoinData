@@ -14,21 +14,6 @@ from bs4 import BeautifulSoup
 from io import BytesIO
 from PIL import Image
 
-# remove whitespace
-#import re
-#pattern = re.compile(r'\s+')
-#sentence = re.sub(pattern, '', sentence)
-
-#def get_positions(x, character):
-#	return [pos for (pos, char) in enumerate(x) if char == character]
-
-# eliminate observations that contain the following words
-stop_words = ['CHF', 'Lot of', 'Quinarius', 'Fourrée', 'fourrée', 'Fourée',
-			  'Brockage', 'brockage', 'Official Dies', 'Forgery', 
-			  'forgery', 'bezel', 'electrotype', 'MIXED', 'imitation', 
-			  'IMITATION', 'INDIA', 'NGC encapsulation', 'ANACS', 
-			  'Restitution issue', 'ICG encapsulation', 'ICG slab']
-
 headers = {"User-Agent": 
 	"Analyzing Roman coins for a class project. \
 	If problems, please contact me at willisc9@msu.edu"}
@@ -204,9 +189,6 @@ def get_lot_description(data):
 	# remove whitespace
 	return ' '.join(desc.split())
 
-def is_nonstandard_lot(text):
-	return any(word in text for word in stop_words)
-
 
 if __name__ == '__main__':
 
@@ -291,11 +273,6 @@ if __name__ == '__main__':
 		notes = get_lot_notes(data)
 		scraped['Notes'] = notes
 		print(' Notes: {}'.format(notes))
-
-		# identify nonstandard lots (i.e. those with a stop word)
-		nonstandard_lot = is_nonstandard_lot(description)
-		scraped['Nonstandard Lot'] = nonstandard_lot
-		print(' Nonstandard Lot: {}'.format(nonstandard_lot))
 
 		# grab the URL of the image on the auction page
 		img_url = get_image_url(data)
