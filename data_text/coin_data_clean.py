@@ -143,10 +143,11 @@ def impute_feature(text, keyword, tagword, verbose=False):
 
 def format_grade(text):
 	# Good VF toned --> Good VF. Comments: toned
-	text = re.sub(r'EF ', 'EF. ', text)
-	text = re.sub(r'VF ', 'VF. ', text)
-	text = re.sub(r'Fine ', 'Fine. ', text)
+	text = re.sub(r'EF ', 'EF. Comments: ', text)
+	text = re.sub(r'VF ', 'VF. Comments: ', text)
+	text = re.sub(r'Fine ', 'Fine. Comments: ', text)
 	return text
+
 
 
 
@@ -166,11 +167,6 @@ if __name__ == '__main__':
 
 	df = pd.read_csv(input_file)
 	print(df.shape)
-	#print(df.info())
-
-	# replace missing entries with an explicit None
-	df['Header'] = df['Header'].apply(lambda x: 'No Header' if pd.isnull(x) else x)
-	df['Notes'] = df['Notes'].apply(lambda x: 'No Notes' if pd.isnull(x) else x)
 	#print(df.info())
 
 	# remove entries tagged as non-standard
@@ -267,6 +263,7 @@ if __name__ == '__main__':
 	# Augustus_Ses_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x)) # <--- should this be AUGUSTUS\.
 
+
 	# Nero_Aur_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(19mm 7\.13\)', '(19mm 7.13 g)', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO\.', 'Nero.', x))
@@ -288,6 +285,23 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'RIC I 388\. green patina', 'RIC I 7; RIC I 388. Fine, green patina', x)) # <-- missing grade!
 	# Nero_Ses_PA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Superb virtually as struck', 'Superb EF, virtually as struck', x)) # <-- missing grade!
+
+
+
+	# Pius_Aur_EA1.htm
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'ANTONINUS PIUS', 'Antoninus Pius', x))
+
+	# --Pius_Aur_PA1.htm (unable to find auction type) (144) unable to find auction id
+	# --Pius_Den_EA1.htm
+	# --Pius_Den_EA2.htm
+	# --Pius_Den_EA3.htm
+	# --Pius_Den_PA1.htm (unable to find auction type) (36)
+	# --Pius_Ses_EA1.htm
+	# --Pius_Ses_EA2.htm
+	# --Pius_Ses_EA3.htm
+	# --Pius_Ses_PA1.htm
+
+
 
 
 	# clean and standardize the Description field

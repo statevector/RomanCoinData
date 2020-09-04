@@ -287,6 +287,11 @@ if __name__ == '__main__':
 	
 	df['Auction ID'] = df['Auction ID'].astype(str)
 
+	# replace missing entries with an explicit None
+	df['Header'] = df['Header'].apply(lambda x: 'No Header' if pd.isnull(x) else x)
+	df['Notes'] = df['Notes'].apply(lambda x: 'No Notes' if pd.isnull(x) else x)
+	#print(df.info())
+
 	df['Emperor'] = df['Description'].apply(lambda x: get_emperor(x))
 	#print(df.info())
 
