@@ -42,14 +42,15 @@ def format_reign(text, verbose=False):
 		r'AD\s\d+-\d+',
 		r'\d+-\d+\sAD' # alternative AD scheme
 	]
+	print('----------')
 	for regexp in regexps:
 		result = re.search(regexp, text) # just the first occurance
 		#print(regexp, result)
 		if result is not None:
-			result = result.group(0)
+			result = result.group()
 			#print(text, result)
-			text = re.sub(regexp, 'Reign, '+result, text)
-			print(text)
+			text = re.sub(result, 'Reign, '+result, text)
+			#print(text)
 			return text
 	raise Exception('No regex match for reign in text: {}'.format(text))
 
