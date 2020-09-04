@@ -16,9 +16,6 @@ pd.set_option('display.max_colwidth', -1)
 #def get_positions(x, character):
 #	return [pos for (pos, char) in enumerate(x) if char == character]
 
-def is_nonstandard_lot(text):
-	return any(word in text for word in stop_words)
-
 def format_abbreviations(text):
 	text = re.sub(r'var\.', 'variation', text)
 	text = re.sub(r'cf\.', 'confer', text)
@@ -39,18 +36,37 @@ def format_abbreviations(text):
 	text = re.sub(r'R\.', 'R', text)
 	return text
 
+def format_reign(text, verbose=False):
+	regexps = [
+		r'\d+\sBC-AD\s\d+',
+		r'AD\s\d+-\d+',
+		r'\d+-\d+\sAD' # alternative AD scheme
+	]
+	for regexp in regexps:
+		result = re.search(regexp, text) # just the first occurance
+		#print(regexp, result)
+		if result is not None:
+			result = result.group(0)
+			#print(text, result)
+			text = re.sub(regexp, 'Reign, '+result, text)
+			print(text)
+			return text
+	raise Exception('No regex match for reign in text: {}'.format(text))
+
+def format_emperor(text, verbose=False):
+	pass
+
 def format_denomination(text, verbose=False):
 	# add separation period
-	text = re.sub(r'AV Aureus', 'AV Aureus.', text)
-	text = re.sub(r'AR Denarius', 'AR Denarius.', text)
-	text = re.sub(r'AR Cistophorus', 'AR Cistophorus.', text)
-	text = re.sub(r'(Æ|AE) Sestertius', 'AE Sestertius.', text)
+	text = re.sub(r'AV Aureus', 'Denomination, AV Aureus.', text)
+	text = re.sub(r'AR Denarius', 'Denomination, AR Denarius.', text)
+	text = re.sub(r'AR Cistophorus', 'Denomination, AR Cistophorus.', text)
+	text = re.sub(r'(Æ|AE) Sestertius', 'Denomination, AE Sestertius.', text)
 	return text
 
 def format_measurements(text, verbose=False):
 	if verbose:
 		print('------------------------------------------------------')
-	if verbose:
 		print(text)
 	# scan text for the following regex patterns
 	patterns = [
@@ -211,7 +227,7 @@ if __name__ == '__main__':
 	# Augustus_Den_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Augustus\. Silver', 'Augustus. 27 BC-AD 14. AR Denarius', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'175mm', '17.5mm', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'OB / CIVIS / SERVATOS', 'OB/ CIVIS/ SERVATOS', x))
+	df['Description'] = df['Description'].apply(lambda x: re.sub(r'OB / CIVIS / SERVATOS', 'OB | CIVIS | SERVATOS', x))
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AMP /', 'AMP/', x)) # EA1, PA1, PA2
 	# Augustus_Den_EA2.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'6nh', '6h', x))
@@ -283,12 +299,24 @@ if __name__ == '__main__':
 	# Pius_Ses_PA1.htm
 	# <--- okay
 
+	# Specify data types
+	# ==================
 
+	df['Auction ID'] = df['Auction ID'].astype(str)
 
-	# clean and standardize the Description field
-	# ===========================================
+	# Impute Missing Values
+	# =====================
+
+	df['Header'] = df['Header'].apply(lambda x: 'No Header' if pd.isnull(x) else x)
+	df['Notes'] = df['Notes'].apply(lambda x: 'No Notes' if pd.isnull(x) else x)
+	#print(df.info())
+
+	# Standardize the Description field
+	# =================================
 
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
+	#print(df.info())
+	df['Description'] = df['Description'].apply(lambda x: format_reign(x))
 	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_denomination(x))
 	#print(df.info())
@@ -301,8 +329,7 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='moneyer', tagword='mint'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='Struck', tagword='moneyer'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword=' / ', tagword='Struck'))
-	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='RIC', tagword='/'))
-
+	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='RIC', tagword=' / '))
 	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_grade(x))
 	#print(df.info())
