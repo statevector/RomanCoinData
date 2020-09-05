@@ -48,4 +48,5 @@ CYPRUS
 Dupondius
 Æ “Medallion”
 Æ Medallion
+Æ 'Medallic' Sestertius
 # keep last line here so we don't cut off last letter of previous word during read
