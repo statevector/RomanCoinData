@@ -36,16 +36,30 @@ def format_abbreviations(text):
 	text = re.sub(r'R\.', 'R', text)
 	return text
 
+def format_emperor(text, verbose=False):
+	#print(text)
+	emperors = [
+		'Augustus', 
+		'Nero', 
+		'Antoninus Pius', 
+		'Faustina Senior'
+	]
+	#print('----------')
+	for emperor in emperors:
+		if emperor in text.split('.')[0]:
+			text = re.sub(emperor, 'Emperor, '+emperor, text)
+			return text
+	raise Exception('No emperor match in text: {}'.format(text))
+
 def format_reign(text, verbose=False):
 	regexps = [
 		r'\d+\sBC-AD\s\d+',
 		r'AD\s\d+-\d+',
 		r'\d+-\d+\sAD' # alternative AD scheme
 	]
-	print('----------')
+	#print('----------')
 	for regexp in regexps:
 		result = re.search(regexp, text) # just the first occurance
-		#print(regexp, result)
 		if result is not None:
 			result = result.group()
 			#print(text, result)
@@ -53,9 +67,6 @@ def format_reign(text, verbose=False):
 			#print(text)
 			return text
 	raise Exception('No regex match for reign in text: {}'.format(text))
-
-def format_emperor(text, verbose=False):
-	pass
 
 def format_denomination(text, verbose=False):
 	# add separation period
@@ -316,6 +327,8 @@ if __name__ == '__main__':
 	# =================================
 
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
+	#print(df.info())
+	df['Description'] = df['Description'].apply(lambda x: format_emperor(x))
 	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_reign(x))
 	#print(df.info())
