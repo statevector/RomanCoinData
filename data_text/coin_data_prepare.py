@@ -10,132 +10,170 @@ pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
 pd.set_option('display.max_colwidth', -1)
 
-emperors = ['Augustus', 'Tiberius', 'Nero', 'Galba', 'Otho', 
-			'Vespasian', 'Domitian', 'Trajan', 'Hadrian', 
-			'Antoninus Pius', 'Marcus Aurelius', 'Faustina Senior']
-
-denominations = ['Aureus', 'Denarius', 'Cistophorus', 'Sestertius']
 
 # order matters; e.g., want to check for 'Superb EF' before 'EF'
 grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 
 		'Choice VF', 'Nice VF', 'Good VF', 'Near VF', 'VF', 
 		'Good Fine', 'Near Fine', 'Fine']
 
-def get_emperor(text):
-	#print(text)
-	for emperor in emperors:
-		if emperor in text.split('.')[0]:
-			return emperor
-	raise Exception('Emperor not found in {}'.format(text))
-
-def get_reign(text):
+def extract_feature(text, keyword):
 	#print(text)
 	for segment in text.split('.'):
-		if 'BC-AD' in segment:
+		if keyword in segment:
 			return segment
-		if 'AD' in segment:
-			return segment
-	raise Exception('Reign not found in {}'.format(text))
+	raise Exception('{} not found in {}'.format(keyword, text))
 
-def get_denomination(text):
-	#print(text)
-	for denomination in denominations:
-		if denomination in text:
-			return denomination
-	raise Exception('Denomination not found in {}'.format(text))
-
-def get_diameter(text):
-	#print(text)
-	for segment in text.split('.'):
-		#print(segment)
-		if 'unlisted Diameter' in segment:
-			return np.nan
-		if 'Diameter' in segment:
-			#print(segment)
-			segment = segment.replace('@', '.')
-			segment = segment.replace('Diameter', '')
-			segment = segment.replace('mm', '')
-			segment = segment.strip()
-			#print(segment)
-			try:
-				return float(segment)
-			except:
-				raise Exception('Bad Diameter in {}'.format(text))
-	raise Exception('Diameter keyword not found in {}'.format(text))
-
-def get_weight(text):
-	#print(text)
-	for segment in text.split('.'):
-		#print(segment)
-		if 'unlisted Weight' in segment:
-			return np.nan
-		if 'Weight' in segment:
-			#print(segment)
-			segment = segment.replace('@', '.')
-			segment = segment.replace('Weight', '')
-			segment = segment.replace('g', '')
-			segment = segment.strip()
-			#print(segment)
-			try:
-				return float(segment)
-			except:
-				raise Exception('Bad Weight in {}'.format(text))
-	raise Exception('Weight keyword not found in {}'.format(text))
-
-def get_hour(text):
-	#print(text)
-	for segment in text.split('.'):
-		#print(segment)
-		if 'unlisted Hour' in segment:
-			return np.nan
-		if 'Hour' in segment:
-			#print(segment)
-			segment = segment.replace('@', '.')
-			segment = segment.replace('Hour', '')
-			segment = segment.replace('h', '')
-			segment = segment.strip()
-			#print(segment)
-			try:
-				return int(segment)
-			except:
-				raise Exception('Bad Hour in {}'.format(text))
-	raise Exception('Hour keyword not found in {}'.format(text))
-
-# def get_mcase(text):
+# def get_emperor(text):
+# 	#print(text)
 # 	for segment in text.split('.'):
-# 		if 'Measurement Case' in segment:
+# 		if 'Emperor' in segment:
 # 			return segment
-# 	return None
+# 	raise Exception('Emperor not found in {}'.format(text))
 
-def get_mint(text):
+# def get_reign(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		if 'Reign' in segment:
+# 			return segment
+# 	raise Exception('Reign not found in {}'.format(text))
+
+# def get_denomination(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		if 'Denomination' in segment:
+# 			return segment
+# 	raise Exception('Denomination not found in {}'.format(text))
+
+# def get_mint(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'mint' in segment:
+# 			return segment
+# 	raise Exception('Mint not found in {}'.format(text))
+
+# def get_strike_date(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'Struck' in segment:
+# 				return segment
+# 	raise Exception('Strike Date not found in {}'.format(text))
+
+# def get_moneyer(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'moneyer' in segment:
+# 				return segment
+# 	raise Exception('Moneyer not found in {}'.format(text))
+
+# def get_imagery(text, verbose=True):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if ' / ' in segment:
+# 			return segment
+# 	raise Exception('Imagery not found in {}'.format(text))
+
+# def get_grade(text):
+# 	#print(text)
+# 	for segment in reversed(text.split('.')):
+# 		#print(segment)
+# 		if 'Grade' in segment:
+# 			return segment
+# 	raise Exception('Grade not found in {}'.format(text))
+
+# def get_comments(text, verbose=True):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'Comments' in segment:
+# 			return segment
+# 	raise Exception('Comments not found in {}'.format(text))
+
+
+def extract_measure(text, measure, units):
 	#print(text)
 	for segment in text.split('.'):
 		#print(segment)
-		if 'unlisted Mint' in segment:
-			return None
-		if 'mint' in segment:
-			return segment
-	raise Exception('Mint not found in {}'.format(text))
+		if 'unlisted' in segment:
+			return np.nan
+		if measure in segment:
+			#print(segment)
+			segment = segment.replace('@', '.')
+			segment = segment.replace(measure, '')
+			segment = segment.replace(units, '')
+			segment = segment.strip()
+			#print(segment)
+			try:
+				return float(segment)
+			except:
+				raise Exception('Bad {} in {}'.format(measure, text))
+	raise Exception('{} keyword not found in {}'.format(measure, text))
 
-def get_strike_date(text):
-	#print(text)
-	for segment in text.split('.'):
-		#print(segment)
-		if 'unlisted Struck' in segment:
-			return None
-		if 'Struck' in segment:
-				return segment
-	raise Exception('Strike Date not found in {}'.format(text))
+# def get_diameter(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'unlisted Diameter' in segment:
+# 			return np.nan
+# 		if 'Diameter' in segment:
+# 			#print(segment)
+# 			segment = segment.replace('@', '.')
+# 			segment = segment.replace('Diameter', '')
+# 			segment = segment.replace('mm', '')
+# 			segment = segment.strip()
+# 			#print(segment)
+# 			try:
+# 				return float(segment)
+# 			except:
+# 				raise Exception('Bad Diameter in {}'.format(text))
+# 	raise Exception('Diameter keyword not found in {}'.format(text))
 
-def get_moneyer(text):
-	#print(text)
-	for segment in text.split('.'):
-		#print(segment)
-		if 'unlisted moneyer' in segment:
-			return None
-		if 'moneyer' in segment:
-				return segment
-	raise Exception('Moneyer not found in {}'.format(text))
+# def get_weight(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'unlisted Weight' in segment:
+# 			return np.nan
+# 		if 'Weight' in segment:
+# 			#print(segment)
+# 			segment = segment.replace('@', '.')
+# 			segment = segment.replace('Weight', '')
+# 			segment = segment.replace('g', '')
+# 			segment = segment.strip()
+# 			#print(segment)
+# 			try:
+# 				return float(segment)
+# 			except:
+# 				raise Exception('Bad Weight in {}'.format(text))
+# 	raise Exception('Weight keyword not found in {}'.format(text))
+
+# def get_hour(text):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'unlisted Hour' in segment:
+# 			return np.nan
+# 		if 'Hour' in segment:
+# 			#print(segment)
+# 			segment = segment.replace('@', '.')
+# 			segment = segment.replace('Hour', '')
+# 			segment = segment.replace('h', '')
+# 			segment = segment.strip()
+# 			#print(segment)
+# 			try:
+# 				return int(segment)
+# 			except:
+# 				raise Exception('Bad Hour in {}'.format(text))
+# 	raise Exception('Hour keyword not found in {}'.format(text))
+
+
+
+
+
+
 
 def get_RIC_number(text):
 	# match pattern 'RIC I/II/III 0-9/00-99/000-999'
@@ -164,98 +202,10 @@ def get_RIC_number(text):
 		return 'RIC Unique'
 	raise Exception('RIC number not found in {}'.format(text))
 
-# def get_imagery(text, verbose=True):
-# 	#print(text)
-# 	lower = text.find('Struck')
-# 	upper = text.find('RIC')
-# 	if upper<0:
-# 		upper = text.find('BMCRE') # backup
-# 	# isolate text
-# 	if lower>0 and upper>0:
-# 		text = text[lower:upper]
-# 	else:
-# 		raise Exception('Unable to isolate \"imagery\" field in {}'.format(text))
-# 	# assume the longest segment between 'Struck' and 'RIC' 
-# 	# fields contains the coin imagery content
-# 	segments = text.split('.')
-# 	length = 0
-# 	imagery = None
-# 	for segment in segments:
-# 		if len(segment)>length:
-# 			imagery = segment
-# 			length = len(segment)
-# 	#print(' imagery: ', imagery)
-# 	if imagery == None:
-# 		raise Exception('Imagery Missing {}'.format(text))
-# 	return imagery
 
 
-def get_imagery(text, verbose=True):
-	#print(text)
-	for segment in text.split('.'):
-		if ' / ' in segment:
-			return segment
-	raise Exception('Imagery not found in {}'.format(text))
 
 
-def get_grade(text):
-	#print(text)
-	segments = text.split('.')
-	# iterate in reverse since we know the grade 
-	# information resides in the last sentence;
-	# we dont want false positives (e.g. 'fine portrait')
-	for segment in reversed(segments):
-		#print(segment)
-		for grade in grades:
-			if grade in segment:
-				return grade
-	raise Exception('Grade not found in {}'.format(text))
-
-# def get_comments(text):
-# 	# isolate the comments section. We know it
-# 	# occurs AFTER the RIC number.
-# 	comments = None
-# 	#print('pre Isolate RIC:\n {}'.format(text))
-# 	lower = text.find('RIC') # add ACIP; RSC; BMCRE as backups
-# 	if lower<0:
-# 		lower = text.find('BMCRE')		
-# 	if lower>0:
-# 		comments = text[lower:]
-# 	else:
-# 		exit('Error: RIC number missing in {}'.format(text))
-# 		return None
-# 	#print('post Isolate RIC:\n {}'.format(comments))
-# 	# remove RIC clause
-# 	comments = comments.split('.')
-# 	comments = comments[1:] 
-# 	comments = ' '.join(comments)
-# 	#print('post Remvove RIC:\n {}'.format(comments))
-# 	# remove grade if present
-# 	for grade in grades:
-# 		if grade in comments:
-# 			comments = comments.replace(grade, '')
-# 	#print('post Remvove Grade:\n {}'.format(comments))
-# 	return comments
-
-
-def get_comments(text, verbose=True):
-	#print(text)
-	for segment in text.split('.'):
-		if 'Comments' in segment:
-			return segment
-	raise Exception('Comments not found in {}'.format(text))
-
-# def split_imagery(x):
-# 	print('imagery: {}'.format(x))
-# 	y=[]
-# 	try:
-# 		y = x.split(' / ')
-# 	except:
-# 		raise Exception('unable to split imagery: {}'.format(x))
-# 	print(y)
-# 	if len(y)!=2:
-# 		raise Exception('more than one split in entry: {}'.format(x))
-# 	return x
 
 
 
@@ -297,6 +247,8 @@ if __name__ == '__main__':
 	# lof = []
 	# for desc in df['Description']:
 	# 	fields = desc.split('. ')
+	#	if len(fields)!= XXX:
+	#		raise Exception('problem in length')
 	# 	woah = OrderedDict()
 	# 	for field, item in zip(fields, field_map):
 	# 		# if any(emp in field for emp in emps)
@@ -326,49 +278,23 @@ if __name__ == '__main__':
 	df = pd.read_csv(input_file)
 	#print(df.info())
 	
-	df['Auction ID'] = df['Auction ID'].astype(str)
+	df['Emperor'] = df['Description'].apply(lambda x: extract_feature(x, 'Emperor'))
+	df['Reign'] = df['Description'].apply(lambda x: extract_feature(x, 'Reign'))
+	df['Denomination'] = df['Description'].apply(lambda x: extract_feature(x,'Denomination'))
 
-	# replace missing entries with an explicit None
-	df['Header'] = df['Header'].apply(lambda x: 'No Header' if pd.isnull(x) else x)
-	df['Notes'] = df['Notes'].apply(lambda x: 'No Notes' if pd.isnull(x) else x)
-	#print(df.info())
+	df['Diameter'] = df['Description'].apply(lambda x: extract_measure(x, 'Diameter', 'mm'))
+	df['Weight'] = df['Description'].apply(lambda x: extract_measure(x, 'Weight', 'g'))
+	df['Hour'] = df['Description'].apply(lambda x: extract_measure(x, 'Hour', 'h'))
 
-	df['Emperor'] = df['Description'].apply(lambda x: get_emperor(x))
-	#print(df.info())
+	df['Mint'] = df['Description'].apply(lambda x: extract_feature(x, 'mint'))
 
-	df['Reign'] = df['Description'].apply(lambda x: get_reign(x))
-	#print(df.info())
+	df['Moneyer'] = df['Description'].apply(lambda x: extract_feature(x, 'moneyer'))
+	df['Struck'] = df['Description'].apply(lambda x: extract_feature(x, 'Struck'))
+	df['Imagery'] = df['Description'].apply(lambda x: extract_feature(x, ' / '))
 
-	df['Denomination'] = df['Description'].apply(lambda x: get_denomination(x))
-	#print(df.info())
-
-	df['Diameter'] = df['Description'].apply(lambda x: get_diameter(x))
-	df['Diameter'] = df['Diameter'].astype(float)
-	#print(df.info())
-
-	df['Weight'] = df['Description'].apply(lambda x: get_weight(x))
-	#print(df.info())
-
-	df['Hour'] = df['Description'].apply(lambda x: get_hour(x))
-	#print(df.info())
-
-	#df['MCase'] = df['Description'].apply(lambda x: get_mcase(x)) # for debug
-	#print(df.info())
-
-	df['Mint'] = df['Description'].apply(lambda x: get_mint(x))
-	#print(df.info())
-
-	df['Moneyer'] = df['Description'].apply(lambda x: get_moneyer(x))
-	df['Moneyer'] = df['Moneyer'].astype(str)
-	#print(df.info())
-
-	df['Struck'] = df['Description'].apply(lambda x: get_strike_date(x))
-	#print(df.info())
-
-	df['Imagery'] = df['Description'].apply(lambda x: get_imagery(x))
-	#print(df.info())
-
-	df['Obverse'], df['Reverse'] = zip(*df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1))
+	# original --->>>>>
+	#df['Obverse'], df['Reverse'] = zip(*df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1))
+	# original --->>>>>
 
 	# rev1 --->>>>>
 	#df['Obverse'] = df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1)
@@ -380,28 +306,21 @@ if __name__ == '__main__':
 	#print(df.info())
 	# original --->>>>>
 
-
-	df['Inscriptions'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
-	df['Inscriptions'] = df['Inscriptions'].apply(clean_inscriptions)
-	df.drop('Imagery', axis=1, inplace=True)
+	#df['Inscriptions'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
+	#df['Inscriptions'] = df['Inscriptions'].apply(clean_inscriptions)
+	#df.drop('Imagery', axis=1, inplace=True)
 	#print(df.info())
 
 	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))
-	#print(df.info())
+	df['Grade'] = df['Description'].apply(lambda x: extract_feature(x, 'Grade'))
+	df['Comments'] = df['Description'].apply(lambda x: extract_feature(x ,'Comments'))
 
-	df['Grade'] = df['Description'].apply(lambda x: get_grade(x))
-	#print(df.info())
-
-	df['Comments'] = df['Description'].apply(lambda x: get_comments(x))
-	#print(df.info())
-
-	# woah!!!
 	#df['Inscription'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
 	# select only the imagery
 	#df['Imagery'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.islower()]))                                                          
 	# try splitting on '/' to get obverse and reverse segmentation
 
-	# finally remove the 'Description' column!
+	# drop the now fully parsed Description field
 	df.drop(['Description'], inplace=True, axis=1)
 	print(df.info())
 
