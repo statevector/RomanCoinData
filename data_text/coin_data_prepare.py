@@ -23,76 +23,6 @@ def extract_feature(text, keyword):
 			return segment
 	raise Exception('{} not found in {}'.format(keyword, text))
 
-# def get_emperor(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		if 'Emperor' in segment:
-# 			return segment
-# 	raise Exception('Emperor not found in {}'.format(text))
-
-# def get_reign(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		if 'Reign' in segment:
-# 			return segment
-# 	raise Exception('Reign not found in {}'.format(text))
-
-# def get_denomination(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		if 'Denomination' in segment:
-# 			return segment
-# 	raise Exception('Denomination not found in {}'.format(text))
-
-# def get_mint(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'mint' in segment:
-# 			return segment
-# 	raise Exception('Mint not found in {}'.format(text))
-
-# def get_strike_date(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'Struck' in segment:
-# 				return segment
-# 	raise Exception('Strike Date not found in {}'.format(text))
-
-# def get_moneyer(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'moneyer' in segment:
-# 				return segment
-# 	raise Exception('Moneyer not found in {}'.format(text))
-
-# def get_imagery(text, verbose=True):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if ' / ' in segment:
-# 			return segment
-# 	raise Exception('Imagery not found in {}'.format(text))
-
-# def get_grade(text):
-# 	#print(text)
-# 	for segment in reversed(text.split('.')):
-# 		#print(segment)
-# 		if 'Grade' in segment:
-# 			return segment
-# 	raise Exception('Grade not found in {}'.format(text))
-
-# def get_comments(text, verbose=True):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'Comments' in segment:
-# 			return segment
-# 	raise Exception('Comments not found in {}'.format(text))
-
-
 def extract_measure(text, measure, units):
 	#print(text)
 	for segment in text.split('.'):
@@ -112,102 +42,32 @@ def extract_measure(text, measure, units):
 				raise Exception('Bad {} in {}'.format(measure, text))
 	raise Exception('{} keyword not found in {}'.format(measure, text))
 
-# def get_diameter(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'unlisted Diameter' in segment:
-# 			return np.nan
-# 		if 'Diameter' in segment:
-# 			#print(segment)
-# 			segment = segment.replace('@', '.')
-# 			segment = segment.replace('Diameter', '')
-# 			segment = segment.replace('mm', '')
-# 			segment = segment.strip()
-# 			#print(segment)
-# 			try:
-# 				return float(segment)
-# 			except:
-# 				raise Exception('Bad Diameter in {}'.format(text))
-# 	raise Exception('Diameter keyword not found in {}'.format(text))
-
-# def get_weight(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'unlisted Weight' in segment:
-# 			return np.nan
-# 		if 'Weight' in segment:
-# 			#print(segment)
-# 			segment = segment.replace('@', '.')
-# 			segment = segment.replace('Weight', '')
-# 			segment = segment.replace('g', '')
-# 			segment = segment.strip()
-# 			#print(segment)
-# 			try:
-# 				return float(segment)
-# 			except:
-# 				raise Exception('Bad Weight in {}'.format(text))
-# 	raise Exception('Weight keyword not found in {}'.format(text))
-
-# def get_hour(text):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'unlisted Hour' in segment:
-# 			return np.nan
-# 		if 'Hour' in segment:
-# 			#print(segment)
-# 			segment = segment.replace('@', '.')
-# 			segment = segment.replace('Hour', '')
-# 			segment = segment.replace('h', '')
-# 			segment = segment.strip()
-# 			#print(segment)
-# 			try:
-# 				return int(segment)
-# 			except:
-# 				raise Exception('Bad Hour in {}'.format(text))
-# 	raise Exception('Hour keyword not found in {}'.format(text))
-
-
-
-
-
-
-
 def get_RIC_number(text):
 	# match pattern 'RIC I/II/III 0-9/00-99/000-999'
 	result = re.search(r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])', text)
+	print(result)
 	if result is not None:
 		return result.group(0)
 	# match pattern 'RIC I/II/III -' (what is the - notation?)
 	result = re.search(r'RIC (IV|III|II|I) -', text) 
+	print(result)
 	if result is not None:
 		return result.group(0)
 	# match pattern 'RIC -' (only the dash?)
 	result = re.search(r'RIC -', text) 
+	print(result)
 	if result is not None:
 		return result.group(0)
 	# match pattern 'RIC 0-999...' (only the numerals?)
 	result = re.search(r'RIC \d+', text) 
+	print(result)
 	if result is not None:
 		return result.group(0)
-	# match pattern 'RIC' (missing dash and numerals?)
-	result = re.search(r'RIC', text) 
-	if result is not None:
-		return result.group(0)
-	result = re.search(r'[Uu]npublished|[Uu]nique', text)
+	result = re.search(r'[Uu]nlisted|[Uu]npublished|[Uu]nique', text)
 	print(result)
 	if result is not None:
 		return 'RIC Unique'
 	raise Exception('RIC number not found in {}'.format(text))
-
-
-
-
-
-
-
 
 def split_imagery(a, b):
 	#print('---------------')
@@ -222,9 +82,6 @@ def split_imagery(a, b):
 	if len(y)!=2:
 		raise Exception('more than one split in entry: {}'.format(a))
 	return y
-
-
-
 
 def clean_inscriptions(x):
 	symbols = ['-', ';', '•','“','”' ,'[', ']', '(', ')']
@@ -278,6 +135,9 @@ if __name__ == '__main__':
 	df = pd.read_csv(input_file)
 	#print(df.info())
 	
+	print(df['Description'])
+	print('RIC' in df['Description'])
+
 	df['Emperor'] = df['Description'].apply(lambda x: extract_feature(x, 'Emperor'))
 	df['Reign'] = df['Description'].apply(lambda x: extract_feature(x, 'Reign'))
 	df['Denomination'] = df['Description'].apply(lambda x: extract_feature(x,'Denomination'))
@@ -287,7 +147,6 @@ if __name__ == '__main__':
 	df['Hour'] = df['Description'].apply(lambda x: extract_measure(x, 'Hour', 'h'))
 
 	df['Mint'] = df['Description'].apply(lambda x: extract_feature(x, 'mint'))
-
 	df['Moneyer'] = df['Description'].apply(lambda x: extract_feature(x, 'moneyer'))
 	df['Struck'] = df['Description'].apply(lambda x: extract_feature(x, 'Struck'))
 	df['Imagery'] = df['Description'].apply(lambda x: extract_feature(x, ' / '))
