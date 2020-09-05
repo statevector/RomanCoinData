@@ -42,32 +42,61 @@ def extract_measure(text, measure, units):
 				raise Exception('Bad {} in {}'.format(measure, text))
 	raise Exception('{} keyword not found in {}'.format(measure, text))
 
+# def get_RIC_number(text):
+# 	# match pattern 'RIC I/II/III 0-9/00-99/000-999'
+# 	result = re.search(r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])', text)
+# 	#print(result)
+# 	if result is not None:
+# 		return result.group(0)
+# 	# match pattern 'RIC I/II/III -' (what is the - notation?)
+# 	result = re.search(r'RIC (IV|III|II|I) -', text) 
+# 	#print(result)
+# 	if result is not None:
+# 		return result.group(0)
+# 	# match pattern 'RIC -' (only the dash?)
+# 	result = re.search(r'RIC -', text) 
+# 	#print(result)
+# 	if result is not None:
+# 		return result.group(0)
+# 	# match pattern 'RIC 0-999...' (only the numerals?)
+# 	result = re.search(r'RIC \d+', text) 
+# 	#print(result)
+# 	# match cases where RIC number is unpublished
+# 	if result is not None:
+# 		return result.group(0)
+# 	result = re.search(r'[Uu]nlisted|[Uu]npublished|[Uu]nique', text)
+# 	#print(result)
+# 	if result is not None:
+# 		return 'RIC Unique'
+# 	raise Exception('RIC number not found in {}'.format(text))
+
+
+
+
+
 def get_RIC_number(text):
-	# match pattern 'RIC I/II/III 0-9/00-99/000-999'
-	result = re.search(r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])', text)
-	print(result)
-	if result is not None:
-		return result.group(0)
-	# match pattern 'RIC I/II/III -' (what is the - notation?)
-	result = re.search(r'RIC (IV|III|II|I) -', text) 
-	print(result)
-	if result is not None:
-		return result.group(0)
-	# match pattern 'RIC -' (only the dash?)
-	result = re.search(r'RIC -', text) 
-	print(result)
-	if result is not None:
-		return result.group(0)
-	# match pattern 'RIC 0-999...' (only the numerals?)
-	result = re.search(r'RIC \d+', text) 
-	print(result)
-	if result is not None:
-		return result.group(0)
-	result = re.search(r'[Uu]nlisted|[Uu]npublished|[Uu]nique', text)
-	print(result)
-	if result is not None:
-		return 'RIC Unique'
-	raise Exception('RIC number not found in {}'.format(text))
+	regexps = [
+		# match pattern 'RIC I/II/III 0-9/00-99/000-999'
+		r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])',
+		# match pattern 'RIC I/II/III -' (what is the - notation?)
+		r'RIC (IV|III|II|I) -', 
+		# match pattern 'RIC -' (only the dash?)
+		r'RIC -',
+		# match pattern 'RIC 0-999...' (only the numerals?)
+		r'RIC \d+',
+		# match cases where RIC number is absent
+		r'[Uu]nlisted|[Uu]npublished|[Uu]nique'
+	]
+	for regexp in regexps:
+		result = re.search(regexp, text)
+		#print(result)
+		if result is not None:
+			return result.group(0)
+	raise Exception('RIC keyword not found in {}'.format(text))
+
+
+
+
 
 def split_imagery(a, b):
 	#print('---------------')
@@ -135,8 +164,8 @@ if __name__ == '__main__':
 	df = pd.read_csv(input_file)
 	#print(df.info())
 	
-	print(df['Description'])
-	print('RIC' in df['Description'])
+	#print(df['Description'])
+	#print('RIC' in df['Description'])
 
 	df['Emperor'] = df['Description'].apply(lambda x: extract_feature(x, 'Emperor'))
 	df['Reign'] = df['Description'].apply(lambda x: extract_feature(x, 'Reign'))
