@@ -36,6 +36,49 @@ def format_abbreviations(text):
 	text = re.sub(r'R\.', 'R', text)
 	return text
 
+# convert / ---> ,obv. rev,
+def format_slash(text, verbose=False):
+	if verbose:
+		print('------------------------------------------------------')
+		print('Input Text: {}\n'.format(text))
+	pos1 = text.find('Struck')
+	pos2 = text.find('RIC')
+	subtext = text[pos1:pos2]
+	if verbose:
+		print('Input Subtext: {}'.format(subtext))
+	if(len(subtext.split(' / '))==2):
+		#subtext = subtext.replace('/', ', Obverse. Reverse, ')
+		new_subtext = re.sub(r' / ', ', Obverse. Reverse, ', subtext)
+		if verbose:
+			print('New Subtext: {}'.format(new_subtext))
+		text = text.replace(subtext, new_subtext)
+		if verbose:
+			print('New Text: {}'.format(text))
+	else:
+		raise Exception('more than one split in text: {}'.format(text))
+	return text
+
+
+
+
+
+def split_imagery(a, b):
+	#print('---------------')
+	#print('text: {}'.format(a))
+	#print('imagery: {}'.format(b))
+	y=[]
+	try:
+		y = b.split(' / ')
+	except:
+		raise Exception('unable to split imagery: {}'.format(a))
+	#print(y)
+	if len(y)!=2:
+		raise Exception('more than one split in entry: {}'.format(a))
+	return y
+
+
+
+
 def format_emperor(text, verbose=False):
 	#print(text)
 	emperors = [
@@ -348,7 +391,19 @@ if __name__ == '__main__':
 	df['Description'] = df['Description'].apply(lambda x: format_grade(x))
 	#print(df.info())
 
+	df['Description'] = df['Description'].apply(lambda x: format_slash(x, verbose=True))
+
+
 	print(df.info())
 
-	# build and save the dataframe
+	# build and save intermediate clean dataframe
 	df.to_csv(fullname, index=False)
+
+	# do prepare stuff here
+	# ----->
+
+	# build and save final prepare dataframe
+	#df.to_csv(fullname, index=False)
+
+
+
