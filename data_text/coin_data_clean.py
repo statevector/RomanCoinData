@@ -36,48 +36,27 @@ def format_abbreviations(text):
 	text = re.sub(r'R\.', 'R', text)
 	return text
 
-# convert / ---> ,obv. rev,
 def format_slash(text, verbose=False):
 	if verbose:
 		print('------------------------------------------------------')
-		print('Input Text: {}\n'.format(text))
+		print('Input Text:\n {}'.format(text))
+	# relies on these existing
 	pos1 = text.find('Struck')
 	pos2 = text.find('RIC')
 	subtext = text[pos1:pos2]
 	if verbose:
-		print('Input Subtext: {}'.format(subtext))
+		print('Input Subtext:\n {}'.format(subtext))
 	if(len(subtext.split(' / '))==2):
 		#subtext = subtext.replace('/', ', Obverse. Reverse, ')
 		new_subtext = re.sub(r' / ', ', Obverse. Reverse, ', subtext)
 		if verbose:
-			print('New Subtext: {}'.format(new_subtext))
+			print('New Subtext:\n {}'.format(new_subtext))
 		text = text.replace(subtext, new_subtext)
 		if verbose:
-			print('New Text: {}'.format(text))
+			print('New Text:\n {}'.format(text))
 	else:
 		raise Exception('more than one split in text: {}'.format(text))
 	return text
-
-
-
-
-
-def split_imagery(a, b):
-	#print('---------------')
-	#print('text: {}'.format(a))
-	#print('imagery: {}'.format(b))
-	y=[]
-	try:
-		y = b.split(' / ')
-	except:
-		raise Exception('unable to split imagery: {}'.format(a))
-	#print(y)
-	if len(y)!=2:
-		raise Exception('more than one split in entry: {}'.format(a))
-	return y
-
-
-
 
 def format_emperor(text, verbose=False):
 	#print(text)
@@ -111,6 +90,24 @@ def format_reign(text, verbose=False):
 			return text
 	raise Exception('No regex match for reign in text: {}'.format(text))
 
+# def format_denomination(text, verbose=False):
+# 	# add separation period
+# 	regexps = [
+# 		{r'AV Aureus': 'Denomination, AV Aureus.'},
+# 		{r'AR Denarius', 'Denomination, AR Denarius.'},
+# 		{r'AR Cistophorus': 'Denomination, AR Cistophorus.'},
+# 		{r'(Æ|AE) Sestertius': 'Denomination, AE Sestertius.'}
+# 	]
+# 	for regexp, subsitution in regexps:
+# 		result = re.search(regexp, text)
+# 		if result is not None:
+# 			result = result.group()
+# 			#print(text, result)
+# 			text = re.sub(result, subsitution, text)
+# 			#print(text)
+# 			return text
+# 	raise Exception('No regex match for reign in text: {}'.format(text))
+
 def format_denomination(text, verbose=False):
 	# add separation period
 	text = re.sub(r'AV Aureus', 'Denomination, AV Aureus.', text)
@@ -123,22 +120,20 @@ def format_measurements(text, verbose=False):
 	if verbose:
 		print('------------------------------------------------------')
 		print(text)
-	# scan text for the following regex patterns
-	patterns = [
-		r'\(.+mm.+gm?.+h\)\.?', # case 1: complete string (sometimes final . is missing)
-		r'\(.+mm.+gm?\)\.',     # case 2: missing 'h' only
-		r'\(.+mm\)\.',          # case 3: missing 'g' and 'h' (no end space)
-		r'\(.+gm?.+h\)\.',      # case 4: missing 'mm' only
-		r'\(.+mm \)\.',         # case 5: missing 'g' and 'h' (with ending space)
-		r'\(\S+\s+gm?\s?\).'    # case 6: missing 'mm' and 'h'; using \S and \s
+	regexps = [
+		r'\(.+mm.+gm?.+h\)\.?', # case 0: complete string (sometimes final . is missing)
+		r'\(.+mm.+gm?\)\.',     # case 1: missing 'h' only
+		r'\(.+mm\)\.',          # case 2: missing 'g' and 'h' (no end space)
+		r'\(.+gm?.+h\)\.',      # case 3: missing 'mm' only
+		r'\(.+mm \)\.',         # case 4: missing 'g' and 'h' (with ending space)
+		r'\(\S+\s+gm?\s?\)\.'   # case 5: missing 'mm' and 'h'; using \S and \s
 	]
-	for case, pattern in enumerate(patterns):
+	for case, regexp in enumerate(regexps):
 		if verbose:
 			print('case {}'.format(case))
-			print('search pattern: {}'.format(pattern))
-		result = re.search(pattern, text)
-		if result is not None:
-			# format diameter, weight, orientation info
+			print('regexp: {}'.format(regexp))
+		result = re.search(regexp, text)
+		if result is not None:			
 			result = result.group(0)
 			if verbose:
 				print('match: {}'.format(result))
@@ -153,21 +148,20 @@ def format_measurements(text, verbose=False):
 			result = result.replace(' mm', 'mm')
 			result = result.replace(' h', 'h')
 			# remove final spaces
-			#result = result.replace('mm ', 'mm') # in the middle!
-			#result = result.replace('g ', 'g') # in the middle!
 			result = result.replace('h ', 'h')
 			# remove brackets and final period '.'
 			result = result[1:-2]
 			if verbose:
 				print(result)
-			# replace internal '.'s to simplify later parsing
-			result = result.replace('.', '@')
+			# replace internal '.'s to simplify later feature extraction
+			result = result.replace('.', 'p')
 			if verbose:
 				print(result)
+			# split match into individual measurements
 			result = result.split(' ')
 			if verbose:
 				print(result)
-			# insert NA for missing fields based on our search case
+			# denote missing fields as unlisted
 			if case==0:
 				pass
 			if case==1:
@@ -185,20 +179,29 @@ def format_measurements(text, verbose=False):
 				result.insert(2, 'unlisted')
 			if verbose:
 				print(result)
-			# build the formatted measurement string
-			new_result = [r+' '+w+'.' for r, w in \
-				zip(result, ['Diameter', 'Weight', 'Hour'])]
+			# insert keyword for each measurement type
+			result[0] = result[0].replace(result[0], 'Diameter, '+result[0]+'.')
+			result[1] = result[1].replace(result[1], 'Weight, '+result[1]+'.')
+			result[2] = result[2].replace(result[2], 'Hour, '+result[2]+'.')
+			# rejoin the list intro a string
+			new_result = ' '.join(result)
 			if verbose:
 				print(new_result)
-			new_result = ' '.join(new_result)
-			if verbose:
-				print(new_result)
-			# sub the formatted string into the original text
-			text = re.sub(pattern, new_result, text)
+			# substitute the formatted string into the original text
+			text = re.sub(regexp, new_result, text)
 			if verbose:
 				print(text)
 			return text
 	raise Exception('No regex match for measurements in text: {}'.format(text))
+
+
+
+
+
+
+
+
+
 
 def format_mint(text):
 	# mint with semicolon indicates proceeding moneyer
@@ -233,6 +236,10 @@ def format_grade(text):
 	text = re.sub(r' Fine\.?', ' Fine, Grade. Comments,', text)
 	return text
 
+# use get_RIC_number to build this
+def format_RIC(text):
+	text = re.sub(r'RIC', 'RN, RIC', text)
+	return text
 
 
 if __name__ == '__main__':
@@ -370,29 +377,21 @@ if __name__ == '__main__':
 	# =================================
 
 	df['Description'] = df['Description'].apply(lambda x: format_abbreviations(x))
-	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_emperor(x))
-	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_reign(x))
-	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_denomination(x))
-	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_measurements(x))
-	#print(df.info())
 	df['Description'] = df['Description'].apply(lambda x: format_mint(x))
-	#print(df.info())
+
 	# impute possible missing keywords
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='mint', tagword='Hour'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='moneyer', tagword='mint'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='Struck', tagword='moneyer'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword=' / ', tagword='Struck'))
 	df['Description'] = df['Description'].apply(lambda x: impute_feature(x, keyword='RIC', tagword=' / '))
-	#print(df.info())
+
 	df['Description'] = df['Description'].apply(lambda x: format_grade(x))
-	#print(df.info())
-
-	df['Description'] = df['Description'].apply(lambda x: format_slash(x, verbose=True))
-
+	df['Description'] = df['Description'].apply(lambda x: format_slash(x))
 
 	print(df.info())
 

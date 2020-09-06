@@ -23,52 +23,25 @@ def extract_feature(text, keyword):
 			return segment
 	raise Exception('{} not found in {}'.format(keyword, text))
 
-def extract_measure(text, measure, units):
-	#print(text)
-	for segment in text.split('.'):
-		#print(segment)
-		if 'unlisted' in segment:
-			return np.nan
-		if measure in segment:
-			#print(segment)
-			segment = segment.replace('@', '.')
-			segment = segment.replace(measure, '')
-			segment = segment.replace(units, '')
-			segment = segment.strip()
-			#print(segment)
-			try:
-				return float(segment)
-			except:
-				raise Exception('Bad {} in {}'.format(measure, text))
-	raise Exception('{} keyword not found in {}'.format(measure, text))
 
-# def get_RIC_number(text):
-# 	# match pattern 'RIC I/II/III 0-9/00-99/000-999'
-# 	result = re.search(r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])', text)
-# 	#print(result)
-# 	if result is not None:
-# 		return result.group(0)
-# 	# match pattern 'RIC I/II/III -' (what is the - notation?)
-# 	result = re.search(r'RIC (IV|III|II|I) -', text) 
-# 	#print(result)
-# 	if result is not None:
-# 		return result.group(0)
-# 	# match pattern 'RIC -' (only the dash?)
-# 	result = re.search(r'RIC -', text) 
-# 	#print(result)
-# 	if result is not None:
-# 		return result.group(0)
-# 	# match pattern 'RIC 0-999...' (only the numerals?)
-# 	result = re.search(r'RIC \d+', text) 
-# 	#print(result)
-# 	# match cases where RIC number is unpublished
-# 	if result is not None:
-# 		return result.group(0)
-# 	result = re.search(r'[Uu]nlisted|[Uu]npublished|[Uu]nique', text)
-# 	#print(result)
-# 	if result is not None:
-# 		return 'RIC Unique'
-# 	raise Exception('RIC number not found in {}'.format(text))
+# def extract_measure(text, measure, units):
+# 	#print(text)
+# 	for segment in text.split('.'):
+# 		#print(segment)
+# 		if 'unlisted' in segment:
+# 			return np.nan
+# 		if measure in segment:
+# 			#print(segment)
+# 			segment = segment.replace('p', '.')
+# 			segment = segment.replace(measure, '')
+# 			segment = segment.replace(units, '')
+# 			segment = segment.strip()
+# 			#print(segment)
+# 			try:
+# 				return float(segment)
+# 			except:
+# 				raise Exception('Bad {} in {}'.format(measure, text))
+# 	raise Exception('{} keyword not found in {}'.format(measure, text))
 
 
 
@@ -93,24 +66,6 @@ def get_RIC_number(text):
 		if result is not None:
 			return result.group(0)
 	raise Exception('RIC keyword not found in {}'.format(text))
-
-
-
-
-
-def split_imagery(a, b):
-	#print('---------------')
-	#print('text: {}'.format(a))
-	#print('imagery: {}'.format(b))
-	y=[]
-	try:
-		y = b.split(' / ')
-	except:
-		raise Exception('unable to split imagery: {}'.format(a))
-	#print(y)
-	if len(y)!=2:
-		raise Exception('more than one split in entry: {}'.format(a))
-	return y
 
 def clean_inscriptions(x):
 	symbols = ['-', ';', '•','“','”' ,'[', ']', '(', ')']
@@ -171,14 +126,15 @@ if __name__ == '__main__':
 	df['Reign'] = df['Description'].apply(lambda x: extract_feature(x, 'Reign'))
 	df['Denomination'] = df['Description'].apply(lambda x: extract_feature(x,'Denomination'))
 
-	df['Diameter'] = df['Description'].apply(lambda x: extract_measure(x, 'Diameter', 'mm'))
-	df['Weight'] = df['Description'].apply(lambda x: extract_measure(x, 'Weight', 'g'))
-	df['Hour'] = df['Description'].apply(lambda x: extract_measure(x, 'Hour', 'h'))
+	df['Diameter'] = df['Description'].apply(lambda x: extract_feature(x, 'Diameter'))
+	df['Weight'] = df['Description'].apply(lambda x: extract_feature(x, 'Weight'))
+	df['Hour'] = df['Description'].apply(lambda x: extract_feature(x, 'Hour'))
 
 	df['Mint'] = df['Description'].apply(lambda x: extract_feature(x, 'mint'))
 	df['Moneyer'] = df['Description'].apply(lambda x: extract_feature(x, 'moneyer'))
 	df['Struck'] = df['Description'].apply(lambda x: extract_feature(x, 'Struck'))
-	df['Imagery'] = df['Description'].apply(lambda x: extract_feature(x, ' / '))
+	df['Obverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Obverse'))
+	df['Reverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Reverse'))
 
 	# original --->>>>>
 	#df['Obverse'], df['Reverse'] = zip(*df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1))
