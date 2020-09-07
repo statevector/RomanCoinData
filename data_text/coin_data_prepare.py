@@ -4,12 +4,6 @@ import re
 import sys
 import os
 import pandas as pd
-import numpy as np
-
-pd.options.display.max_rows = 999
-pd.set_option('display.width', 1000)
-pd.set_option('display.max_colwidth', -1)
-
 
 # order matters; e.g., want to check for 'Superb EF' before 'EF'
 grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 
@@ -20,32 +14,13 @@ def extract_feature(text, keyword):
 	#print(text)
 	for segment in text.split('.'):
 		if keyword in segment:
+			# remove keyword and clean up
+			segment = segment.replace(keyword+', ', '')
+			segment = segment.replace(', '+keyword, '')
+			segment = segment.replace('@', '.') # hack for measure fields
+			segment = segment.strip()
 			return segment
 	raise Exception('{} not found in {}'.format(keyword, text))
-
-
-# def extract_measure(text, measure, units):
-# 	#print(text)
-# 	for segment in text.split('.'):
-# 		#print(segment)
-# 		if 'unlisted' in segment:
-# 			return np.nan
-# 		if measure in segment:
-# 			#print(segment)
-# 			segment = segment.replace('p', '.')
-# 			segment = segment.replace(measure, '')
-# 			segment = segment.replace(units, '')
-# 			segment = segment.strip()
-# 			#print(segment)
-# 			try:
-# 				return float(segment)
-# 			except:
-# 				raise Exception('Bad {} in {}'.format(measure, text))
-# 	raise Exception('{} keyword not found in {}'.format(measure, text))
-
-
-
-
 
 def get_RIC_number(text):
 	regexps = [
@@ -119,50 +94,25 @@ if __name__ == '__main__':
 	df = pd.read_csv(input_file)
 	#print(df.info())
 	
-	#print(df['Description'])
-	#print('RIC' in df['Description'])
-
 	df['Emperor'] = df['Description'].apply(lambda x: extract_feature(x, 'Emperor'))
 	df['Reign'] = df['Description'].apply(lambda x: extract_feature(x, 'Reign'))
-	df['Denomination'] = df['Description'].apply(lambda x: extract_feature(x,'Denomination'))
-
+	df['Denomination'] = df['Description'].apply(lambda x: extract_feature(x, 'Denomination'))
 	df['Diameter'] = df['Description'].apply(lambda x: extract_feature(x, 'Diameter'))
 	df['Weight'] = df['Description'].apply(lambda x: extract_feature(x, 'Weight'))
 	df['Hour'] = df['Description'].apply(lambda x: extract_feature(x, 'Hour'))
-
 	df['Mint'] = df['Description'].apply(lambda x: extract_feature(x, 'mint'))
 	df['Moneyer'] = df['Description'].apply(lambda x: extract_feature(x, 'moneyer'))
 	df['Struck'] = df['Description'].apply(lambda x: extract_feature(x, 'Struck'))
 	df['Obverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Obverse'))
 	df['Reverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Reverse'))
-
-	# original --->>>>>
-	#df['Obverse'], df['Reverse'] = zip(*df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1))
-	# original --->>>>>
-
-	# rev1 --->>>>>
-	#df['Obverse'] = df.apply(lambda x: split_imagery(x['Description'], x['Imagery']), axis=1)
-	#print(df.info())
-	# rev1 --->>>>>
-
-	# original --->>>>>
-	#df['Obverse'], df['Reverse'] = zip(*df['Imagery'].apply(split_imagery))
-	#print(df.info())
-	# original --->>>>>
-
-	#df['Inscriptions'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
-	#df['Inscriptions'] = df['Inscriptions'].apply(clean_inscriptions)
-	#df.drop('Imagery', axis=1, inplace=True)
-	#print(df.info())
-
 	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))
 	df['Grade'] = df['Description'].apply(lambda x: extract_feature(x, 'Grade'))
 	df['Comments'] = df['Description'].apply(lambda x: extract_feature(x ,'Comments'))
 
 	#df['Inscription'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
+	#df['Inscription'] = df['Inscription'].apply(clean_inscriptions)
 	# select only the imagery
 	#df['Imagery'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.islower()]))                                                          
-	# try splitting on '/' to get obverse and reverse segmentation
 
 	# drop the now fully parsed Description field
 	df.drop(['Description'], inplace=True, axis=1)
