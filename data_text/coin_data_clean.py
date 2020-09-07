@@ -234,10 +234,10 @@ def format_grade(text):
 	# use ? to grab cases where no comments exist, just the grade
 	# use 1 to replace ONLY the first match (avoid cases like EF. Fine Style, etc.)
 	regexps = {
-		r' FDC\.?': ' FDC, Grade. Comments,',
-		r' EF\.?': ' EF, Grade. Comments,',
-		r' VF\.?': ' VF, Grade. Comments,',
-		r' Fine\.?': ' Fine, Grade. Comments,'
+		r' FDC\.?': ' FDC, Grade. Comments, ',
+		r' EF\.?': ' EF, Grade. Comments, ',
+		r' VF\.?': ' VF, Grade. Comments, ',
+		r' Fine\.?': ' Fine, Grade. Comments, '
 	}
 	for regexp, sub in regexps.items():
 		result = re.search(regexp, text)
@@ -452,10 +452,4 @@ if __name__ == '__main__':
 
 	# build and save the dataframe
 	df.to_csv(write_output(sys.argv[1], 'prepared'), index=False)
-
-
-
-
-
-
 
