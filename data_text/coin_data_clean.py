@@ -195,15 +195,6 @@ def format_measurements(text, verbose=False):
 			return text
 	raise Exception('No regex match for measurements in text: {}'.format(text))
 
-
-
-
-
-
-
-
-
-
 def format_mint(text):
 	# mint with semicolon indicates proceeding moneyer
 	# e.g. Rome mint; C. Marius C. f. moneyer.
@@ -336,40 +327,14 @@ if __name__ == '__main__':
 	# Nero_Ses_PA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Superb virtually as struck', 'Superb EF, virtually as struck', x)) # <-- missing grade!
 
-
 	# PIUS
-
-	# # Pius_Aur_EA1.htm
-	# df['Description'] = df['Description'].apply(lambda x: re.sub(r'ANTONINUS PIUS', 'Antoninus Pius', x))
-	# # Pius_Aur_PA1.htm
-	# # <--- okay
-	# # Pius_Den_EA1.htm
-	# df['Description'] = df['Description'].apply(lambda x: re.sub(r'Struck AD 143-144\. AD 138-161', 'Antoninus Pius. AD 138-161', x))
-	# df['Description'] = df['Description'].apply(lambda x: re.sub(r'in ancient gold pendant mount', '', x))
-	# df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(18mm 3\.\.23 g 12h\)', '(18mm 3.23 g 12h)', x))
-	# # Pius_Den_EA2.htm
-	# # <--- okay
-	# # Pius_Den_EA3.htm
-	# df['Description'] = df['Description'].apply(lambda x: re.sub(r'/ PRIMI / DECEN / COS IIII', '/ PRIMI | DECEN | COS IIII', x))
-	# # Pius_Den_PA1.htm
-	# # <--- okay
-	# # Pius_Ses_EA1.htm
-	# # <--- okay
-	# # Pius_Ses_EA2.htm
-	# # <--- okay
-	# # Pius_Ses_EA3.htm
-	# # <--- okay
-	# # Pius_Ses_PA1.htm
-	# # <--- okay
-
 
 	with open('config/replace_pius.json') as f: 
 		data = json.load(f)
 		for r in data['replacement']:
-			if r['regex'] == "":
-				continue
-			print(' --> replacing [{}] with [{}] from {}'.format(r['regex'], r['sub'], r['file']))
-			df['Description'] = df['Description'].apply(lambda x: re.sub(r['regex'], r['sub'], x))
+			if r['replace']:
+				print(' --> replacing [{}] with [{}] from {}'.format(r['regex'], r['sub'], r['file']))
+				df['Description'] = df['Description'].apply(lambda x: re.sub(r['regex'], r['sub'], x))
 
 	# Specify data types
 	# ==================
