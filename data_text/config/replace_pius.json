@@ -33,15 +33,27 @@
 		},
 		{
 			"file": "Pius_Den_EA2.htm",
-			"replace": false,
-			"regex": "",
-			"sub": ""
+			"replace": true,
+			"regex": "with MARCUS AURELIUS",
+			"sub": "with Marcus Aurelius"
+		},
+		{
+			"file": "Pius_Den_EA2.htm",
+			"replace": true,
+			"regex": "& MARCUS AURELIUS",
+			"sub": "with Marcus Aurelius"
 		},
 		{
 			"file": "Pius_Den_EA3.htm",
 			"replace": true,
 			"regex": "/ PRIMI / DECEN / COS IIII",
 			"sub": "/ PRIMI | DECEN | COS IIII"
+		},
+		{
+			"file": "Pius_Den_EA3.htm",
+			"replace": true,
+			"regex": "and MARCUS AURELIUS",
+			"sub": "with Marcus Aurelius"
 		},
 		{
 			"file": "Pius_Den_PA1.htm",
@@ -51,9 +63,9 @@
 		},
 		{
 			"file": "Pius_Ses_EA1.htm",
-			"replace": false,
-			"regex": "",
-			"sub": ""
+			"replace": true,
+			"regex": "3130mm",
+			"sub": "31.30mm"
 		},
 		{
 			"file": "Pius_Ses_EA2.htm",
