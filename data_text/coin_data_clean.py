@@ -231,13 +231,21 @@ def impute_feature(text, keyword, tagword, verbose=False):
 
 def format_grade(text):
 	# "Good VF toned --> Good VF. Comments: toned"
-	# "EF. --> EF. Comments:"
 	# use ? to grab cases where no comments exist, just the grade
-	text = re.sub(r' FDC\.?', ' FDC, Grade. Comments,', text)
-	text = re.sub(r' EF\.?', ' EF, Grade. Comments,', text)
-	text = re.sub(r' VF\.?', ' VF, Grade. Comments,', text)
-	text = re.sub(r' Fine\.?', ' Fine, Grade. Comments,', text)
-	return text
+	# use 1 to replace ONLY the first match (avoid cases like EF. Fine Style, etc.)
+	regexps = {
+		r' FDC\.?': ' FDC, Grade. Comments,',
+		r' EF\.?': ' EF, Grade. Comments,',
+		r' VF\.?': ' VF, Grade. Comments,',
+		r' Fine\.?': ' Fine, Grade. Comments,'
+	}
+	for regexp, sub in regexps.items():
+		result = re.search(regexp, text)
+		#print(result)
+		if result is not None:
+			text = re.sub(regexp, sub, text, 1)
+			return text
+	raise Exception('RIC keyword not found in {}'.format(text))
 
 # use get_RIC_number to build this
 def format_RIC(text):
