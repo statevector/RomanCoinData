@@ -17,6 +17,13 @@ pd.set_option('display.max_colwidth', -1)
 #def get_positions(x, character):
 #	return [pos for (pos, char) in enumerate(x) if char == character]
 
+def write_output(input_file, keyword):
+	output_name = input_file.split('/')[1]+'_'+keyword+'.csv'
+	output_dir = 'data_scraped/'+input_file.split('/')[1]
+	output_path = os.path.join(output_dir, output_name)
+	print('output path: {}'.format(output_path))
+	return output_path
+
 def format_abbreviations(text):
 	text = re.sub(r'var\.', 'variation', text)
 	text = re.sub(r'cf\.', 'confer', text)
@@ -218,6 +225,10 @@ def impute_feature(text, keyword, tagword, verbose=False):
 			print('after {} insert:\n{}'.format(keyword, text))
 	return text
 
+# grades = ['FDC', 'Superb EF', 'Choice EF', 'Near EF', 'EF', 
+# 		'Choice VF', 'Nice VF', 'Good VF', 'Near VF', 'VF', 
+# 		'Good Fine', 'Near Fine', 'Fine']
+
 def format_grade(text):
 	# "Good VF toned --> Good VF. Comments: toned"
 	# "EF. --> EF. Comments:"
@@ -233,24 +244,56 @@ def format_RIC(text):
 	text = re.sub(r'RIC', 'RN, RIC', text)
 	return text
 
+def extract_feature(text, keyword):
+	#print(text)
+	for segment in text.split('.'):
+		if keyword in segment:
+			# remove keyword and clean up
+			segment = segment.replace(keyword+', ', '')
+			segment = segment.replace(', '+keyword, '')
+			segment = segment.replace('@', '.') # hack for measure fields
+			segment = segment.strip()
+			return segment
+	raise Exception('{} not found in {}'.format(keyword, text))
+
+def get_RIC_number(text):
+	regexps = [
+		# match pattern 'RIC I/II/III 0-9/00-99/000-999'
+		r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])',
+		# match pattern 'RIC I/II/III -' (what is the - notation?)
+		r'RIC (IV|III|II|I) -', 
+		# match pattern 'RIC -' (only the dash?)
+		r'RIC -',
+		# match pattern 'RIC 0-999...' (only the numerals?)
+		r'RIC \d+',
+		# match cases where RIC number is absent
+		r'[Uu]nlisted|[Uu]npublished|[Uu]nique'
+	]
+	for regexp in regexps:
+		result = re.search(regexp, text)
+		#print(result)
+		if result is not None:
+			return result.group(0)
+	raise Exception('RIC keyword not found in {}'.format(text))
+
 
 if __name__ == '__main__':
+
+	# Load Data
+	# =========
 
 	print(' Script name: {}'.format(sys.argv[0]))
 	print(' Number of arguments: {}'.format(len(sys.argv)))
 	print(' Arguments include: {}'.format(str(sys.argv)))
-
 	if len(sys.argv)!=2: 
 		exit('missing input!')
 
-	input_file = sys.argv[1]
-	outname = input_file.split('/')[1]+'_cleaned.csv'
-	outdir = 'data_scraped/'+input_file.split('/')[1]
-	fullname = os.path.join(outdir, outname)
-
-	df = pd.read_csv(input_file)
+	df = pd.read_csv(sys.argv[1])
 	#print(df.info())
 	print('pre-selection shape: {}'.format(df.shape))
+
+	# Data Selection
+	# ==============
 
 	# load stop words
 	stop_words = []
@@ -268,8 +311,8 @@ if __name__ == '__main__':
 	df = df[~df['Auction Type'].str.contains(r'Affiliated Auction')]
 	print('post-selection shape: {}'.format(df.shape))
 
-	# correct edge cases 
-	# ==================
+	# Data Formatting
+	# ===============
 
 	# AUGUSTUS
 
@@ -333,7 +376,7 @@ if __name__ == '__main__':
 		data = json.load(f)
 		for r in data['replacement']:
 			if r['replace']:
-				print(' --> replacing [{}] with [{}] from {}'.format(r['regex'], r['sub'], r['file']))
+				#print(' --> replacing [{}] with [{}] from {}'.format(r['regex'], r['sub'], r['file']))
 				df['Description'] = df['Description'].apply(lambda x: re.sub(r['regex'], r['sub'], x))
 
 	# Specify data types
@@ -367,17 +410,44 @@ if __name__ == '__main__':
 
 	df['Description'] = df['Description'].apply(lambda x: format_grade(x))
 	df['Description'] = df['Description'].apply(lambda x: format_slash(x))
-
 	print(df.info())
 
 	# build and save intermediate clean dataframe
-	df.to_csv(fullname, index=False)
+	df.to_csv(write_output(sys.argv[1], 'cleaned'), index=False)
 
-	# do prepare stuff here
-	# ----->
+	# Extract Fields from Description
+	# ===============================
 
-	# build and save final prepare dataframe
-	#df.to_csv(fullname, index=False)
+	df['Emperor'] = df['Description'].apply(lambda x: extract_feature(x, 'Emperor'))
+	df['Reign'] = df['Description'].apply(lambda x: extract_feature(x, 'Reign'))
+	df['Denomination'] = df['Description'].apply(lambda x: extract_feature(x, 'Denomination'))
+	df['Diameter'] = df['Description'].apply(lambda x: extract_feature(x, 'Diameter'))
+	df['Weight'] = df['Description'].apply(lambda x: extract_feature(x, 'Weight'))
+	df['Hour'] = df['Description'].apply(lambda x: extract_feature(x, 'Hour'))
+	df['Mint'] = df['Description'].apply(lambda x: extract_feature(x, 'mint'))
+	df['Moneyer'] = df['Description'].apply(lambda x: extract_feature(x, 'moneyer'))
+	df['Struck'] = df['Description'].apply(lambda x: extract_feature(x, 'Struck'))
+	df['Obverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Obverse'))
+	df['Reverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Reverse'))
+	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))
+	df['Grade'] = df['Description'].apply(lambda x: extract_feature(x, 'Grade'))
+	df['Comments'] = df['Description'].apply(lambda x: extract_feature(x ,'Comments'))
+
+	#df['Inscription'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.isupper()]))
+	#df['Inscription'] = df['Inscription'].apply(clean_inscriptions)
+	# select only the imagery
+	#df['Imagery'] = df['Imagery'].apply(lambda x: ' '.join([word for word in x.split(' ') if word.islower()]))                                                          
+
+	# drop the now fully parsed Description field
+	df.drop(['Description'], inplace=True, axis=1)
+	print(df.info())
+
+	# build and save the dataframe
+	df.to_csv(write_output(sys.argv[1], 'prepared'), index=False)
+
+
+
+
 
 
 
