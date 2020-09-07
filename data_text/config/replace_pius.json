@@ -1,0 +1,54 @@
+
+{
+	"file": {
+		"Pius_Aur_EA1.htm": {
+			"regex": "ANTONINUS PIUS",
+			"sub": "Antoninus Pius"
+		},
+		"Pius_Aur_PA1.htm": {
+			"regex": "",
+			"sub": ""
+		},
+		"Pius_Den_EA1.htm": {
+			"regex": "Struck AD 143-144\\. AD 138-161", 
+			"sub": "Antoninus Pius. AD 138-161"
+		},
+		"Pius_Den_EA1.htm": {
+			"regex": "in ancient gold pendant mount",
+			"sub": ""
+		},
+		"Pius_Den_EA1.htm": {
+			"regex": "\\(18mm 3\\.\\.23 g 12h\\)",
+			"sub": "(18mm 3.23 g 12h)"
+		},
+		"Pius_Den_EA2.htm": {
+			"regex": "",
+			"sub": ""
+		},
+		"Pius_Den_EA3.htm": {
+			"regex": "/ PRIMI / DECEN / COS IIII",
+			"sub": "/ PRIMI | DECEN | COS IIII"
+		},
+		"Pius_Den_PA1.htm": {
+			"regex": "",
+			"sub": ""
+		},
+		"Pius_Ses_EA1.htm": {
+			"regex": "",
+			"sub": ""
+		},
+		"Pius_Ses_EA2.htm": {
+			"regex": "",
+			"sub": ""
+		},
+		"Pius_Ses_EA3.htm": {
+			"regex": "",
+			"sub": ""
+		},
+		"Pius_Ses_PA1.htm": {
+			"regex": "",
+			"sub": ""
+		}
+	}
+}
+
