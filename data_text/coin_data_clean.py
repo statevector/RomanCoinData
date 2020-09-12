@@ -42,6 +42,13 @@ def format_abbreviations(text):
 	text = re.sub(r'P\.', 'P', text)
 	text = re.sub(r'Q\.', 'Q', text)
 	text = re.sub(r'R\.', 'R', text)
+	# correct pius edge cases
+	text = re.sub(r'variation Good VF', 'variation. Good VF', text)
+	text = re.sub(r'correction VF', 'correction. VF', text)
+	text = re.sub(r'variation Fine', 'variation. Fine', text)
+	text = re.sub(r'variation Good VF', 'variation. Good VF', text)
+	text = re.sub(r'correction Near VF', 'correction. Near VF', text)
+	text = re.sub(r'variation VF', 'variation. VF', text)
 	return text
 
 def format_slash(text, verbose=False):
@@ -264,27 +271,6 @@ def extract_feature(text, keyword):
 			return segment
 	raise Exception('{} not found in {}'.format(keyword, text))
 
-def get_RIC_number(text):
-	regexps = [
-		# match pattern 'RIC I/II/III 0-9/00-99/000-999'
-		r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])',
-		# match pattern 'RIC I/II/III -' (what is the - notation?)
-		r'RIC (IV|III|II|I) -', 
-		# match pattern 'RIC -' (only the dash?)
-		r'RIC -',
-		# match pattern 'RIC 0-999...' (only the numerals?)
-		r'RIC \d+',
-		# match cases where RIC number is absent
-		r'[Uu]nlisted|[Uu]npublished|[Uu]nique'
-	]
-	for regexp in regexps:
-		result = re.search(regexp, text)
-		#print(result)
-		if result is not None:
-			return result.group(0)
-	raise Exception('RIC keyword not found in {}'.format(text))
-
-
 if __name__ == '__main__':
 
 	# Load Data
@@ -418,6 +404,7 @@ if __name__ == '__main__':
 
 	df['Description'] = df['Description'].apply(lambda x: format_grade(x))
 	df['Description'] = df['Description'].apply(lambda x: format_slash(x))
+	df['Description'] = df['Description'].apply(lambda x: format_RIC(x))
 	print(df.info())
 
 	# build and save intermediate clean dataframe
@@ -437,7 +424,7 @@ if __name__ == '__main__':
 	df['Struck'] = df['Description'].apply(lambda x: extract_feature(x, 'Struck'))
 	df['Obverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Obverse'))
 	df['Reverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Reverse'))
-	df['RIC'] = df['Description'].apply(lambda x: get_RIC_number(x))
+	df['RIC'] = df['Description'].apply(lambda x: extract_feature(x, 'RN'))
 	df['Grade'] = df['Description'].apply(lambda x: extract_feature(x, 'Grade'))
 	df['Comments'] = df['Description'].apply(lambda x: extract_feature(x ,'Comments'))
 
