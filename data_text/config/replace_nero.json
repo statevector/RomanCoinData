@@ -1,0 +1,64 @@
+{
+	"file": {
+		"Nero_Aur_EA1.csv": [
+			{
+				"regexp": "\\(19mm 7\\.13\\)",
+				"repl": "(19mm 7.13 g)"
+			},
+			{
+				"regexp": "NERO\\.",
+				"repl": "Nero."
+			},
+			{
+				"regexp": "/  / PONTIF • MAX",
+				"repl": "/ PONTIF • MAX •"
+			}
+		],
+		"Nero_Aur_PA1.csv": [
+		],
+		"Nero_Den_EA1.csv": [
+			{
+				"regexp": "\\(18mm 328 g 5h\\)",
+				"repl": "(18mm 3.28 g 5h)"
+			}
+		],
+		"Nero_Den_EA2.csv": [
+			{
+				"regexp": "NERO,\\? with Agrippina",
+				"repl": "Nero with Agrippina Jr"
+			},
+			{
+				"regexp": "NERO and AGRIPPINA JR",
+				"repl": "Nero with Agrippina Jr"
+			},
+			{
+				"regexp": "RIC I 7; BMCRE 8; RSC 4\\.",
+				"repl": "RIC I 7; BMCRE 8; RSC 4. Good Fine"
+			}
+		],
+		"Nero_Den_PA1.csv": [
+			{
+				"regexp": "Struck AD 60-61. PONTIF • MAX",
+				"repl": "Struck AD 60-61. NERO CAESAR AVG IMP / PONTIF • MAX"
+			},
+			{
+				"regexp": "\\(352 g 5h\\)",
+				"repl": "(3.52 g 5h)"
+			}
+		],
+		"Nero_Ses_EA1.csv": [
+		],
+		"Nero_Ses_EA2.csv": [
+			{
+				"regexp": "RIC I 388\\. green patina",
+				"repl": "RIC I 388. Fine, green patina"
+			}
+		],
+		"Nero_Ses_PA1.csv":[
+			{
+				"regexp": "Superb virtually as struck",
+				"repl": "Superb EF, virtually as struck"
+			}
+		]
+	}
+}
