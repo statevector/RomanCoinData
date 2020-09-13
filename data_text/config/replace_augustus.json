@@ -1,0 +1,96 @@
+{
+	"file": {
+		"Augustus_Aur_EA1.csv": [
+			{
+				"regexp": "BC- AD",
+				"sub": "BC-AD"
+			},
+			{
+				"regexp": "Calicó 176. Fair",
+				"sub": "Calicó 176. Fine"
+			},
+			{
+				"regexp": "/  / PONTIF • MAX",
+				"sub": "/ PONTIF • MAX •"
+			}
+		],
+		"Augustus_Aur_PA1.csv": [
+		],
+		"Augustus_Den_EA1.csv": [
+			{
+				"regexp": "Augustus\\. Silver",
+				"sub": "Augustus. 27 BC-AD 14. AR Denarius"
+			},
+			{
+				"regexp": "175mm",
+				"sub": "17.5mm"
+			},
+			{
+				"regexp": "OB / CIVIS / SERVATOS",
+				"sub": "OB | CIVIS | SERVATOS"
+			},
+			{
+				"regexp": "AMP /",
+				"sub": "AMP |"
+			}
+		],
+		"Augustus_Den_EA2.csv": [
+			{
+				"regexp": "6nh",
+				"sub": "6h"
+			}
+		],
+		"Augustus_Den_EA3.csv": [
+			{
+				"regexp": "379 g",
+				"sub": "3.79 g"
+			},
+			{
+				"regexp": "230mm",
+				"sub": "20mm"
+			},
+			{
+				"regexp": "\\(9mm",
+				"sub": "(9mm"
+			}
+		],
+		"Augustus_Den_EA4.csv": [
+		],
+		"Augustus_Den_PA1.csv": [
+		],
+		"Augustus_Den_PA2.csv": [
+			{
+				"regexp": "PAREN\\[T\\] /",
+				"sub": "PAREN[T] |"
+			}
+		],
+		"Augustus_Den_PA3.csv": [
+			{
+				"regexp": "3/91",
+				"sub": "3.91"
+			},
+			{
+				"regexp": "M[\\.] DVRMIVS III\\. VIR",
+				"sub": "M • DVRMIVS/ • III • VIR"
+			},
+			{
+				"regexp": "S•P•Q•R /",
+				"sub": "S•P•Q•R |"
+			}
+		],
+		"Augustus_Ses_EA1.csv": [
+			{
+				"regexp": "AUGUSTUS",
+				"sub": "Augustus"
+			},
+			{
+				"regexp": "SPAIN Corduba\\. Augustus\\.",
+				"sub": "Augustus."
+			},
+			{
+				"regexp": "Bare head left / COLONIA / PATRICIA in two lines",
+				"sub": "Bare head left / COLONIA PATRICIA in two lines"
+			}
+		]
+	}
+}
