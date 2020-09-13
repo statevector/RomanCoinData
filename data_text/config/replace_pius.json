@@ -1,149 +1,104 @@
-
 {
-	"replacement": [
-		{
-			"file": "Pius_Aur_EA1.htm",
-			"replace": true,
-			"regex": "ANTONINUS PIUS",
-			"sub": "Antoninus Pius"
-		},
-		{
-			"file": "Pius_Aur_PA1.htm",
-			"replace": false,
-			"regex": "",
-			"sub": ""
-		},
-		{
-			"file": "Pius_Den_EA1.htm",
-			"replace": true,
-			"regex": "Struck AD 143-144\\. AD 138-161", 
-			"sub": "Antoninus Pius. AD 138-161"
-		},
-		{
-			"file": "Pius_Den_EA1.htm",
-			"replace": true,
-			"regex": "in ancient gold pendant mount",
-			"sub": ""
-		},
-		{
-			"file": "Pius_Den_EA1.htm",
-			"replace": true,
-			"regex": "Coin Good VF toned. Mount damaged in areas",
-			"sub": "Good VF toned."
-		},
-		{
-			"file": "Pius_Den_EA1.htm",
-			"replace": true,
-			"regex": "\\(18mm 3\\.\\.23 g 12h\\)",
-			"sub": "(18mm 3.23 g 12h)"
-		},
-		{
-			"file": "Pius_Den_EA2.htm",
-			"replace": true,
-			"regex": "with MARCUS AURELIUS",
-			"sub": "with Marcus Aurelius"
-		},
-		{
-			"file": "Pius_Den_EA2.htm",
-			"replace": true,
-			"regex": "& MARCUS AURELIUS",
-			"sub": "with Marcus Aurelius"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "/ PRIMI / DECEN / COS IIII",
-			"sub": "/ PRIMI | DECEN | COS IIII"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "and MARCUS AURELIUS",
-			"sub": "with Marcus Aurelius"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 154\\. Toned good VF",
-			"sub": "RSC 154. Good VF Toned"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 281\\. Toned good VF",
-			"sub": "RSC 281. Good VF Toned"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 280\\. Toned good VF",
-			"sub": "RSC 280. Good VF Toned"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 945\\. Attractively toned good VF",
-			"sub": "RSC 945. Good VF Attractively toned"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 834\\. Attractively toned good VF",
-			"sub": "RSC 834. Good VF Attractively toned"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 673\\. Toned good VF irregular flan",
-			"sub": "RSC 673. Good VF Toned, irregular flan"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 68a\\. Toned good VF",
-			"sub": "RSC 68a. Good VF Toned"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "Toned VF",
-			"sub": "VF Toned"
-		},
-		{
-			"file": "Pius_Den_EA3.htm",
-			"replace": true,
-			"regex": "RSC 916\\. Toned nice VF",
-			"sub": "RSC 916. Nice VF Toned"
-		},
-		{
-			"file": "Pius_Den_PA1.htm",
-			"replace": false,
-			"regex": "",
-			"sub": ""
-		},
-		{
-			"file": "Pius_Ses_EA1.htm",
-			"replace": true,
-			"regex": "Æ Sestertius \\(3130mm 25\\.98 g 12h\\)",
-			"sub": "Æ Sestertius (31.30mm 25.98 g 12h)"
-		},
-		{
-			"file": "Pius_Ses_EA2.htm",
-			"replace": true,
-			"regex": "Æ Sestertius \\(31mm 2330 g 6h\\)",
-			"sub": "Æ Sestertius (31mm 23.30 g 6h)"
-		},
-		{
-			"file": "Pius_Ses_EA3.htm",
-			"replace": false,
-			"regex": "",
-			"sub": ""
-		},
-		{
-			"file": "Pius_Ses_PA1.htm",
-			"replace": false,
-			"regex": "",
-			"sub": ""
-		}
-	]
+	"file": {
+		"Pius_Aur_EA1.htm": [
+			{
+				"regexp": "ANTONINUS PIUS",
+				"sub": "Antoninus Pius"
+			}
+		],
+		"Pius_Aur_PA1.htm": [
+		],
+		"Pius_Den_EA1.htm": [
+			{
+				"regexp": "Struck AD 143-144\\. AD 138-161", 
+				"sub": "Antoninus Pius. AD 138-161"
+			},
+			{
+				"regexp": "in ancient gold pendant mount",
+				"sub": ""
+			},
+			{
+				"regexp": "Coin Good VF toned. Mount damaged in areas",
+				"sub": "Good VF toned."
+			},
+			{
+				"regexp": "\\(18mm 3\\.\\.23 g 12h\\)",
+				"sub": "(18mm 3.23 g 12h)"
+			}
+		],
+		"Pius_Den_EA2.htm": [
+			{
+				"regexp": "with MARCUS AURELIUS",
+				"sub": "with Marcus Aurelius"
+			},
+			{
+				"regexp": "& MARCUS AURELIUS",
+				"sub": "with Marcus Aurelius"
+			}
+		],
+		"Pius_Den_EA3.htm": [
+			{
+				"regexp": "/ PRIMI / DECEN / COS IIII",
+				"sub": "/ PRIMI | DECEN | COS IIII"
+			},
+			{
+				"regexp": "and MARCUS AURELIUS",
+				"sub": "with Marcus Aurelius"
+			},
+			{
+				"regexp": "RSC 154\\. Toned good VF",
+				"sub": "RSC 154. Good VF Toned"
+			},
+			{
+				"regexp": "RSC 281\\. Toned good VF",
+				"sub": "RSC 281. Good VF Toned"
+			},
+			{
+				"regexp": "RSC 280\\. Toned good VF",
+				"sub": "RSC 280. Good VF Toned"
+			},
+			{
+				"regexp": "RSC 945\\. Attractively toned good VF",
+				"sub": "RSC 945. Good VF Attractively toned"
+			},
+			{
+				"regexp": "RSC 834\\. Attractively toned good VF",
+				"sub": "RSC 834. Good VF Attractively toned"
+			},
+			{
+				"regexp": "RSC 673\\. Toned good VF irregular flan",
+				"sub": "RSC 673. Good VF Toned, irregular flan"
+			},
+			{
+				"regexp": "RSC 68a\\. Toned good VF",
+				"sub": "RSC 68a. Good VF Toned"
+			},
+			{
+				"regexp": "Toned VF",
+				"sub": "VF Toned"
+			},
+			{
+				"regexp": "RSC 916\\. Toned nice VF",
+				"sub": "RSC 916. Nice VF Toned"
+			}
+		],
+		"Pius_Den_PA1.htm": [
+		],
+		"Pius_Ses_EA1.htm": [
+			{
+				"regexp": "Æ Sestertius \\(3130mm 25\\.98 g 12h\\)",
+				"sub": "Æ Sestertius (31.30mm 25.98 g 12h)"
+			}
+		],
+		"Pius_Ses_EA2.htm": [
+			{
+				"regexp": "Æ Sestertius \\(31mm 2330 g 6h\\)",
+				"sub": "Æ Sestertius (31mm 23.30 g 6h)"
+			}
+		],	
+		"Pius_Ses_EA3.htm": [
+		],
+		"Pius_Ses_PA1.htm":[
+		]
+	}
 }
