@@ -253,7 +253,7 @@ def format_grade(text):
 		if result is not None:
 			text = re.sub(regexp, sub, text, 1)
 			return text
-	raise Exception('RIC keyword not found in {}'.format(text))
+	raise Exception('Grade not found in {}'.format(text))
 
 # use get_RIC_number to build this
 def format_RIC(text):
@@ -286,6 +286,8 @@ if __name__ == '__main__':
 		stop_file = 'config/replace_nero.json'
 	if 'Pius' in sys.argv[1]:
 		stop_file = 'config/replace_pius.json'
+	if 'Augustus' in sys.argv[1]:
+		stop_file = 'config/replace_augustus.json'
 	print('loaded stop file: {}'.format(stop_file))
 
 	# load data
@@ -314,40 +316,6 @@ if __name__ == '__main__':
 
 	# Data Formatting
 	# ===============
-
-	# AUGUSTUS
-
-	# Augustus_Aur_EA1.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'BC- AD', 'BC-AD', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Fair', 'Fine', x))
-	# Augustus_Aur_PA1.csv
-	# <--- okay
-	# Augustus_Den_EA1.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Augustus\. Silver', 'Augustus. 27 BC-AD 14. AR Denarius', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'175mm', '17.5mm', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'OB / CIVIS / SERVATOS', 'OB | CIVIS | SERVATOS', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AMP /', 'AMP/', x)) # EA1, PA1, PA2
-	# Augustus_Den_EA2.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'6nh', '6h', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Nice VF', 'Good VF', x))
-	# Augustus_Den_EA3.csv 
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'379 g', '3.79 g', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'230mm', '20mm', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(9mm', '(9mm', x))
-	# Augustus_Den_EA4.csv
-	# <--- okay
-	# Augustus_Den_PA1.csv
-	# <--- okay
-	# Augustus_Den_PA2.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'PAREN\[T\] /', 'PAREN[T]/', x)) # Triton XI, 767, 500
-	# Augustus_Den_PA3.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'3/91', '3.91', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'M[\.] DVRMIVS III\. VIR', 'M • DVRMIVS/ • III • VIR', x)) # FA, Triton X, 559
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'S•P•Q•R /', 'S•P•Q•R/', x)) # FA, CNG 75, 964
-	# Augustus_Ses_EA1.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x)) # <--- should this be AUGUSTUS\.
-
-
 
 	with open(stop_file) as f: 
 		data = json.load(f)
