@@ -65,4 +65,9 @@ Contorniate
 #
 Æ Imitative Sestertius
 Orichalcum Sestertius
+# (provincial?) Augustus Sestertii
+SPAIN Gades
+LYCIAN LEAGUE
+BYZACIUM
+NUMIDIA
 # keep last line here so we don't cut off last letter of previous word during read
