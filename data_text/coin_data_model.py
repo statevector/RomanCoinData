@@ -33,8 +33,47 @@ pd.set_option('display.max_colwidth', -1)
 # 	print('Non-outlier observations: %d' % len(outliers_removed))
 # 	return outliers_removed
 
+def get_RIC_number(x):
+	regexps = [
+		# match pattern 'RIC I/II/III 0-9/00-99/000-999'
+		r'RIC (IV|III|II|I) ([0-9][0-9][0-9]|[0-9][0-9]|[0-9])',
+		# match pattern 'RIC I/II/III -' (what is the - notation?)
+		r'RIC (IV|III|II|I) -', 
+		# match pattern 'RIC -' (only the dash?)
+		r'RIC -',
+		# match pattern 'RIC 0-999...' (only the numerals?)
+		r'RIC \d+',
+		# match cases where RIC number is absent
+		r'[Uu]nlisted|[Uu]npublished|[Uu]nique'
+	]
+	for regexp in regexps:
+		result = re.search(regexp, x)
+		#print(result)
+		if result is not None:
+			return result.group(0)
+	raise Exception('RIC keyword not found in {}'.format(x))
+
+def get_Reign(x):
+	regexps = [
+		r'\d+-\d+',
+		r'\d+ BC-AD \d+'
+	]
+	for regexp in regexps:
+		result = re.search(regexp, x)
+		#print(result)
+		if result is not None:
+			result = result.group()
+			result = result.replace('BC','')
+			result = result.replace('AD','')
+			reign = result.split('-')
+			#print(reign)
+			reign = list(map(int, reign))
+			#print(reign)
+			return abs(reign[1] - reign[0])
+	raise Exception('Reign not found in {}'.format(x))
+
 def consolidate_mints(x):
-	# sub greek to latin mint names for consistency
+	# sub greek to latin mint names
 	x = re.sub(r'Ephesos', 'Ephesus', x)
 	x = re.sub(r'Pergamon', 'Pergamum', x)
 	for mint in mints:
@@ -73,10 +112,31 @@ def consolidate_grades(text):
 	# EF            34
 	# Superb EF      4
 	# Choice EF      0
-	if 'Choice VF' in text:
-		return 'Near EF'
+	#
+	# Antoninus
+	# Near Fine      1
+	# Fine          45
+	# Nice Fine      1
+	# Good Fine     22
+	# Near VF      103
+	# VF           429
+	# Good VF      297
+	# Nice VF        1
+	# Choice VF     11
+	# Near EF      118
+	# EF           141
+	# Superb EF     21
+	# Choice EF     14
+	# FDC            1
+	#
 	if 'Near Fine' in text:
 		return 'Fine'
+	if 'Nice Fine' in text:
+		return 'Good Fine'
+	if 'Nice VF' in text:
+		return 'Good VF'
+	if 'Choice VF' in text:
+		return 'Near EF'
 	if 'Superb EF' in text:
 		return 'Good EF'
 	if 'Choice EF' in text:
@@ -266,8 +326,11 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Aug*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
+	#files2 = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Pius*/*prepared.csv')
+	#print('Loaded files: \n{}'.format(files2))
+	#files = files + files2
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[~data['Denomination'].str.contains(r'Sestertius')]
 	#data = data[~data['Denomination'].str.contains(r'Cistophorus')]
@@ -280,6 +343,8 @@ if __name__ == '__main__':
 	#data = data[data['Denomination'].str.contains(r'Aureus')] # looks good, nero drops from 88 to 81, data.drop([164], axis=0, inplace=True)
 	#data = data[data['Denomination'].str.contains(r'Cistophorus')] # looks good
 	#data = data[data['Denomination'].str.contains(r'Denarius')] # much lower... ~75 aug, all over the place (nero), why?
+
+	#data = data[:960]
 
 	#data = data[:177]
 	#data = data[:900]
@@ -296,7 +361,8 @@ if __name__ == '__main__':
 
 	# =========
 
-	def read_dates(directory):
+	def read_dates():
+		directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv'
 		files = glob.glob(directory)
 		print('Loaded date files: \n{}'.format(files))
 		data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
@@ -312,8 +378,7 @@ if __name__ == '__main__':
 				return datetime.strptime(a_date, '%B %d, %Y').year
 		raise Exception('Auction date not found for Auction ID {}'.format(x))
 
-	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv'
-	date_dict = read_dates(directory)
+	date_dict = read_dates()
 
 	# =========
 
@@ -359,9 +424,9 @@ if __name__ == '__main__':
 	data.drop(['Auction Type'], axis=1, inplace=True)
 
 	# one hot encode 'Auction ID'
-	data['Auction ID'] = data['Auction ID'].astype(str)
-	data['is_Triton'] = data['Auction ID'].map(lambda x: True if 'Triton' in x else False)
-	data['is_CNG'] = data['Auction ID'].apply(lambda x: True if 'CNG' in x else False)
+	#data['Auction ID'] = data['Auction ID'].astype(str)
+	data['is_Triton'] = data['Auction ID'].map(lambda x: True if 'Triton' in str(x) else False)
+	data['is_CNG'] = data['Auction ID'].apply(lambda x: True if 'CNG' in str(x) else False)
 	# <-- drop first weekly values. Double check.
 
 	# minor improvement (~2%)
@@ -416,9 +481,12 @@ if __name__ == '__main__':
 	# predictive, but irrelevant for Augustus only dataset
 	data['is_Augustus'] = data['Emperor'].map(lambda x: True if 'Augustus' in x else False)
 	data['is_Nero'] = data['Emperor'].map(lambda x: True if 'Nero' in x else False)
+	data['is_Antoninus'] = data['Emperor'].map(lambda x: True if 'Antoninus' in x else False)
 	data.drop(['Emperor'], axis=1, inplace=True)
 
 	# non predictive
+	data['Reign'] = data['Reign'].apply(lambda x: get_Reign(x))
+	#print(data['Reign'].value_counts())
 	data.drop(['Reign'], axis=1, inplace=True)
 
 	# one hot encode 'Denomination'
@@ -427,13 +495,24 @@ if __name__ == '__main__':
 	data['is_Cistophorus'] = data['Denomination'].map(lambda x: True if 'Cistophorus' in x else False)
 	data['is_Sestertius'] = data['Denomination'].map(lambda x: True if 'Sestertius' in x else False)
 
+	def remove_dimension(x, dimension):
+		if 'unlisted' in x:
+			return np.nan
+		if dimension in x:
+			return float(x.replace(dimension,''))
+		raise Exception('Unable to format {} for example: {}'.format(dimension, x))
+
 	# impute missing 'Diameter' measurements
+	data['Diameter'] = data['Diameter'].apply(lambda x: remove_dimension(x, dimension='mm'))
 	diameter_map = data.groupby('Denomination')['Diameter'].transform(np.median)
 	data['Diameter'] = data['Diameter'].fillna(diameter_map)
+	#print(data['Diameter'].sort_values())
 
 	# impute missing 'Weight' measurements
+	data['Weight'] = data['Weight'].apply(lambda x: remove_dimension(x, dimension='g'))
 	weight_transformer = data.groupby('Denomination')['Weight'].transform(np.median)
 	data['Weight'] = data['Weight'].fillna(weight_transformer)
+	#print(data['Weight'].sort_values())
 
 	# impute missing 'Hour' measurements (drop now for simplicity)
 	# assume die axis rotate left vs. rotate right has no effect on sale price
@@ -483,25 +562,26 @@ if __name__ == '__main__':
 	data.drop(['Reverse'], axis=1, inplace=True)
 
 	# figure this out
-	data.drop(['Inscriptions'], axis=1, inplace=True)
+	#data.drop(['Inscriptions'], axis=1, inplace=True)
 
 	# drop for now, but possibly predictive?
 	data.drop(['RIC'], axis=1, inplace=True)
 
 	# one hot encode 'Grade'
 	data['Grade'] = data['Grade'].map(consolidate_grades)
-	data['is_Fine'] = data['Grade'].map(lambda x: True if 'Fine' in x else False)
-	data['is_Good_Fine'] = data['Grade'].map(lambda x: True if 'Good Fine' in x else False)
-	data['is_Near_VF'] = data['Grade'].map(lambda x: True if 'Near VF' in x else False)
-	data['is_VF'] = data['Grade'].map(lambda x: True if 'VF' in x else False)
-	data['is_Good_VF'] = data['Grade'].map(lambda x: True if 'Good VF' in x else False)
-	data['is_Near_EF'] = data['Grade'].map(lambda x: True if 'Near EF' in x else False)
-	data['is_EF'] = data['Grade'].map(lambda x: True if 'EF' in x else False) # drop
-	data['is_Good_EF'] = data['Grade'].map(lambda x: True if 'Good EF' in x else False)
+	data['is_Fine'] = data['Grade'].map(lambda x: True if x=='Fine' else False)
+	data['is_Good_Fine'] = data['Grade'].map(lambda x: True if x=='Good Fine' else False)
+	data['is_Near_VF'] = data['Grade'].map(lambda x: True if x=='Near VF' else False)
+	data['is_VF'] = data['Grade'].map(lambda x: True if x=='VF' else False)
+	data['is_Good_VF'] = data['Grade'].map(lambda x: True if x=='Good VF' else False)
+	data['is_Near_EF'] = data['Grade'].map(lambda x: True if x=='Near EF' else False)
+	data['is_EF'] = data['Grade'].map(lambda x: True if x=='EF' else False)
+	data['is_Good_EF'] = data['Grade'].map(lambda x: True if x=='Good EF' else False)
 	data.drop(['Grade'], axis=1, inplace=True)
 
 	# figure this out
 	# do manual stemming/lemmatization for now
+	data['Comments'] = data['Comments'].astype(str)
 	data['Comments'] = data['Comments'].map(lambda x: x.lower())
 	data['Comments'] = data['Comments'].map(correct_misspellings)
 	#words = count_unique_words(data['Comments'])
@@ -901,6 +981,29 @@ if __name__ == '__main__':
 		y_pred = clf.predict(X_test)
 		print('test r2: {}'.format(r2_score(y_test, y_pred)))
 		#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
+
+	print('gbr')
+	from sklearn.ensemble import GradientBoostingRegressor
+	#gbr = GradientBoostingRegressor(n_estimators=1000, subsample=0.50, max_features='sqrt', verbose=1, random_state=42)
+	gbr = GradientBoostingRegressor(n_estimators=100, verbose=1, random_state=42)
+	gbr.fit(X_train, y_train)
+	y_pred = gbr.predict(X_train)
+	print('train r2: {}'.format(r2_score(y_train, y_pred)))
+	y_pred = gbr.predict(X_test)
+	print('test r2: {}'.format(r2_score(y_test, y_pred)))
+
+	print('adaboost')
+	from sklearn.tree import DecisionTreeRegressor
+	dt = DecisionTreeRegressor(max_depth=8)
+	from sklearn.ensemble import AdaBoostRegressor
+	ada = AdaBoostRegressor(dt, n_estimators=100, random_state=42) # loss='square'
+	ada.fit(X_train, y_train)
+	y_pred = ada.predict(X_train)
+	print('train r2: {}'.format(r2_score(y_train, y_pred)))
+	y_pred = ada.predict(X_test)
+	print('test r2: {}'.format(r2_score(y_test, y_pred)))
+
+
 
 
 	# how do our predictions compare to the test set values?
