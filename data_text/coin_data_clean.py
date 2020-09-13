@@ -89,6 +89,7 @@ def format_emperor(text, verbose=False):
 	raise Exception('No emperor match in text: {}'.format(text))
 
 def format_reign(text, verbose=False):
+	#print(text)
 	regexps = [
 		r'\d+\sBC-AD\s\d+',
 		r'AD\s\d+-\d+',
@@ -273,15 +274,21 @@ def extract_feature(text, keyword):
 
 if __name__ == '__main__':
 
-	# Load Data
-	# =========
-
 	print(' Script name: {}'.format(sys.argv[0]))
 	print(' Number of arguments: {}'.format(len(sys.argv)))
 	print(' Arguments include: {}'.format(str(sys.argv)))
 	if len(sys.argv)!=2: 
 		exit('missing input!')
 
+	# load stop words
+	stop_file = None
+	if 'Nero' in sys.argv[1]:
+		stop_file = 'config/replace_nero.json'
+	if 'Pius' in sys.argv[1]:
+		stop_file = 'config/replace_pius.json'
+	print('loaded stop file: {}'.format(stop_file))
+
+	# load data
 	df = pd.read_csv(sys.argv[1])
 	#print(df.info())
 	print('pre-selection shape: {}'.format(df.shape))
@@ -340,38 +347,15 @@ if __name__ == '__main__':
 	# Augustus_Ses_EA1.csv
 	df['Description'] = df['Description'].apply(lambda x: re.sub(r'AUGUSTUS', 'Augustus', x)) # <--- should this be AUGUSTUS\.
 
-	# NERO
 
-	# Nero_Aur_EA1.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(19mm 7\.13\)', '(19mm 7.13 g)', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO\.', 'Nero.', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'/  / PONTIF • MAX', '/ PONTIF • MAX •', x))
-	# Nero_Aur_PA1.csv
-	# <--- okay
-	# Nero_Den_EA1.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(18mm 328 g 5h\)', '(18mm 3.28 g 5h)', x))
-	# Nero_Den_EA2.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO\,? with Agrippina', 'Nero with Agrippina', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'NERO and AGRIPPINA JR', 'Nero and Agrippina Jr', x))
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'RIC I 7; BMCRE 8; RSC 4\.', 'RIC I 7; BMCRE 8; RSC 4. Good Fine', x)) # <-- missing grade!
-	# Nero_Den_PA1.csv 
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Struck AD 60-61. PONTIF • MAX', 'Struck AD 60-61. NERO CAESAR AUG IMP / PONTIF • MAX', x)) # missing obv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'\(352 g 5h\)', '(3.52 g 5h)', x))
-	# Nero_Ses_EA1.csv
-	# <--- okay
-	# Nero_Ses_EA2.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'RIC I 388\. green patina', 'RIC I 7; RIC I 388. Fine, green patina', x)) # <-- missing grade!
-	# Nero_Ses_PA1.csv
-	df['Description'] = df['Description'].apply(lambda x: re.sub(r'Superb virtually as struck', 'Superb EF, virtually as struck', x)) # <-- missing grade!
 
-	# PIUS
-
-	with open('config/replace_pius.json') as f: 
+	with open(stop_file) as f: 
 		data = json.load(f)
-		for r in data['replacement']:
-			if r['replace']:
-				#print(' --> replacing [{}] with [{}] from {}'.format(r['regex'], r['sub'], r['file']))
-				df['Description'] = df['Description'].apply(lambda x: re.sub(r['regex'], r['sub'], x))
+		for file, replacements in data['file'].items(): 
+			#print(key, val, '\n')
+			for r in replacements: 
+				#print(' --> replacing [{}] with [{}] from {}'.format(r['regexp'], r['sub'], file))
+				df['Description'] = df['Description'].apply(lambda x: re.sub(r['regexp'], r['sub'], x))
 
 	# Specify data types
 	# ==================
