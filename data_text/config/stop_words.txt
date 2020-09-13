@@ -49,4 +49,20 @@ Dupondius
 Æ “Medallion”
 Æ Medallion
 Æ 'Medallic' Sestertius
+# nero paduan type cast after Giovanni da Cavino
+ANCIENT THEMES
+PADUAN MEDALS
+Æ Cast “Sestertius”
+Giovanni da Cavino
+# Countermarks applied under Nero
+MOESIA & THRACE\. Æ Sestertius
+GERMANIA INFERIOR\. Æ Sestertius
+GALLIA LUGDUNENSIS\(\?\)\. Æ Sestertius
+GERMANIA SUPERIOR\. Æ Sestertius
+BRITANNIA\(\?\)\. Æ Sestertius
+# medal or medallion of bronze issued in the fourth and fifth centuries
+Contorniate
+#
+Æ Imitative Sestertius
+Orichalcum Sestertius
 # keep last line here so we don't cut off last letter of previous word during read
