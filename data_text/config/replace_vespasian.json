@@ -2,12 +2,20 @@
 	"file": {
 		"Vespasian_Aur_EA1.htm": [
 			{
-				"regexp": "VESPASIAN",
-				"sub": "Vespasian"
+				"regexp": "Titus\\. As Caesar",
+				"sub": "Titus, as Caesar."
 			},
 			{
-				"regexp": "TITUS",
-				"sub": "Titus"
+				"regexp": "TITUS as Caesar",
+				"sub": "Titus, as Caesar"
+			},
+			{
+				"regexp": "VESPASIAN\\. 69-79 AD",
+				"sub": "Vespasian. 69-79 AD"
+			},
+			{
+				"regexp": "TITUS\\. As Caesar 69-79 AD",
+				"sub": "Titus, as Caesar. 69-79 AD"
 			}
 
 		],
@@ -20,10 +28,22 @@
 			},
 			{
 				"regexp": "Titus\\. As Caesar",
-				"sub": "Titus"
+				"sub": "Titus, as Caesar"
+			},
+			{
+				"regexp": "1820mm",
+				"sub": "18.20mm"
 			}
 		],
 		"Vespasian_Den_EA2.htm": [
+			{
+				"regexp": "Vespasian with Titus and Domitian as Caesars",
+				"sub": "Vespasian with Titus and Domitian as Caesares"
+			},
+			{
+				"regexp": "Vespasian with Titus & Domitian",
+				"sub": "Vespasian with Titus and Domitian as Caesares"
+			}
 		],
 		"Vespasian_Den_EA3.htm": [
 		],
@@ -31,15 +51,71 @@
 			{
 				"regexp": "AR Denarius\\. Rome mint",
 				"sub": "AR Denarius (). Rome mint"
+			},
+			{
+				"regexp": "DIVVS VESPASIAN",
+				"sub": "DIVUS Vespasian"
+			},
+			{
+				"regexp": "VESPASIAN\\. 69-79 AD",
+				"sub": "Vespasian. 69-79 AD"
+			},
+			{
+				"regexp": "69-79 AD AR Denarius",
+				"sub": "69-79 AD. AR Denarius"
 			}
 		],
 		"Vespasian_Den_PA1.htm": [
+			{
+				"regexp": "Toned good VF",
+				"sub": "Good VF toned"
+			},
+			{
+				"regexp": "Toned VF",
+				"sub": "VF toned"
+			},
+			{
+				"regexp": "Lightly toned EF",
+				"sub": "EF Lightly toned"
+			},
+			{
+				"regexp": "Toned EF",
+				"sub": "EF Toned"
+			},
+			{
+				"regexp": "Toned Fine",
+				"sub": "Fine Toned"
+			},
+			{
+				"regexp": "Lightly toned good VF",
+				"sub": "Good VF Lightly toned"
+			},
+			{
+				"regexp": "Toned Good VF",
+				"sub": "Good VF Toned"
+			},
+			{
+				"regexp": "Toned nice VF",
+				"sub": "Good VF Toned"
+			},
+			{
+				"regexp": "Lustrous EF",
+				"sub": "EF Lustrous"
+			},
+			{
+				"regexp": "Lightly toned VF",
+				"sub": "VF Lightly toned"
+			}
 		],
 		"Vespasian_Ses_EA1.htm": [
 		],
 		"Vespasian_Ses_EA2.htm": [
 		],
 		"Vespasian_Ses_PA1.htm":[
+			{
+				"regexp": "TITUS\\. As Caesar, 69-79 AD",
+				"sub": "Titus, as Caesar. 69-79 AD."
+			}
 		]
 	}
 }
