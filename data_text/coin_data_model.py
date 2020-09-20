@@ -24,19 +24,8 @@ pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
 pd.set_option('display.max_colwidth', -1)
 
-# def identify_outliers(data):
-# 	# calculate summary statistics
-# 	data_mean, data_std = np.mean(data), np.std(data)
-# 	# identify outliers
-# 	cut_off = data_std * 3
-# 	lower, upper = data_mean - cut_off, data_mean + cut_off
-# 	# identify outliers
-# 	outliers = [x for x in data if x < lower or x > upper]
-# 	print('Identified outliers: %d' % len(outliers))
-# 	# remove outliers
-# 	outliers_removed = [x for x in data if x >= lower and x <= upper]
-# 	print('Non-outlier observations: %d' % len(outliers_removed))
-# 	return outliers_removed
+def mean_absolute_percentage_error(y_true, y_pred): 
+	return np.mean(np.abs((y_true - y_pred) / y_true))
 
 def get_struck_dates(x):
 	# check for struck keyword 
@@ -169,49 +158,6 @@ def count_unique_words(series):
 	return word_list.sort_values(ascending=False)
 
 def consolidate_grades(text):
-	#
-	# Augustus
-	# Near Fine      5
-	# Fine          99
-	# Good Fine     35
-	# Near VF      128
-	# VF           586
-	# Good VF      354
-	# Choice VF      1
-	# Near EF      119
-	# EF           116
-	# Superb EF     17
-	# Choice EF      8
-	#
-	# Nero
-	# Near Fine     17
-	# Fine         130
-	# Good Fine     38
-	# Near VF      146
-	# VF           358
-	# Good VF      180
-	# Choice VF      2
-	# Near EF       46
-	# EF            34
-	# Superb EF      4
-	# Choice EF      0
-	#
-	# Antoninus
-	# Near Fine      1
-	# Fine          45
-	# Nice Fine      1
-	# Good Fine     22
-	# Near VF      103
-	# VF           429
-	# Good VF      297
-	# Nice VF        1
-	# Choice VF     11
-	# Near EF      118
-	# EF           141
-	# Superb EF     21
-	# Choice EF     14
-	# FDC            1
-	#
 	if 'Near Fine' in text:
 		return 'Fine'
 	if 'Nice Fine' in text:
@@ -406,65 +352,38 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 			X_trans.append(row)
 		return X_trans
 
+def read_dates():
+	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv'
+	files = glob.glob(directory)
+	print('Loaded date files: \n{}'.format(files))
+	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
+	#data = data.sort_values(by='Auction ID', ascending=False)
+	data = data[~data['Auction ID'].str.contains('Post-Sale Information')]
+	date_dict = dict(zip(data['Auction ID'], data['Auction Date']))
+	return date_dict
+
+def id_to_date_map(x, date_dict):
+	for a_id, a_date in date_dict.items():
+		#print(x)
+		if str(x) == str(a_id):
+			return datetime.strptime(a_date, '%B %d, %Y').year
+	raise Exception('Auction date not found for Auction ID {}'.format(x))
 
 if __name__ == '__main__':
 
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Pius*/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
-	#files2 = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Pius*/*prepared.csv')
-	#print('Loaded files: \n{}'.format(files2))
-	#files = files + files2
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
-	#data = data[~data['Denomination'].str.contains(r'Sestertius')]
-	#data = data[~data['Denomination'].str.contains(r'Cistophorus')]
-	#data = data[~data['Denomination'].str.contains(r'Aureus')]
-	#data = data[~data['Denomination'].str.contains(r'Denarius')]
-	#data = data[~data['Comments'].str.contains(r'test cut')]
-
-	#
 	#data = data[data['Denomination'].str.contains(r'Sestertius')] # both look good
 	#data = data[data['Denomination'].str.contains(r'Aureus')] # looks good, nero drops from 88 to 81, data.drop([164], axis=0, inplace=True)
 	#data = data[data['Denomination'].str.contains(r'Cistophorus')] # looks good
 	#data = data[data['Denomination'].str.contains(r'Denarius')] # much lower... ~75 aug, all over the place (nero), why?
-
-	#data = data[:900]
-
-	#data = data[:177]
-	#data = data[:900]
-	#data = data[:1800]
-	random_state = 42 # try running for different values to check stability of denarius data
 	
-	# Augustus Den PA
-	#data.drop([275], axis=0, inplace=True)
-	#data.drop([284], axis=0, inplace=True)
-	#data.drop([377], axis=0, inplace=True)
-
 	print('INPUT DATASET: ')
 	print(data.shape)
 
 	# outlier removal
 	#data = data[data['Sold']<20000]
-
-	# =========
-
-	def read_dates():
-		directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_dates/*.csv'
-		files = glob.glob(directory)
-		print('Loaded date files: \n{}'.format(files))
-		data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True)
-		#data = data.sort_values(by='Auction ID', ascending=False)
-		data = data[~data['Auction ID'].str.contains('Post-Sale Information')]
-		date_dict = dict(zip(data['Auction ID'], data['Auction Date']))
-		return date_dict
-
-	def id_to_date_map(x, date_dict):
-		for a_id, a_date in date_dict.items():
-			#print(x)
-			if str(x) == str(a_id):
-				return datetime.strptime(a_date, '%B %d, %Y').year
-		raise Exception('Auction date not found for Auction ID {}'.format(x))
-
-	date_dict = read_dates()
 
 	# =========
 
@@ -485,12 +404,9 @@ if __name__ == '__main__':
 		if center is not None:
 				return center
 		else:
-			#print('ERROR')
-			#return 'average'
+			print('ERROR')
+			return 'average'
 			raise Exception('No center mapping exists for {}'.format(x))
-
-	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_*_centering.csv'
-	center_dict = read_centers(directory)
 
 	# =========
 
@@ -518,6 +434,7 @@ if __name__ == '__main__':
 	# <-- drop first weekly values. Double check.
 
 	# minor improvement (~2%)
+	date_dict = read_dates()
 	data['Auction Year'] = data['Auction ID'].map(lambda x: id_to_date_map(x, date_dict))
 	#print(data['Auction Year'].value_counts())
 	data.drop(['Auction ID'], axis=1, inplace=True)
@@ -552,8 +469,10 @@ if __name__ == '__main__':
 
 	# semi-predictive
 	if(False):
+		directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_*_centering.csv'
+		center_dict = read_centers(directory)
 		data['Centered'] = data['Image URL'].map(lambda x: url_to_center_map(x, center_dict))
-		#print(data['Centered'].value_counts())
+		print(data['Centered'].value_counts())
 		data['is_centered_perfect'] = data['Centered'].map(lambda x: True if x=='perfect' else False)
 		data['is_centered_well'] = data['Centered'].map(lambda x: True if x=='well' else False)
 		data['is_centered_average'] = data['Centered'].map(lambda x: True if x=='average' else False)
@@ -1041,7 +960,7 @@ if __name__ == '__main__':
 	# y_binned = np.digitize(y, bins)
 	# print(y_binned)
 
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=random_state)
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
 	print(X_train.shape)
 
 	scaler = StandardScaler()
@@ -1170,24 +1089,18 @@ if __name__ == '__main__':
 	print('train r2: {}'.format(r2_score(y_train, y_pred)))
 	y_pred = gbr.predict(X_test)
 	print('test r2: {}'.format(r2_score(y_test, y_pred)))
-
-	#from sklearn.utils import check_arrays
-	def mean_absolute_percentage_error(y_true, y_pred): 
-		#y_true, y_pred = check_arrays(y_true, y_pred)
-		return np.mean(np.abs((y_true - y_pred) / y_true))
-
-	print('test mape: {}'.format(mean_absolute_percentage_error(y_test, y_pred)))
-	print('test exp(mape): {}'.format(mean_absolute_percentage_error(np.exp(y_test), np.exp(y_pred))))
+	#print('test mape: {}'.format(mean_absolute_percentage_error(y_test, y_pred)))
+	#print('test exp(mape): {}'.format(mean_absolute_percentage_error(np.exp(y_test), np.exp(y_pred))))
 	#print(np.exp(y_test) - np.exp(y_pred))
 
-	print('adaboost')
-	dt = DecisionTreeRegressor(max_depth=8)
-	ada = AdaBoostRegressor(dt, n_estimators=100, random_state=42) # loss='square'
-	ada.fit(X_train, y_train)
-	y_pred = ada.predict(X_train)
-	print('train r2: {}'.format(r2_score(y_train, y_pred)))
-	y_pred = ada.predict(X_test)
-	print('test r2: {}'.format(r2_score(y_test, y_pred)))
+	# print('adaboost')
+	# dt = DecisionTreeRegressor(max_depth=8)
+	# ada = AdaBoostRegressor(dt, n_estimators=100, random_state=42) # loss='square'
+	# ada.fit(X_train, y_train)
+	# y_pred = ada.predict(X_train)
+	# print('train r2: {}'.format(r2_score(y_train, y_pred)))
+	# y_pred = ada.predict(X_test)
+	# print('test r2: {}'.format(r2_score(y_test, y_pred)))
 
 
 
@@ -1196,7 +1109,7 @@ if __name__ == '__main__':
 	#for y, yp in zip(y_test, y_test_pred):
 	#	print(int(np.exp(y)), int(np.exp(yp)))
 
-	if(False):
+	if(True):
 		import matplotlib.pyplot as plt
 		plt.scatter(y_pred, y_test-y_pred, c = "lightgreen", marker = "s", label = "Test data")
 		plt.title("Linear Regression")
