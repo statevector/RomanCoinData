@@ -1,5 +1,7 @@
 CHF
 Lot of
+LOT SOLD AS IS NO RETURNS
+coins in lot
 Quinarius
 Fourrée
 fourrée
@@ -52,6 +54,7 @@ Dupondius
 # nero paduan type cast after Giovanni da Cavino
 ANCIENT THEMES
 PADUAN MEDALS
+PADUAN MEDAL
 Æ Cast “Sestertius”
 Giovanni da Cavino
 # Countermarks applied under Nero

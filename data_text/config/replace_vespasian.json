@@ -1,0 +1,45 @@
+{
+	"file": {
+		"Vespasian_Aur_EA1.htm": [
+			{
+				"regexp": "VESPASIAN",
+				"sub": "Vespasian"
+			},
+			{
+				"regexp": "TITUS",
+				"sub": "Titus"
+			}
+
+		],
+		"Vespasian_Aur_PA1.htm": [
+		],
+		"Vespasian_Den_EA1.htm": [
+			{
+				"regexp": "\\(18mm 6hh\\)\\.",
+				"sub": "(18mm 6h)."
+			},
+			{
+				"regexp": "Titus\\. As Caesar",
+				"sub": "Titus"
+			}
+		],
+		"Vespasian_Den_EA2.htm": [
+		],
+		"Vespasian_Den_EA3.htm": [
+		],
+		"Vespasian_Den_EA4.htm": [
+			{
+				"regexp": "AR Denarius\\. Rome mint",
+				"sub": "AR Denarius (). Rome mint"
+			}
+		],
+		"Vespasian_Den_PA1.htm": [
+		],
+		"Vespasian_Ses_EA1.htm": [
+		],
+		"Vespasian_Ses_EA2.htm": [
+		],
+		"Vespasian_Ses_PA1.htm":[
+		]
+	}
+}
