@@ -145,7 +145,8 @@ def format_measurements(text, verbose=False):
 		r'\(.+gm?.+h\)\.',      # case 3: missing 'mm' only
 		r'\(.+mm \)\.',         # case 4: missing 'g' and 'h' (with ending space)
 		r'\(\S+\s+gm?\s?\)\.',  # case 5: missing 'mm' and 'h'; using \S and \s
-		r'\(\d+mm\s+\d+h\)\.'   # case 6: missing 'g' only
+		r'\(\d+mm\s+\d+h\)\.',  # case 6: missing 'g' only
+		r'\(\)\.'               # case 7: missing all three
 	]
 	for case, regexp in enumerate(regexps):
 		if verbose:
@@ -198,6 +199,10 @@ def format_measurements(text, verbose=False):
 				result.insert(2, 'unlisted')
 			if case==6:
 				result.insert(1, 'unlisted')
+			if case==7:
+				result.insert(0, 'unlisted')
+				result.insert(1, 'unlisted')
+				result.insert(2, 'unlisted')
 			if verbose:
 				print(result)
 			# insert keyword for each measurement type
