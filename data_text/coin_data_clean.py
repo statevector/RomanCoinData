@@ -78,6 +78,8 @@ def format_emperor(text, verbose=False):
 	emperors = [
 		'Augustus', 
 		'Nero', 
+		'Vespasian',
+		'Titus',
 		'Antoninus Pius', 
 		'Faustina Senior'
 	]
@@ -142,7 +144,8 @@ def format_measurements(text, verbose=False):
 		r'\(.+mm\)\.',          # case 2: missing 'g' and 'h' (no end space)
 		r'\(.+gm?.+h\)\.',      # case 3: missing 'mm' only
 		r'\(.+mm \)\.',         # case 4: missing 'g' and 'h' (with ending space)
-		r'\(\S+\s+gm?\s?\)\.'   # case 5: missing 'mm' and 'h'; using \S and \s
+		r'\(\S+\s+gm?\s?\)\.',  # case 5: missing 'mm' and 'h'; using \S and \s
+		r'\(\d+mm\s+\d+h\)\.'   # case 6: missing 'g' only
 	]
 	for case, regexp in enumerate(regexps):
 		if verbose:
@@ -193,6 +196,8 @@ def format_measurements(text, verbose=False):
 			if case==5:
 				result.insert(0, 'unlisted')
 				result.insert(2, 'unlisted')
+			if case==6:
+				result.insert(1, 'unlisted')
 			if verbose:
 				print(result)
 			# insert keyword for each measurement type
@@ -289,6 +294,10 @@ if __name__ == '__main__':
 		stop_file = 'config/replace_pius.json'
 	if 'Augustus' in sys.argv[1]:
 		stop_file = 'config/replace_augustus.json'
+	if 'Vespasian' in sys.argv[1]:
+		stop_file = 'config/replace_vespasian.json'
+	if stop_file is None:
+		raise Exception('missing stop words file')
 	print('loaded stop file: {}'.format(stop_file))
 
 	# load data
