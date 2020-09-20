@@ -34,6 +34,10 @@
 			{
 				"regexp": "RIC I 7; BMCRE 8; RSC 4\\.",
 				"sub": "RIC I 7; BMCRE 8; RSC 4. Good Fine"
+			},
+			{
+				"regexp": "Rome mint. Struck circa AD \\.",
+				"sub": "Rome mint. Struck circa AD 64-65\\."
 			}
 		],
 		"Nero_Den_PA1.csv": [

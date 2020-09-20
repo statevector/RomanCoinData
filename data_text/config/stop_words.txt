@@ -70,4 +70,6 @@ SPAIN Gades
 LYCIAN LEAGUE
 BYZACIUM
 NUMIDIA
+# countermarking words
+countermark
 # keep last line here so we don't cut off last letter of previous word during read

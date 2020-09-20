@@ -14,6 +14,11 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
+from sklearn.model_selection import RepeatedKFold, KFold
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import learning_curve
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import AdaBoostRegressor
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
@@ -32,6 +37,84 @@ pd.set_option('display.max_colwidth', -1)
 # 	outliers_removed = [x for x in data if x >= lower and x <= upper]
 # 	print('Non-outlier observations: %d' % len(outliers_removed))
 # 	return outliers_removed
+
+def get_struck_dates(x):
+	# check for struck keyword 
+	# (e.g. cases where reign and struck dates were 
+	# both pulled into struck field)
+	regexp = re.search(r'\(Struck.+\)', x)
+	if regexp:
+		x = regexp.group()
+	# case 1a: two year (e.g. Struck AD 141-143 (AD/), Struck (BC/) 11-10 BC)
+	regexp = re.search(r'((AD|BC)\s\d+-\d+|\d+-\d+\s(AD|BC))', x)
+	if regexp:
+		dates = regexp.group()
+		if 'BC' in dates:
+			dates = dates.replace('BC', '').strip()
+			dates = list(map(int, dates.strip().split('-')))
+			return [-d for d in dates]
+		elif 'AD' in dates:
+			dates = dates.replace('AD', '').strip()
+			dates = list(map(int, dates.strip().split('-')))
+			return dates
+		else:
+			raise Exception('missing BC or AD in {}, {}'.format(x, dates))
+	# case 1b: two year (e.g. Struck 2 BC-AD 4)
+	regexp = re.search(r'\d+\sBC-AD\s\d+', x)
+	if regexp:
+		dates = regexp.group()
+		if 'BC-AD' in dates:
+			#print('X', dates)
+			dates = dates.replace('BC-AD', '-')
+			dates = list(map(int, dates.strip().split('-')))
+			dates[0] = -dates[0] # convert BC to negative
+			#print(dates)
+			return dates
+		else:
+			raise Exception('missing BC-AD in {}, {}'.format(x, dates))
+	# case 2a: one year (e.g. Struck (BC/) 8 BC, Struck (AD/) 149 AD)
+	# use ' ' prefactor to avoid grabbing cases like "Struck 127/8 AD"
+	regexp = re.search(r' (\d+\s(BC|AD)|(BC|AD)\s\d+)', x)
+	if regexp:
+		dates = regexp.group()
+		if 'BC' in dates:
+			dates = dates.replace('BC', '').strip()
+			dates = int(dates)
+			return [-dates, -dates]
+		elif 'AD' in dates:
+			dates = dates.replace('AD', '').strip()
+			dates = int(dates)
+			return [dates, dates]
+		else:
+			raise Exception('missing BC or AD in {}, {}'.format(x, dates))
+	# case 2b: one year, but uncertain? (e.g. (AD/) 151/152 AD, (BC/) 12/11 BC)
+	regexp = re.search(r'(\d+\/\d+\s(AD|BC)|(AD|BC)\s\d+\/\d+)', x)
+	if regexp:
+		dates = regexp.group()
+		if 'BC' in dates:
+			#print(dates)
+			# take the min year for accuracy; 
+			# i.e. properly handle cases like 19/8 BC, 
+			# where 8 would otherwise be year pulled
+			dates = dates.split('/')[0]
+			dates = dates.replace('BC', '')
+			dates = -int(dates)
+			#print(dates)
+			return [dates, dates]
+		elif 'AD' in dates:
+			#print(dates)
+			dates = dates.split('/')[0]
+			dates = dates.replace('AD', '')
+			dates = int(dates)
+			#print(dates)
+			return [dates, dates]
+		else:
+			raise Exception('missing BC or AD in {}, {}'.format(x, dates))
+	# case 3: unlisted
+	regexp = re.search(r'unlisted', x)
+	if regexp:
+		return [np.nan, np.nan]
+	raise Exception('bad struck field: {}'.format(x))
 
 def get_RIC_number(x):
 	regexps = [
@@ -326,7 +409,7 @@ class TextTransformer(base.BaseEstimator, base.TransformerMixin):
 
 if __name__ == '__main__':
 
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Aug*/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Pius*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
 	#files2 = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Pius*/*prepared.csv')
 	#print('Loaded files: \n{}'.format(files2))
@@ -344,7 +427,7 @@ if __name__ == '__main__':
 	#data = data[data['Denomination'].str.contains(r'Cistophorus')] # looks good
 	#data = data[data['Denomination'].str.contains(r'Denarius')] # much lower... ~75 aug, all over the place (nero), why?
 
-	#data = data[:960]
+	#data = data[:900]
 
 	#data = data[:177]
 	#data = data[:900]
@@ -358,6 +441,9 @@ if __name__ == '__main__':
 
 	print('INPUT DATASET: ')
 	print(data.shape)
+
+	# outlier removal
+	#data = data[data['Sold']<20000]
 
 	# =========
 
@@ -399,6 +485,8 @@ if __name__ == '__main__':
 		if center is not None:
 				return center
 		else:
+			#print('ERROR')
+			#return 'average'
 			raise Exception('No center mapping exists for {}'.format(x))
 
 	directory = '/Users/cwillis/GitHub/RomanCoinData/data_text/data_centered/Nero_*_centering.csv'
@@ -447,8 +535,8 @@ if __name__ == '__main__':
 	y = data['Sold'].values
 	data.drop(['Sold'], axis=1, inplace=True)
 
-	# studied and no impact
-	#data['has_Header'] = data['Header'].apply(lambda x: False if x=='No Header' else True)
+	# studied and augustus impact
+	data['has_Header'] = data['Header'].apply(lambda x: False if x=='No Header' else True)
 	#print(data['has_Header'].value_counts())
 	#data['len_Header'] = data['Header'].apply(lambda x: len(x))
 	data.drop(['Header'], axis=1, inplace=True)
@@ -466,10 +554,10 @@ if __name__ == '__main__':
 	if(False):
 		data['Centered'] = data['Image URL'].map(lambda x: url_to_center_map(x, center_dict))
 		#print(data['Centered'].value_counts())
-		data['is_centered_perfect'] = data['Centered'].map(lambda x: True if 'perfect' in x else False)
-		data['is_centered_well'] = data['Centered'].map(lambda x: True if 'well' in x else False)
-		data['is_centered_average'] = data['Centered'].map(lambda x: True if 'average' in x else False)
-		data['is_centered_poor'] = data['Centered'].map(lambda x: True if 'poor' in x else False)
+		data['is_centered_perfect'] = data['Centered'].map(lambda x: True if x=='perfect' else False)
+		data['is_centered_well'] = data['Centered'].map(lambda x: True if x=='well' else False)
+		data['is_centered_average'] = data['Centered'].map(lambda x: True if x=='average' else False)
+		data['is_centered_poor'] = data['Centered'].map(lambda x: True if x=='poor' else False)
 		data.drop(['Centered'], axis=1, inplace=True)
 
 	# non predictive
@@ -512,6 +600,7 @@ if __name__ == '__main__':
 	data['Weight'] = data['Weight'].apply(lambda x: remove_dimension(x, dimension='g'))
 	weight_transformer = data.groupby('Denomination')['Weight'].transform(np.median)
 	data['Weight'] = data['Weight'].fillna(weight_transformer)
+	#data['Weight'] = data['Weight'].apply(lambda x: np.sin(x))
 	#print(data['Weight'].sort_values())
 
 	# impute missing 'Hour' measurements (drop now for simplicity)
@@ -552,8 +641,20 @@ if __name__ == '__main__':
 	#data['has_Moneyer'] = data['Moneyer'].apply(lambda x: False if x=='nan' else True)
 	data.drop(['Moneyer'], axis=1, inplace=True)
 
-	# drop for now, but possibly predictive?
-	data.drop(['Struck'], axis=1, inplace=True)
+	# xxx
+	data['s'] = data['Struck'].apply(get_struck_dates)
+	data['s1'], data['s2'] = zip(*data['s'])
+	data['s3'] = data['s2'] - data['s1']
+	print(data['s3'].value_counts().sort_index())
+	data['s3'] = data['s3'].fillna(0) # quick and dirty
+	data.drop(['Struck', 's', 's1', 's2'], axis=1, inplace=True)
+	# break out into date categories
+	data['is_0years'] = data['s3'].map(lambda x: True if x==0 else False)
+	data['is_1years'] = data['s3'].map(lambda x: True if x==1 else False)
+	data['is_2-3years'] = data['s3'].map(lambda x: True if (x==2 or x==3) else False)
+	data['is_4-5years'] = data['s3'].map(lambda x: True if (x==4 or x==5) else False)
+	data['is_6+years'] = data['s3'].map(lambda x: True if x>6 else False)
+	data.drop(['s3'], axis=1, inplace=True)
 
 	# figure this out
 	data.drop(['Obverse'], axis=1, inplace=True)
@@ -586,6 +687,9 @@ if __name__ == '__main__':
 	data['Comments'] = data['Comments'].map(correct_misspellings)
 	#words = count_unique_words(data['Comments'])
 	#print(words)
+
+	#data['no_comments'] = data['Comments'].apply(lambda x: True if x=='nan' else False)
+	#print(data['no_comments'].value_counts())
 
 	# keywords: tone
 	# ==============
@@ -794,7 +898,6 @@ if __name__ == '__main__':
 	# # studied and no impact
 	# data['keyword_cut'] = data['Comments'].apply(lambda x: True if 'cut' in x else False)
 
-	data.drop('Comments', axis=1, inplace=True)
 
 
 
@@ -880,6 +983,13 @@ if __name__ == '__main__':
 	#print('stop words: {}'.format(v2.stop_words_))
 	# X2 = X2.toarray()
 
+	# tfidfvec = TfidfVectorizer(min_df=100, max_df=0.75, ngram_range=(1,1))
+	# X2 = tfidfvec.fit_transform(data['Comments'])
+	# X2 = X2.toarray()
+	# print(X2.shape)
+
+
+	data.drop('Comments', axis=1, inplace=True)
 
 	print('FEATURE MATRIX: ')
 	print(data.shape)
@@ -931,12 +1041,70 @@ if __name__ == '__main__':
 	# y_binned = np.digitize(y, bins)
 	# print(y_binned)
 
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=random_state)#, stratify=data['is_Augustus'])
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=random_state)
 	print(X_train.shape)
 
 	scaler = StandardScaler()
 	X_train = scaler.fit_transform(X_train)
 	X_test = scaler.transform(X_test)
+
+	# iterate over r folds
+	# for r in range(2,20):
+	# 	model = Ridge(alpha=0.66, random_state=42)
+	# 	#model = Lasso(alpha=0.01, random_state=42)
+	# 	#model = GradientBoostingRegressor(n_estimators=100, random_state=42)
+	# 	cv = RepeatedKFold(n_splits=10, n_repeats=r, random_state=1)
+	# 	cv_scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='r2', n_jobs=-1)
+	# 	#print(r, ':', cv_scores, ': ', np.mean(cv_scores), np.std(cv_scores)/np.sqrt(r))
+	# 	print('repeat {}, mean {:.3f}, std {:.3f}'.format(r, np.mean(cv_scores), np.std(cv_scores)/np.sqrt(r)))
+
+	# iterate over r folds
+	# for r in range(2,50):
+	# 	model = Ridge(alpha=0.66, random_state=42)
+	# 	#model = Lasso(alpha=0.01, random_state=42)
+	# 	#model = GradientBoostingRegressor(n_estimators=100, random_state=42)
+	# 	cv = KFold(n_splits=r, shuffle=True, random_state=1)
+	# 	cv_scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='r2', n_jobs=-1)
+	# 	#print(r, ':', cv_scores, ': ', np.mean(cv_scores), np.std(cv_scores)/np.sqrt(r))
+	# 	print('k: {}, mean {:.3f}, std {:.3f}'.format(r, np.mean(cv_scores), np.std(cv_scores)))
+
+	estimator = GradientBoostingRegressor(learning_rate=0.1, max_depth=3, n_estimators=50, subsample=0.8, random_state=42)
+	#estimator = Ridge(alpha=0.66, random_state=42)
+	train_sizes, train_scores, test_scores = learning_curve(estimator, X_train, y_train, 
+		train_sizes=np.linspace(0.1, 1, 30), scoring='r2', cv=5, n_jobs=-1) # neg_mean_squared_error
+	train_scores_mean = np.mean(train_scores, axis=1)
+	train_scores_std = np.std(train_scores, axis=1)
+	test_scores_mean = np.mean(test_scores, axis=1)
+	test_scores_std = np.std(test_scores, axis=1)
+
+	import matplotlib.pyplot as plt
+
+	_, axes = plt.subplots(1, 1, figsize=(7, 7))
+	
+	#ylim=(0.1, 0.4)
+	ylim=(0.7, 1.01)
+	title = 'pius learning curves'
+
+	axes.set_title(title)
+	if ylim is not None:
+		axes.set_ylim(*ylim)
+	axes.set_xlabel("Training examples")
+	axes.set_ylabel("Score")
+
+	# Plot learning curve
+	axes.grid()
+	axes.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="r")
+	axes.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std, alpha=0.1, color="g")
+	axes.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
+	axes.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
+	axes.legend(loc="best")
+
+	plt.show()
+
+
+
+
+
 
 	# initialize linear regression model with L2 regularization
 	linear = Ridge(random_state=42, max_iter=1e5)
@@ -953,6 +1121,7 @@ if __name__ == '__main__':
 	y_pred = clf.predict(X_test) # predict calls the estimator with the best found parameters
 	print('test r2: {}'.format(r2_score(y_test, y_pred)))
 	#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
+	#print(clf.cv_results_)
 
 	# initialize linear regression model with L1 regularization
 	linear = Lasso(random_state=42, max_iter=1e5)
@@ -982,20 +1151,37 @@ if __name__ == '__main__':
 		print('test r2: {}'.format(r2_score(y_test, y_pred)))
 		#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
 
+	# gbr = GradientBoostingRegressor(n_estimators=100, verbose=0, random_state=42)
+	# param_grid = {'learning_rate': [0.1, 0.5], 'n_estimators': [25, 50, 100], 'subsample': [0.8, 1.0], 'max_depth':[4, 5, 6], 'max_features': ['auto', 'sqrt']}
+	# clf = GridSearchCV(gbr, param_grid, cv=5, scoring='r2', n_jobs=-1, verbose=True)
+	# clf.fit(X_train, y_train)
+	# print('train r2: {}'.format(clf.best_score_))
+	# y_pred = clf.predict(X_test) # predict calls the estimator with the best found parameters
+	# print('test r2: {}'.format(r2_score(y_test, y_pred)))
+	# print(clf.best_params_)
+	# print(clf.best_estimator_.feature_importances_)
+
 	print('gbr')
-	from sklearn.ensemble import GradientBoostingRegressor
 	#gbr = GradientBoostingRegressor(n_estimators=1000, subsample=0.50, max_features='sqrt', verbose=1, random_state=42)
-	gbr = GradientBoostingRegressor(n_estimators=100, verbose=1, random_state=42)
+	#gbr = GradientBoostingRegressor(n_estimators=100, verbose=1, random_state=42)
+	gbr = GradientBoostingRegressor(learning_rate=0.1, max_depth=3, n_estimators=50, subsample=0.8, random_state=42)
 	gbr.fit(X_train, y_train)
 	y_pred = gbr.predict(X_train)
 	print('train r2: {}'.format(r2_score(y_train, y_pred)))
 	y_pred = gbr.predict(X_test)
 	print('test r2: {}'.format(r2_score(y_test, y_pred)))
 
+	#from sklearn.utils import check_arrays
+	def mean_absolute_percentage_error(y_true, y_pred): 
+		#y_true, y_pred = check_arrays(y_true, y_pred)
+		return np.mean(np.abs((y_true - y_pred) / y_true))
+
+	print('test mape: {}'.format(mean_absolute_percentage_error(y_test, y_pred)))
+	print('test exp(mape): {}'.format(mean_absolute_percentage_error(np.exp(y_test), np.exp(y_pred))))
+	#print(np.exp(y_test) - np.exp(y_pred))
+
 	print('adaboost')
-	from sklearn.tree import DecisionTreeRegressor
 	dt = DecisionTreeRegressor(max_depth=8)
-	from sklearn.ensemble import AdaBoostRegressor
 	ada = AdaBoostRegressor(dt, n_estimators=100, random_state=42) # loss='square'
 	ada.fit(X_train, y_train)
 	y_pred = ada.predict(X_train)

@@ -57,6 +57,11 @@
 		"Augustus_Den_EA4.csv": [
 		],
 		"Augustus_Den_PA1.csv": [
+			{
+				"regexp": "Struck circa AD 18-17/16 BC",
+				"sub": "Struck circa 18-16 BC",
+				"notes": "https://www.wildwinds.com/coins/sear5/s1606.html#RIC_0134a"
+			}
 		],
 		"Augustus_Den_PA2.csv": [
 			{
@@ -76,6 +81,10 @@
 			{
 				"regexp": "S•P•Q•R /",
 				"sub": "S•P•Q•R |"
+			},
+			{
+				"regexp": "Struck circa 19-4 BC",
+				"sub": "Struck circa 19-14 BC"
 			}
 		],
 		"Augustus_Ses_EA1.csv": [

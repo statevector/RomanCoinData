@@ -245,7 +245,8 @@ def format_grade(text):
 		r' FDC\.?': ' FDC, Grade. Comments, ',
 		r' EF\.?': ' EF, Grade. Comments, ',
 		r' VF\.?': ' VF, Grade. Comments, ',
-		r' Fine\.?': ' Fine, Grade. Comments, '
+		r' Fine\.?': ' Fine, Grade. Comments, ',
+		r' Fair\.?': ' Fine, Grade. Comments, '
 	}
 	for regexp, sub in regexps.items():
 		result = re.search(regexp, text)

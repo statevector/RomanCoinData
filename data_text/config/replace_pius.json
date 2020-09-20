@@ -7,6 +7,10 @@
 			}
 		],
 		"Pius_Aur_PA1.htm": [
+			{
+				"regexp": "Struck circa AD 157-8",
+				"sub": "Struck circa AD 157-158"
+			}
 		],
 		"Pius_Den_EA1.htm": [
 			{
@@ -34,6 +38,11 @@
 			{
 				"regexp": "& MARCUS AURELIUS",
 				"sub": "with Marcus Aurelius"
+			},
+			{
+				"regexp": "Struck under Antoninus Pius AD 138-161",
+				"sub": "Struck under Antoninus Pius AD 140",
+				"notes": "https://www.wildwinds.com/coins/ric/faustina_I/RIC_0339a.txt"
 			}
 		],
 		"Pius_Den_EA3.htm": [
@@ -80,6 +89,10 @@
 			{
 				"regexp": "RSC 916\\. Toned nice VF",
 				"sub": "RSC 916. Nice VF Toned"
+			},
+			{
+				"regexp": "Struck under Marcus Aurelius\\.",
+				"sub": "Struck under Marcus Aurelius after 161 AD\\."
 			}
 		],
 		"Pius_Den_PA1.htm": [
