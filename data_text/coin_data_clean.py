@@ -49,6 +49,8 @@ def format_abbreviations(text):
 	text = re.sub(r'variation Good VF', 'variation. Good VF', text)
 	text = re.sub(r'correction Near VF', 'correction. Near VF', text)
 	text = re.sub(r'variation VF', 'variation. VF', text)
+	# correct vespasian edge cases
+	text = re.sub(r'variation Good Fine', 'variation. Good Fine', text)
 	return text
 
 def format_slash(text, verbose=False):

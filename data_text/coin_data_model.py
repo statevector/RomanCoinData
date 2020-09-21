@@ -369,9 +369,15 @@ def id_to_date_map(x, date_dict):
 			return datetime.strptime(a_date, '%B %d, %Y').year
 	raise Exception('Auction date not found for Auction ID {}'.format(x))
 
+
+
+
+
 if __name__ == '__main__':
 
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv')
+	import glob
+	import pandas as pd
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Vesp*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[data['Denomination'].str.contains(r'Sestertius')] # both look good
@@ -382,7 +388,18 @@ if __name__ == '__main__':
 	print('INPUT DATASET: ')
 	print(data.shape)
 
+	# =========
+
 	# outlier removal
+
+	#data = data[data['Diameter']>data['Diameter'].quantile(0.0001)] # drop low-end outliers
+	#data = data[data['Diameter']>10]
+
+	#print(data.Sold.mean())
+	#print(data.old.std())
+	
+	#data = data[data['Sold']<data['Sold'].quantile(0.99)] # drop high-end outliers
+
 	#data = data[data['Sold']<20000]
 
 	# =========
@@ -410,21 +427,12 @@ if __name__ == '__main__':
 
 	# =========
 
-	#data = data[data['Diameter']>data['Diameter'].quantile(0.0001)] # drop low-end outliers
-	#data = data[data['Diameter']>10]
-
-	#print(data.Sold.mean())
-	#print(data.old.std())
-	
-	#data = data[data['Sold']<data['Sold'].quantile(0.99)] # drop high-end outliers
-
-	# =========
-
 	# non predictive
 	data.drop(['URL'], axis=1, inplace=True)
 
 	# one hot encode 'Auction Type' and drop
 	data['is_Feature_Auction'] = data['Auction Type'].map(lambda x: True if 'Feature Auction' in x else False)
+	#data['is_Electronic_Auction'] = data['Auction Type'].map(lambda x: True if 'Electronic Auction' in x else False)
 	data.drop(['Auction Type'], axis=1, inplace=True)
 
 	# one hot encode 'Auction ID'
@@ -465,7 +473,8 @@ if __name__ == '__main__':
 	data.drop(['Notes'], axis=1, inplace=True)
 
 	# non predictive
-	data.drop(['Nonstandard Lot'], axis=1, inplace=True)
+	if 'Nonstandard Lot' in data.columns:
+		data.drop(['Nonstandard Lot'], axis=1, inplace=True)
 
 	# semi-predictive
 	if(False):
@@ -488,6 +497,8 @@ if __name__ == '__main__':
 	# predictive, but irrelevant for Augustus only dataset
 	data['is_Augustus'] = data['Emperor'].map(lambda x: True if 'Augustus' in x else False)
 	data['is_Nero'] = data['Emperor'].map(lambda x: True if 'Nero' in x else False)
+	data['is_Vespasian'] = data['Emperor'].map(lambda x: True if 'Vespasian' in x else False)
+	data['is_Titus'] = data['Emperor'].map(lambda x: True if 'Titus' in x else False)
 	data['is_Antoninus'] = data['Emperor'].map(lambda x: True if 'Antoninus' in x else False)
 	data.drop(['Emperor'], axis=1, inplace=True)
 

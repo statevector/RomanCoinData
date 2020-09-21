@@ -16,6 +16,10 @@
 			{
 				"regexp": "TITUS\\. As Caesar 69-79 AD",
 				"sub": "Titus, as Caesar. 69-79 AD"
+			},
+			{
+				"regexp": "AD 77-8",
+				"sub": "AD 77-78"
 			}
 
 		],
@@ -32,7 +36,8 @@
 			},
 			{
 				"regexp": "1820mm",
-				"sub": "18.20mm"
+				"sub": "18.20mm",
+				"note": "typo"
 			}
 		],
 		"Vespasian_Den_EA2.htm": [
@@ -43,9 +48,18 @@
 			{
 				"regexp": "Vespasian with Titus & Domitian",
 				"sub": "Vespasian with Titus and Domitian as Caesares"
+			},
+			{
+				"regexp": "Struck AD 72-733",
+				"sub": "Struck AD 72-73",
+				"note": "typo"
 			}
 		],
 		"Vespasian_Den_EA3.htm": [
+			{
+				"regexp": "Struck AD 72-3",
+				"sub": "Struck AD 72-73"
+			}
 		],
 		"Vespasian_Den_EA4.htm": [
 			{
