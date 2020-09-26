@@ -1,0 +1,79 @@
+{
+	"file": {
+		"Titus_Aur_EA1.htm": [
+			{
+				"regexp": "TITUS\\.",
+				"sub": "Titus."
+			}
+		],
+		"Titus_Aur_PA1.htm": [
+		],
+		"Titus_Den_EA1.htm": [
+			{
+				"regexp": "\\(18mm 3.05 g 5h",
+				"sub": "(18mm 3.05 g 5h)"
+			},
+			{
+				"regexp": "Toned good VF",
+				"sub": "Good VF Toned"
+			}
+		],
+		"Titus_Den_EA2.htm": [
+			{
+				"regexp": "Toned VF",
+				"sub": "VF Toned"
+			},
+			{
+				"regexp": "Lightly toned VF",
+				"sub": "VF Lightly toned"
+			},
+			{
+				"regexp": "Toned near VF",
+				"sub": "Near VF Toned"
+			}
+		],
+		"Titus_Den_PA1.htm": [
+			{
+				"regexp": "JULIA TITI\\. Augusta",
+				"sub": "Julia Titi. Augusta"
+			},
+			{
+				"regexp": "JULIA TITI daughter of Titus",
+				"sub": "Julia Titi"
+			}
+		],
+		"Titus_Ses_EA1.htm": [
+			{
+				"regexp": "DIVUS VESPASIAN\\.",
+				"sub": "Divus Vespasian."
+			},
+			{
+				"regexp": "Struck under Titus 79-81 AD",
+				"sub": "Struck under Titus 79 AD",
+				"note": "Vespasian death"
+			}
+		],
+		"Titus_Ses_PA1.htm":[
+			{
+				"regexp": "Lustrous EF",
+				"sub": "EF Lustrous"
+			},
+			{
+				"regexp": "Nicely toned good VF",
+				"sub": "Good VF Nicely toned"
+			},
+			{
+				"regexp": "Toned nice VF",
+				"sub": "Good VF Toned"
+			},
+			{
+				"regexp": "Toned near EF",
+				"sub": "Near EF Toned"
+			}
+		],
+		"Titus_Cis_EA1.htm":[
+		],
+		"Titus_Cis_PA1.htm":[
+		]
+	}
+}

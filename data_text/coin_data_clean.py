@@ -82,13 +82,15 @@ def format_emperor(text, verbose=False):
 		'Nero', 
 		'Vespasian',
 		'Titus',
+		'Julia Titi',
 		'Antoninus Pius', 
 		'Faustina Senior'
 	]
 	#print('----------')
 	for emperor in emperors:
 		if emperor in text.split('.')[0]:
-			text = re.sub(emperor, 'Emperor, '+emperor, text)
+			# only replace first match at the start
+			text = re.sub(emperor, 'Emperor, '+emperor, text, 1)
 			return text
 	raise Exception('No emperor match in text: {}'.format(text))
 
@@ -97,7 +99,8 @@ def format_reign(text, verbose=False):
 	regexps = [
 		r'\d+\sBC-AD\s\d+',
 		r'AD\s\d+-\d+',
-		r'\d+-\d+\sAD' # alternative AD scheme
+		r'\d+-\d+\sAD', # alternative AD scheme
+		r'Died\s\d+\sAD' # divus emperor case
 	]
 	#print('----------')
 	for regexp in regexps:
@@ -144,7 +147,7 @@ def format_measurements(text, verbose=False):
 		r'\(.+mm.+gm?.+h\)\.?', # case 0: complete string (sometimes final . is missing)
 		r'\(.+mm.+gm?\)\.',     # case 1: missing 'h' only
 		r'\(.+mm\)\.',          # case 2: missing 'g' and 'h' (no end space)
-		r'\(.+gm?.+h\)\.',      # case 3: missing 'mm' only
+		r'\(.+gm?.+\d+h\)\.',   # case 3: missing 'mm' only
 		r'\(.+mm \)\.',         # case 4: missing 'g' and 'h' (with ending space)
 		r'\(\S+\s+gm?\s?\)\.',  # case 5: missing 'mm' and 'h'; using \S and \s
 		r'\(\d+mm\s+\d+h\)\.',  # case 6: missing 'g' only
@@ -303,6 +306,8 @@ if __name__ == '__main__':
 		stop_file = 'config/replace_augustus.json'
 	if 'Vespasian' in sys.argv[1]:
 		stop_file = 'config/replace_vespasian.json'
+	if 'Titus' in sys.argv[1]:
+		stop_file = 'config/replace_titus.json'
 	if stop_file is None:
 		raise Exception('missing stop words file')
 	print('loaded stop file: {}'.format(stop_file))

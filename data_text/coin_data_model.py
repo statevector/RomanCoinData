@@ -128,7 +128,7 @@ def get_RIC_number(x):
 def get_Reign(x):
 	regexps = [
 		r'\d+-\d+',
-		r'\d+ BC-AD \d+'
+		r'\d+ BC-AD \d+',
 	]
 	for regexp in regexps:
 		result = re.search(regexp, x)
@@ -377,7 +377,7 @@ if __name__ == '__main__':
 
 	import glob
 	import pandas as pd
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Vesp*/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Tit*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[data['Denomination'].str.contains(r'Sestertius')] # both look good
@@ -391,16 +391,10 @@ if __name__ == '__main__':
 	# =========
 
 	# outlier removal
-
-	#data = data[data['Diameter']>data['Diameter'].quantile(0.0001)] # drop low-end outliers
-	#data = data[data['Diameter']>10]
-
-	#print(data.Sold.mean())
-	#print(data.old.std())
-	
 	#data = data[data['Sold']<data['Sold'].quantile(0.99)] # drop high-end outliers
-
 	#data = data[data['Sold']<20000]
+	# this works very well
+	#data = data[data['Sold']<3*data['Estimate']]
 
 	# =========
 
@@ -978,6 +972,11 @@ if __name__ == '__main__':
 	X_train = scaler.fit_transform(X_train)
 	X_test = scaler.transform(X_test)
 
+	# from sklearn.preprocessing import RobustScaler
+	# scaler = RobustScaler(quantile_range=(0.25, 0.75))
+	# X_train = scaler.fit_transform(X_train)
+	# X_test = scaler.transform(X_test)
+
 	# iterate over r folds
 	# for r in range(2,20):
 	# 	model = Ridge(alpha=0.66, random_state=42)
@@ -1081,15 +1080,15 @@ if __name__ == '__main__':
 		print('test r2: {}'.format(r2_score(y_test, y_pred)))
 		#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
 
-	# gbr = GradientBoostingRegressor(n_estimators=100, verbose=0, random_state=42)
-	# param_grid = {'learning_rate': [0.1, 0.5], 'n_estimators': [25, 50, 100], 'subsample': [0.8, 1.0], 'max_depth':[4, 5, 6], 'max_features': ['auto', 'sqrt']}
-	# clf = GridSearchCV(gbr, param_grid, cv=5, scoring='r2', n_jobs=-1, verbose=True)
-	# clf.fit(X_train, y_train)
-	# print('train r2: {}'.format(clf.best_score_))
-	# y_pred = clf.predict(X_test) # predict calls the estimator with the best found parameters
-	# print('test r2: {}'.format(r2_score(y_test, y_pred)))
-	# print(clf.best_params_)
-	# print(clf.best_estimator_.feature_importances_)
+	gbr = GradientBoostingRegressor(n_estimators=100, verbose=0, random_state=42)
+	param_grid = {'learning_rate': [0.05, 0.1, 0.5], 'n_estimators': [25, 50, 100], 'subsample': [0.8, 1.0], 'max_depth':[3, 4, 5], 'max_features': ['auto', 'sqrt']}
+	clf = GridSearchCV(gbr, param_grid, cv=5, scoring='r2', n_jobs=-1, verbose=True)
+	clf.fit(X_train, y_train)
+	print('train r2: {}'.format(clf.best_score_))
+	y_pred = clf.predict(X_test) # predict calls the estimator with the best found parameters
+	print('test r2: {}'.format(r2_score(y_test, y_pred)))
+	print(clf.best_params_)
+	print(clf.best_estimator_.feature_importances_)
 
 	print('gbr')
 	#gbr = GradientBoostingRegressor(n_estimators=1000, subsample=0.50, max_features='sqrt', verbose=1, random_state=42)
@@ -1100,8 +1099,8 @@ if __name__ == '__main__':
 	print('train r2: {}'.format(r2_score(y_train, y_pred)))
 	y_pred = gbr.predict(X_test)
 	print('test r2: {}'.format(r2_score(y_test, y_pred)))
-	#print('test mape: {}'.format(mean_absolute_percentage_error(y_test, y_pred)))
-	#print('test exp(mape): {}'.format(mean_absolute_percentage_error(np.exp(y_test), np.exp(y_pred))))
+	print('test mape: {}'.format(mean_absolute_percentage_error(y_test, y_pred)))
+	print('test exp(mape): {}'.format(mean_absolute_percentage_error(np.exp(y_test), np.exp(y_pred))))
 	#print(np.exp(y_test) - np.exp(y_pred))
 
 	# print('adaboost')
