@@ -10,10 +10,6 @@
 				"sub": "Titus, as Caesar"
 			},
 			{
-				"regexp": "VESPASIAN\\. 69-79 AD",
-				"sub": "Vespasian. 69-79 AD"
-			},
-			{
 				"regexp": "TITUS\\. As Caesar 69-79 AD",
 				"sub": "Titus, as Caesar. 69-79 AD"
 			},
@@ -67,8 +63,13 @@
 				"sub": "AR Denarius (). Rome mint"
 			},
 			{
-				"regexp": "DIVVS VESPASIAN",
-				"sub": "DIVUS Vespasian"
+				"regexp": "DIVVS VESPASIAN\\. Died 79 AD",
+				"sub": "Divus Vespasian. 69-79 AD",
+				"note": "for reign consistency"
+			},
+			{
+				"regexp": "DIVUS VESPASIAN\\. 69-79 AD",
+				"sub": "Divus Vespasian. 69-79 AD"
 			},
 			{
 				"regexp": "VESPASIAN\\. 69-79 AD",
@@ -77,7 +78,12 @@
 			{
 				"regexp": "69-79 AD AR Denarius",
 				"sub": "69-79 AD. AR Denarius"
+			},
+			{
+				"regexp": "Vespasian\\. Died 79 AD",
+				"sub": "Vespasian. 69-79 AD"
 			}
+
 		],
 		"Vespasian_Den_PA1.htm": [
 			{

@@ -44,8 +44,8 @@
 		],
 		"Titus_Ses_EA1.htm": [
 			{
-				"regexp": "DIVUS VESPASIAN\\.",
-				"sub": "Divus Vespasian."
+				"regexp": "DIVUS VESPASIAN\\. Died 79 AD",
+				"sub": "Divus Vespasian. 69-79 AD"
 			},
 			{
 				"regexp": "Struck under Titus 79-81 AD",

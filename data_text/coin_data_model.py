@@ -123,25 +123,32 @@ def get_RIC_number(x):
 		#print(result)
 		if result is not None:
 			return result.group(0)
-	raise Exception('RIC keyword not found in {}'.format(x))
+	return None
+	#raise Exception('RIC keyword not found in {}'.format(x))
 
 def get_Reign(x):
 	regexps = [
 		r'\d+-\d+',
-		r'\d+ BC-AD \d+',
+		r'\d+ BC-AD \d+'
 	]
 	for regexp in regexps:
 		result = re.search(regexp, x)
 		#print(result)
 		if result is not None:
 			result = result.group()
-			result = result.replace('BC','')
-			result = result.replace('AD','')
-			reign = result.split('-')
-			#print(reign)
-			reign = list(map(int, reign))
-			#print(reign)
-			return abs(reign[1] - reign[0])
+			if 'BC' in result:
+				result = result.replace('BC', '')
+				result = result.replace('AD','')
+				low = -int(result.split('-')[0])
+				high = int(result.split('-')[1])
+				return abs(high - low)
+			else:
+				result = result.replace('AD','')
+				reign = result.split('-')
+				#print(reign)
+				reign = list(map(int, reign))
+				#print(reign)
+				return abs(reign[1] - reign[0])
 	raise Exception('Reign not found in {}'.format(x))
 
 def consolidate_mints(x):
@@ -377,14 +384,15 @@ if __name__ == '__main__':
 
 	import glob
 	import pandas as pd
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Tit*/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[data['Denomination'].str.contains(r'Sestertius')] # both look good
 	#data = data[data['Denomination'].str.contains(r'Aureus')] # looks good, nero drops from 88 to 81, data.drop([164], axis=0, inplace=True)
 	#data = data[data['Denomination'].str.contains(r'Cistophorus')] # looks good
 	#data = data[data['Denomination'].str.contains(r'Denarius')] # much lower... ~75 aug, all over the place (nero), why?
-	
+	#data = data[~data['Emperor'].str.contains(r'Titus')]
+
 	print('INPUT DATASET: ')
 	print(data.shape)
 
@@ -394,7 +402,7 @@ if __name__ == '__main__':
 	#data = data[data['Sold']<data['Sold'].quantile(0.99)] # drop high-end outliers
 	#data = data[data['Sold']<20000]
 	# this works very well
-	#data = data[data['Sold']<3*data['Estimate']]
+	data = data[data['Sold']<4*data['Estimate']]
 
 	# =========
 
@@ -494,12 +502,13 @@ if __name__ == '__main__':
 	data['is_Vespasian'] = data['Emperor'].map(lambda x: True if 'Vespasian' in x else False)
 	data['is_Titus'] = data['Emperor'].map(lambda x: True if 'Titus' in x else False)
 	data['is_Antoninus'] = data['Emperor'].map(lambda x: True if 'Antoninus' in x else False)
+	data['has_Caesar'] = data['Emperor'].map(lambda x: True if 'Caesar' in x else False)
 	data.drop(['Emperor'], axis=1, inplace=True)
 
 	# non predictive
 	data['Reign'] = data['Reign'].apply(lambda x: get_Reign(x))
-	#print(data['Reign'].value_counts())
-	data.drop(['Reign'], axis=1, inplace=True)
+	print(data['Reign'].value_counts())
+	#data.drop(['Reign'], axis=1, inplace=True)
 
 	# one hot encode 'Denomination'
 	data['is_Aureus'] = data['Denomination'].map(lambda x: True if 'Aureus' in x else False)
@@ -590,6 +599,7 @@ if __name__ == '__main__':
 	#data.drop(['Inscriptions'], axis=1, inplace=True)
 
 	# drop for now, but possibly predictive?
+	data['RIC'] = data['RIC'].apply(lambda x: get_RIC_number(x))
 	data.drop(['RIC'], axis=1, inplace=True)
 
 	# one hot encode 'Grade'
@@ -1081,7 +1091,7 @@ if __name__ == '__main__':
 		#print('test rmse: {}'.format(np.sqrt(mean_squared_error(y_test, y_pred))))
 
 	gbr = GradientBoostingRegressor(n_estimators=100, verbose=0, random_state=42)
-	param_grid = {'learning_rate': [0.05, 0.1, 0.5], 'n_estimators': [25, 50, 100], 'subsample': [0.8, 1.0], 'max_depth':[3, 4, 5], 'max_features': ['auto', 'sqrt']}
+	param_grid = {'learning_rate': [0.05, 0.1, 0.5], 'n_estimators': [50, 100, 150], 'subsample': [0.8, 1.0], 'max_depth':[3, 4, 5], 'max_features': ['auto', 'sqrt']}
 	clf = GridSearchCV(gbr, param_grid, cv=5, scoring='r2', n_jobs=-1, verbose=True)
 	clf.fit(X_train, y_train)
 	print('train r2: {}'.format(clf.best_score_))
@@ -1094,13 +1104,15 @@ if __name__ == '__main__':
 	#gbr = GradientBoostingRegressor(n_estimators=1000, subsample=0.50, max_features='sqrt', verbose=1, random_state=42)
 	#gbr = GradientBoostingRegressor(n_estimators=100, verbose=1, random_state=42)
 	gbr = GradientBoostingRegressor(learning_rate=0.1, max_depth=3, n_estimators=50, subsample=0.8, random_state=42)
+	#gbr = GradientBoostingRegressor(learning_rate=0.05, max_depth=5, n_estimators=150, subsample=0.8, random_state=42)
 	gbr.fit(X_train, y_train)
 	y_pred = gbr.predict(X_train)
 	print('train r2: {}'.format(r2_score(y_train, y_pred)))
+	#print('train mape: {}'.format(mean_absolute_percentage_error(y_train, y_pred)))
 	y_pred = gbr.predict(X_test)
 	print('test r2: {}'.format(r2_score(y_test, y_pred)))
-	print('test mape: {}'.format(mean_absolute_percentage_error(y_test, y_pred)))
-	print('test exp(mape): {}'.format(mean_absolute_percentage_error(np.exp(y_test), np.exp(y_pred))))
+	#print('test mape: {}'.format(mean_absolute_percentage_error(y_test, y_pred)))
+	#print('test exp(mape): {}'.format(mean_absolute_percentage_error(np.exp(y_test), np.exp(y_pred))))
 	#print(np.exp(y_test) - np.exp(y_pred))
 
 	# print('adaboost')
@@ -1128,7 +1140,7 @@ if __name__ == '__main__':
 		plt.legend(loc = "upper left")
 		plt.hlines(y = 0, xmin = 4, xmax = 13.5, color = 'red', alpha = 0.5)
 		plt.xlim(4,12)
-		plt.ylim(-5,5)
+		plt.ylim(-3,3)
 		plt.show()
 
 	if(False):

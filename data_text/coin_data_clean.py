@@ -99,8 +99,7 @@ def format_reign(text, verbose=False):
 	regexps = [
 		r'\d+\sBC-AD\s\d+',
 		r'AD\s\d+-\d+',
-		r'\d+-\d+\sAD', # alternative AD scheme
-		r'Died\s\d+\sAD' # divus emperor case
+		r'\d+-\d+\sAD' # alternative AD scheme
 	]
 	#print('----------')
 	for regexp in regexps:
