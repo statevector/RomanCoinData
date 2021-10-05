@@ -384,7 +384,7 @@ if __name__ == '__main__':
 
 	import glob
 	import pandas as pd
-	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/*/*prepared.csv')
+	files = glob.glob('/Users/cwillis/GitHub/RomanCoinData/data_text/data_scraped/Tit*/*prepared.csv')
 	print('Loaded files: \n{}'.format(files))
 	data = pd.concat((pd.read_csv(f) for f in files), axis=0, sort=False, ignore_index=True) 
 	#data = data[data['Denomination'].str.contains(r'Sestertius')] # both look good
@@ -392,6 +392,7 @@ if __name__ == '__main__':
 	#data = data[data['Denomination'].str.contains(r'Cistophorus')] # looks good
 	#data = data[data['Denomination'].str.contains(r'Denarius')] # much lower... ~75 aug, all over the place (nero), why?
 	#data = data[~data['Emperor'].str.contains(r'Titus')]
+	#data = data[~data['Emperor'].str.contains(r'Augusta')]
 
 	print('INPUT DATASET: ')
 	print(data.shape)
