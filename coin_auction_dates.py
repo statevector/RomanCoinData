@@ -28,12 +28,15 @@ def get_links(html, verbose=True):
 	return urls
 
 if __name__ == '__main__':
+	
 	# feature auctions
 	#url = 'https://cngcoins.com/PricesRealized.aspx?CONTAINER_TYPE_ID=3'
 	#output = 'data_dates/feature_auction_dates.csv'
+	
 	# weekly auctions
 	url = 'https://cngcoins.com/PricesRealized.aspx?CONTAINER_TYPE_ID=2'
 	output = 'data_dates/eAuction_dates.csv'
+
 	# grab info
 	html = get_html(url)
 	urls = get_links(html)
