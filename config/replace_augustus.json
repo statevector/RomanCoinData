@@ -32,12 +32,20 @@
 			{
 				"regexp": "AMP /",
 				"sub": "AMP |"
+			},
+			{
+				"regexp": "the obverse is corroded and grades Near Fine. Near Fine/Good VF\\. The reverse exhibits three clear portraits\\.",
+				"sub": "the obverse is corroded. The reverse exhibits three clear portraits. Near Fine."
 			}
 		],
 		"Augustus_Den_EA2.csv": [
 			{
 				"regexp": "6nh",
 				"sub": "6h"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
 			}
 		],
 		"Augustus_Den_EA3.csv": [
@@ -55,6 +63,10 @@
 			}
 		],
 		"Augustus_Den_EA4.csv": [
+			{
+				"regexp": "Choice VF",
+				"sub": "Near EF"
+			}
 		],
 		"Augustus_Den_PA1.csv": [
 			{

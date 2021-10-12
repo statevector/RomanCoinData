@@ -7,7 +7,7 @@ import json
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)
-pd.set_option('display.max_colwidth', -1)
+pd.set_option('display.max_colwidth', None)
 
 # remove whitespace
 #import re
@@ -17,12 +17,12 @@ pd.set_option('display.max_colwidth', -1)
 #def get_positions(x, character):
 #	return [pos for (pos, char) in enumerate(x) if char == character]
 
-def write_output(input_file, keyword):
-	output_name = input_file.split('/')[1]+'_'+keyword+'.csv'
-	output_dir = 'data_scraped/'+input_file.split('/')[1]
-	output_path = os.path.join(output_dir, output_name)
-	print('output path: {}'.format(output_path))
-	return output_path
+# def write_output(input_file, keyword):
+# 	output_name = input_file.split('/')[1]+'_'+keyword+'.csv'
+# 	output_dir = 'data/'+input_file.split('/')[1]
+# 	output_path = os.path.join(output_dir, output_name)
+# 	print('output path: {}'.format(output_path))
+# 	return output_path
 
 def format_abbreviations(text):
 	text = re.sub(r'var\.', 'variation', text)
@@ -289,9 +289,8 @@ def extract_feature(text, keyword):
 
 if __name__ == '__main__':
 
-	print(' Script name: {}'.format(sys.argv[0]))
-	print(' Number of arguments: {}'.format(len(sys.argv)))
-	print(' Arguments include: {}'.format(str(sys.argv)))
+	print('Running: {}'.format(sys.argv[0]))
+	print('Arguments: {}'.format(str(sys.argv)))
 	if len(sys.argv)!=2: 
 		exit('missing input!')
 
@@ -309,7 +308,8 @@ if __name__ == '__main__':
 		stop_file = 'config/replace_titus.json'
 	if stop_file is None:
 		raise Exception('missing stop words file')
-	print('loaded stop file: {}'.format(stop_file))
+	print('Loaded stop file: {}'.format(stop_file))
+	print('-----------------------')
 
 	# load data
 	df = pd.read_csv(sys.argv[1])
@@ -334,6 +334,7 @@ if __name__ == '__main__':
 	# remove Affiliated Auctions (these non-standard formatting)
 	df = df[~df['Auction Type'].str.contains(r'Affiliated Auction')]
 	print('post-selection shape: {}'.format(df.shape))
+	print('-----------------------')
 
 	# Data Formatting
 	# ===============
@@ -381,7 +382,7 @@ if __name__ == '__main__':
 	print(df.info())
 
 	# build and save intermediate clean dataframe
-	df.to_csv(write_output(sys.argv[1], 'cleaned'), index=False)
+	df.to_csv(sys.argv[1].replace('.csv', '_cleaned.csv'), index=False)
 
 	# Extract Fields from Description
 	# ===============================
@@ -411,5 +412,5 @@ if __name__ == '__main__':
 	print(df.info())
 
 	# build and save the dataframe
-	df.to_csv(write_output(sys.argv[1], 'prepared'), index=False)
+	df.to_csv(sys.argv[1].replace('.csv', '_prepared.csv'), index=False)
 
