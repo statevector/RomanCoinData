@@ -12,6 +12,10 @@
 			{
 				"regexp": "/  / PONTIF • MAX",
 				"sub": "/ PONTIF • MAX •"
+			},
+			{
+				"regexp": "2nd emission 10 BC\\.",
+				"sub": "Struck 10 BC (2nd emission)."
 			}
 		],
 		"Augustus_Aur_PA1.csv": [
@@ -35,7 +39,7 @@
 			},
 			{
 				"regexp": "the obverse is corroded and grades Near Fine. Near Fine/Good VF\\. The reverse exhibits three clear portraits\\.",
-				"sub": "the obverse is corroded. The reverse exhibits three clear portraits. Near Fine."
+				"sub": "the obverse is corroded. The reverse exhibits three clear portraits. Good VF."
 			}
 		],
 		"Augustus_Den_EA2.csv": [
@@ -73,6 +77,10 @@
 				"regexp": "Struck circa AD 18-17/16 BC",
 				"sub": "Struck circa 18-16 BC",
 				"notes": "https://www.wildwinds.com/coins/sear5/s1606.html#RIC_0134a"
+			},
+			{
+				"regexp": "CA coinage\\.",
+				"sub": ""
 			}
 		],
 		"Augustus_Den_PA2.csv": [
@@ -105,12 +113,17 @@
 				"sub": "Augustus"
 			},
 			{
-				"regexp": "SPAIN Corduba\\. Augustus\\.",
-				"sub": "Augustus."
+				"regexp": "Bare head left / COLONIA / PATRICIA in two lines",
+				"sub": "Bare head left / COLONIA | PATRICIA in two lines"
 			},
 			{
-				"regexp": "Bare head left / COLONIA / PATRICIA in two lines",
-				"sub": "Bare head left / COLONIA PATRICIA in two lines"
+				"regexp": "S • C RIC",
+				"sub": "S • C. RIC"
+			},
+			{
+				"regexp": "Brown surfaces\\. Fine\\.",
+				"sub": "Fine. Brown surfaces.",
+				"note": "no way yet implemented to differentiate grade and comment ordering"
 			}
 		]
 	}
