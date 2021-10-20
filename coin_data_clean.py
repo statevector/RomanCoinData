@@ -168,7 +168,8 @@ def format_mint_new3(text):
 def format_moneyer(text):
 
    # first, check if 'moneyer' keyword is present
-   if re.search(r'[Mm]oneyer', text) is None:
+   # sometimes, e.g.: Rome mint; C. Sulpicius Platorinus triumvir monetalis
+   if re.search(r'[Mm]oneyer|[Mm]onetalis', text) is None:
       segments = []
       # find mint segment and append moneyer after it
       # need to handle cases like: 'Uncertain mint in Syria.', and 'Rome mint', etc.
@@ -184,24 +185,26 @@ def format_moneyer(text):
    # mint with semicolon (or period) indicates proceeding moneyer
    # e.g. Rome mint; C. Marius C. f. moneyer.
    # want to break this apart into two fields: "Rome mint"., "C Marius C f moneyer".
-   result = re.search(r'[Mm]int[\.;].+[Mm]oneyer', text)
+   result = re.search(r'[Mm]int[ \.;].+([Mm]oneyer|[Mm]onetalis)', text) # space, dot, or semi-colon follow mint
    if result is None:
       return text
+
    #print('before: ', text)
    result = result.group()
-   # first change mint. to mint;
-   result = re.sub(r'mint\.', 'mint;', result)
-   # then remove any period (.) in moneyer's name
+   # first change 'mint.' or 'mint' to 'mint;' 
+   result = re.sub(r'mint ', 'mint; ', result)
+   result = re.sub(r'mint\. ', 'mint; ', result)
+   # then remove any dot (.) in moneyer's name
    result = re.sub(r'\.', '', result)
-   # finally segment the mint from the moneyer
+   # then return the dot to mint
    result = re.sub(r'mint;', 'mint.', result)
-   # sub the cleaned mint/moneyer section back into the text
-   text = re.sub(r'[Mm]int[\.;].+[Mm]oneyer', result, text)
+   # finally, sub the cleaned mint & moneyer sections back into the text
+   text = re.sub(r'[Mm]int[ \.;].+([Mm]oneyer|[Mm]onetalis)', result, text)
 
    # add 'Moneyer:' tag
    segments = []
    for seg in text.split('. '):
-      if re.search(r'moneyer', seg) is not None:
+      if re.search(r'([Mm]oneyer|[Mm]onetalis)', seg) is not None:
          seg = 'Moneyer: ' + seg
       segments.append(seg)
    text = '. '.join(segments)
@@ -351,8 +354,8 @@ if __name__ == '__main__':
    df['Diameter'] = df['Description'].apply(lambda x: extract_feature(x, 'Diameter'))
    df['Weight'] = df['Description'].apply(lambda x: extract_feature(x, 'Weight'))
    df['Hour'] = df['Description'].apply(lambda x: extract_feature(x, 'Hour'))
-   df['Mint'] = df['Description'].apply(lambda x: extract_feature(x, 'mint'))
-   df['Moneyer'] = df['Description'].apply(lambda x: extract_feature(x, 'moneyer'))
+   df['Mint'] = df['Description'].apply(lambda x: extract_feature(x, 'Mint'))
+   df['Moneyer'] = df['Description'].apply(lambda x: extract_feature(x, 'Moneyer'))
    df['Struck'] = df['Description'].apply(lambda x: extract_feature(x, 'Struck'))
    df['Obverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Obverse'))
    df['Reverse'] = df['Description'].apply(lambda x: extract_feature(x, 'Reverse'))

@@ -63,7 +63,7 @@
 			},
 			{
 				"regexp": "\\(9mm",
-				"sub": "(9mm"
+				"sub": "(19mm"
 			}
 		],
 		"Augustus_Den_EA4.csv": [
@@ -124,7 +124,30 @@
 				"regexp": "Brown surfaces\\. Fine\\.",
 				"sub": "Fine. Brown surfaces.",
 				"note": "no way yet implemented to differentiate grade and comment ordering"
+			},
+			{
+				"regexp": "Struck circa 18 BC\\. Q\\. Aelius Lamia moneyer\\.",
+				"sub": "Q. Aelius Lamia moneyer. Struck circa 18 BC.",
+				"note": "prevent failure of format_moneyer function"
+			},
+			{
+				"regexp": "Æ Sestertius \\(36mm 25\\.50 g\\)\\. P\\. Licinius Stolo moneyer\\.",
+				"sub": "Æ Sestertius (36mm 25.50 g). Rome mint; P. Licinius Stolo moneyer.",
+				"note": "edge case where both hour and mint are missing but moneyer is not. Rome mint is known from other Stolo examples."
+			},
+			{
+				"regexp": " Æ Sestertius \\(34mm 24\\.52 g\\)\\. C\\. Cassius Celer moneyer\\.",
+				"sub": " Æ Sestertius (34mm 24.52 g). Rome mint; C. Cassius Celer moneyer.",
+				"note": "same issue as above"
 			}
+		],
+		"Augustus_Ses_PA1.csv": [
+			{
+				"regexp": "Ti[\\. ] Sempronius Gracc\\(h\\)us",
+				"sub": "Ti. Sempronius Graccus",
+				"note": "the (h) confuses the hour extraction. Crosslisted as Ti. Sempronius Graccus."
+			}
+
 		]
 	}
 }
