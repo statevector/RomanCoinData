@@ -267,6 +267,52 @@ def format_grade_new2(text):
    text = re.sub(r' Fair\.?', ' Fair. Comments:', text)
    return text
 
+
+# this needs work
+# def format_grade_new3(text):
+#    print('-------------------------')
+
+#    print(text)
+
+#    # find first occurance of grade --> introduce 'Grade' keyword
+#    # order matters here
+#    grades = ['FDC', 'Choice EF', 'Superb EF', 'Near EF', 'EF', 'Choice VF', 'Nice VF', 'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 'Fine', 'Fair']
+#    result = None
+#    for grade in grades:
+#       raw = r'{}'.format(grade)+r'[/. ]'
+#       if re.search(raw, text) is not None:
+#          result = grade
+#          break
+#    if result is None:
+#       raise Exception('grade not found in text: {}'.format(text))
+
+#    # remove the identified grade segment from the text
+#    text = re.sub(result, '', text)
+
+#    # introduce 'Grade' keyword
+#    if '.' not in result:
+#       result = result + '.'
+#    result1 = 'Grade: ' + result
+#    print(result1)
+
+#    # find the comments section
+#    comm = text.split('. ')[-1]
+#    print(comm)
+
+#    # remove the final segment
+#    text = re.sub(comm, '', text)
+
+#    # introduce 'Comments' keyword
+#    result2 = 'Comments: ' + comm
+#    print(result2)
+
+#    # append everything
+#    text = text + result1 + result2
+#    print(text)
+
+#    return text
+
+
 if __name__ == '__main__':
 
    print('Running: {}'.format(sys.argv[1]))

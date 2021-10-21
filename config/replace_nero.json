@@ -12,9 +12,23 @@
 			{
 				"regexp": "/  / PONTIF • MAX",
 				"sub": "/ PONTIF • MAX •"
+			},
+			{
+				"regexp": "Toned VF",
+				"sub": "VF Toned"
 			}
 		],
 		"Nero_Aur_PA1.csv": [
+			{
+				"regexp": "AV Aureus \\(7\\.39 g 5h\\)\\.",
+				"sub": "AV Aureus (7.39 g 5h). Rome mint.",
+				"note": "OCRE search: RIC I Nero 52"
+			},
+			{
+				"regexp": "In ICG holder graded VF 35.",
+				"sub": "VF",
+				"note": "this uses the standard format"
+			}
 		],
 		"Nero_Den_EA1.csv": [
 			{
@@ -24,12 +38,12 @@
 		],
 		"Nero_Den_EA2.csv": [
 			{
-				"regexp": "NERO with Agrippina",
-				"sub": "Nero with Agrippina Jr"
+				"regexp": "NERO with Agrippina Jr",
+				"sub": "Nero with Agrippina Junior"
 			},
 			{
 				"regexp": "NERO and AGRIPPINA JR",
-				"sub": "Nero with Agrippina Jr"
+				"sub": "Nero with Agrippina Junior"
 			},
 			{
 				"regexp": "RIC I 7; BMCRE 8; RSC 4\\.",
@@ -38,7 +52,29 @@
 			{
 				"regexp": "Rome mint. Struck circa AD \\.",
 				"sub": "Rome mint. Struck circa AD 64-65\\."
+			},
+			{
+				"regexp": "Bare head right / EX S C within wreath\\.",
+				"sub": "Bare head right / EX S C within wreath. RIC I 22.",
+				"note": "OCRE search: RIC 1 Nero 22"
+			},
+			{
+				"regexp": "Toned Fine",
+				"sub": "Fine Toned"
+			},
+			{
+				"regexp": "Lightly toned Fine",
+				"sub": "Fine Lightly toned"
+			},
+			{
+				"regexp": "Nicely toned good VF",
+				"sub": "Good VF Nicely toned"
+			},
+			{
+				"regexp": "Toned good VF",
+				"sub": "Good VF Toned"
 			}
+
 		],
 		"Nero_Den_PA1.csv": [
 			{
@@ -48,20 +84,64 @@
 			{
 				"regexp": "\\(352 g 5h\\)",
 				"sub": "(3.52 g 5h)"
+			},
+			{
+				"regexp": "Toned good Fine",
+				"sub": "Good Fine Toned"
+			},
+			{
+				"regexp": "Toned nice VF",
+				"sub": "Nice VF Toned"
+			},
+			{
+				"regexp": "Attractively toned choice EF",
+				"sub": "Choice EF Attractively toned"
+			},
+			{
+				"regexp": "Darkly toned VF",
+				"sub": "VF Darkly Toned"
 			}
+
 		],
 		"Nero_Ses_EA1.csv": [
+			{
+				"regexp": "Hallowed out\\. VF",
+				"sub": "Hallowed out. RIC unlisted. VF"
+			},
+			{
+				"regexp": "RPC I 1758",
+				"sub": "RIC -, RPC I 1758",
+				"note": "RIC - via wildwinds"
+			},
+			{
+				"regexp": "Countermark Fine host coin: ",
+				"sub": "",
+				"note": "Fine appears twice here."
+			}
 		],
 		"Nero_Ses_EA2.csv": [
 			{
 				"regexp": "RIC I 388\\. green patina",
 				"sub": "RIC I 388. Fine, green patina"
+			},
+			{
+				"regexp": "Attractive VF",
+				"sub": "VF Attractive"
+			},
+			{
+				"regexp": "RIC I 132; WCN 96; BMCRE pg\\. 219 note; Cohen 8 var\\.",
+				"sub": "RIC I 132; WCN 96; BMCRE pg. 219 note; Cohen 8 variation.",
+				"note": "var. is final word in segment"
 			}
 		],
 		"Nero_Ses_PA1.csv":[
 			{
 				"regexp": "Superb virtually as struck",
-				"sub": "Superb EF, virtually as struck"
+				"sub": "Superb EF virtually as struck"
+			},
+			{
+				"regexp": "RIC I 433; BMCRE 330; BN 69; WCN 414; Cohen 306 Good VF",
+				"sub": " RIC I 433; BMCRE 330; BN 69; WCN 414; Cohen 306. Good VF"
 			}
 		]
 	}

@@ -78,4 +78,14 @@ countermark
 # cast of sestertius
 Sulfur cast of a sestertius made by Admiral William Henry Smyth
 SPAIN Corduba
+#
+# NERO WORDS
+#
+Gilt Æ Sestertius
+Gilt AE Sestertius
+Hinged Æ Mirror
+Les miroirs de Néron
+Half of a Neronian Mirror
+mirror
+#
 # keep last line here so we don't cut off last letter of previous word during read
