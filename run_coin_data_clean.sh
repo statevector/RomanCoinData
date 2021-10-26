@@ -22,31 +22,31 @@
 
 # Nero
 
-python3 coin_data_clean.py data/data_scraped/Nero_Aur_EA1/Nero_Aur_EA1.csv config/replace_nero.json
-python3 coin_data_clean.py data/data_scraped/Nero_Aur_PA1/Nero_Aur_PA1.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Aur_EA1/Nero_Aur_EA1.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Aur_PA1/Nero_Aur_PA1.csv config/replace_nero.json
 
-python3 coin_data_clean.py data/data_scraped/Nero_Den_EA1/Nero_Den_EA1.csv config/replace_nero.json
-python3 coin_data_clean.py data/data_scraped/Nero_Den_EA2/Nero_Den_EA2.csv config/replace_nero.json
-python3 coin_data_clean.py data/data_scraped/Nero_Den_PA1/Nero_Den_PA1.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Den_EA1/Nero_Den_EA1.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Den_EA2/Nero_Den_EA2.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Den_PA1/Nero_Den_PA1.csv config/replace_nero.json
 
-python3 coin_data_clean.py data/data_scraped/Nero_Ses_EA1/Nero_Ses_EA1.csv config/replace_nero.json
-python3 coin_data_clean.py data/data_scraped/Nero_Ses_EA2/Nero_Ses_EA2.csv config/replace_nero.json
-python3 coin_data_clean.py data/data_scraped/Nero_Ses_PA1/Nero_Ses_PA1.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Ses_EA1/Nero_Ses_EA1.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Ses_EA2/Nero_Ses_EA2.csv config/replace_nero.json
+# python3 coin_data_clean.py data/data_scraped/Nero_Ses_PA1/Nero_Ses_PA1.csv config/replace_nero.json
 
 # Vespasian
 
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_EA1/Vespasian_Aur_EA1.csv
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_PA1/Vespasian_Aur_PA1.csv
+python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_EA1/Vespasian_Aur_EA1.csv config/replace_vespasian.json
+python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_PA1/Vespasian_Aur_PA1.csv config/replace_vespasian.json
 
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA1/Vespasian_Den_EA1.csv
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA2/Vespasian_Den_EA2.csv
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA3/Vespasian_Den_EA3.csv
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA4/Vespasian_Den_EA4.csv
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_PA1/Vespasian_Den_PA1.csv
+python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA1/Vespasian_Den_EA1.csv config/replace_vespasian.json
+python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA2/Vespasian_Den_EA2.csv config/replace_vespasian.json
+python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA3/Vespasian_Den_EA3.csv config/replace_vespasian.json
+python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA4/Vespasian_Den_EA4.csv config/replace_vespasian.json
+python3 coin_data_clean.py data/data_scraped/Vespasian_Den_PA1/Vespasian_Den_PA1.csv config/replace_vespasian.json
 
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA1/Vespasian_Ses_EA1.csv
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA2/Vespasian_Ses_EA2.csv
-# python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_PA1/Vespasian_Ses_PA1.csv
+python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA1/Vespasian_Ses_EA1.csv config/replace_vespasian.json
+python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA2/Vespasian_Ses_EA2.csv config/replace_vespasian.json
+python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_PA1/Vespasian_Ses_PA1.csv config/replace_vespasian.json
 
 # Titus
 

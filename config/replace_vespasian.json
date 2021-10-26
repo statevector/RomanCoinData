@@ -16,6 +16,10 @@
 			{
 				"regexp": "AD 77-8",
 				"sub": "AD 77-78"
+			},
+			{
+				"regexp": "Laureate head right Pax seated left holding olive branch and cradling winged caduceus",
+				"sub": "IMP CAESAR VESPASIANVS AVG laureate head right / COS ITE R TR POT Pax seated left holding olive branch and cradling winged caduceus"
 			}
 
 		],
@@ -125,11 +129,19 @@
 			{
 				"regexp": "Lightly toned VF",
 				"sub": "VF Lightly toned"
+			},
+			{
+				"regexp": "Unpublished\\. VF porous\\. Unique",
+				"sub": "RIC Unpublished. VF porous. Unique"
 			}
 		],
 		"Vespasian_Ses_EA1.htm": [
 		],
 		"Vespasian_Ses_EA2.htm": [
+			{
+				"regexp": "/\\[IVDAEA CAPT\\]A",
+				"sub": "/ [IVDAEA CAPT]A"
+			}
 		],
 		"Vespasian_Ses_PA1.htm":[
 			{
