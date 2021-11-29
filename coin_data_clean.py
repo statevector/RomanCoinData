@@ -8,7 +8,7 @@ pd.set_option('display.width', 1000)
 pd.set_option('display.max_colwidth', None)
 
 def format_abbreviations(text):
-   text = re.sub(r'var\.', 'variation', text)
+   text = re.sub(r'var\.', 'variation', text) # need to account for cases like... var. VF
    text = re.sub(r'cf\.', 'confer', text)
    text = re.sub(r'Cf\.', 'Confer', text)
    # include space to avoid entries that end in e.g. 'edge chip.'

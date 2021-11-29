@@ -20,10 +20,36 @@
 			{
 				"regexp": "Laureate head right Pax seated left holding olive branch and cradling winged caduceus",
 				"sub": "IMP CAESAR VESPASIANVS AVG laureate head right / COS ITE R TR POT Pax seated left holding olive branch and cradling winged caduceus"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
+			},
+			{
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
+			},
+			{
+				"regexp": "Fair\\.",
+				"sub": "Fine."
+			},
+			{
+				"regexp": "Fair ",
+				"sub": "Fine "
 			}
 
 		],
 		"Vespasian_Aur_PA1.htm": [
+			{
+				"regexp": "RPC II 1904/3 \\(this coin – attributed to Antioch\\)",
+				"sub": "RPC II 1904/3: this coin – attributed to Antioch",
+				"note": "extra parenthesis ending in 'Antioch' messes up coin Hour parsing logic"
+			},
+			{
+				"regexp": "Calicó 604a \\(Antioch\\); RPC II 1905/2 \\(this coin – attributed to Antioch\\)",
+				"sub": "Calicó 604a: Antioch; RPC II 1905/2: this coin – attributed to Antioch",
+				"note": "same as above"
+			}
 		],
 		"Vespasian_Den_EA1.htm": [
 			{
@@ -38,6 +64,11 @@
 				"regexp": "1820mm",
 				"sub": "18.20mm",
 				"note": "typo"
+			},
+			{
+				"regexp": "RIC II 1394 var. \\(rev. legend and without genii holding wreath\\)",
+				"sub": "RIC II 1394 var.",
+				"note": "removing 'wreath' for coin Hour parsing logic"
 			}
 		],
 		"Vespasian_Den_EA2.htm": [
@@ -86,8 +117,23 @@
 			{
 				"regexp": "Vespasian\\. Died 79 AD",
 				"sub": "Vespasian. 69-79 AD"
+			},
+			{
+				"regexp": "RSC 17\\. Choice VF",
+				"sub": "RSC 17. Good VF"
+			},
+			{
+				"regexp": "RSC 164\\. Choice VF",
+				"sub": "RSC 164. Near EF"
+			},
+			{
+				"regexp": "RSC 226\\. Choice VF",
+				"sub": "RSC 226. Good VF"
+			},
+			{
+				"regexp": "RSC 126\\. Choice VF",
+				"sub": "RSC 126. Near EF"
 			}
-
 		],
 		"Vespasian_Den_PA1.htm": [
 			{
@@ -141,12 +187,32 @@
 			{
 				"regexp": "/\\[IVDAEA CAPT\\]A",
 				"sub": "/ [IVDAEA CAPT]A"
+			},
+			{
+				"regexp": "Cohen 4 var\\. VF from the standpoint of wear but fields heavily worked",
+				"sub": "Cohen 4 variation. VF. VF from the standpoint of wear but fields heavily worked",
+				"note": "missing logic to handle this"
 			}
 		],
 		"Vespasian_Ses_PA1.htm":[
 			{
 				"regexp": "TITUS\\. As Caesar, 69-79 AD",
 				"sub": "Titus, as Caesar. 69-79 AD."
+			},
+			{
+				"regexp": "Cohen 236 var\\. VF brown patina extensive obverse smoothing",
+				"sub": "Cohen 236 variation. VF. Brown patina extensive obverse smoothing",
+				"note": "missing logic to handle this: e.g. var. VF"
+			},
+			{
+				"regexp": "Cohen 238 var\\. Good Fine reddish brown patina rough",
+				"sub": "Cohen 238 variation. Good Fine. Reddish brown patina rough",
+				"note": "same as above"
+			},
+			{
+				"regexp": "Cohen 239 var\\. VF dark green patina reverse double struck some smoothing in fields",
+				"sub": "Cohen 239 variation. VF. Dark green patina reverse double struck some smoothing in fields",
+				"note": "same as above"
 			}
 		]
 	}
