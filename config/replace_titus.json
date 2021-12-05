@@ -2,20 +2,30 @@
 	"file": {
 		"Titus_Aur_EA1.htm": [
 			{
-				"regexp": "TITUS\\.",
-				"sub": "Titus."
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
 			}
 		],
 		"Titus_Aur_PA1.htm": [
 		],
 		"Titus_Den_EA1.htm": [
 			{
-				"regexp": "\\(18mm 3.05 g 5h",
-				"sub": "(18mm 3.05 g 5h)"
-			},
-			{
 				"regexp": "Toned good VF",
 				"sub": "Good VF Toned"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
+			},
+			{
+				"regexp": "AR Denarius \\(18mm 3\\.05 g 5h\\. Struck 80 AD\\.",
+				"sub": "AR Denarius (18mm 3.05 g 5h). Rome mint. Struck 80 AD.",
+				"note": "CNG typo missing mint"
+			},
+			{
+				"regexp": "gm\\)\\. Struck 80 AD\\.",
+				"sub": "gm). unknown mint. Struck 80 AD.",
+				"note": "CNG typos missing mint"
 			}
 		],
 		"Titus_Den_EA2.htm": [
@@ -40,7 +50,22 @@
 			{
 				"regexp": "JULIA TITI daughter of Titus",
 				"sub": "Julia Titi"
+			},
+			{
+				"regexp": "TITUS\\.79-81 AD\\.",
+				"sub": "Titus. 79-81 AD.",
+				"note": "CNG typo"
+			},
+			{
+				"regexp": "AR Denarius \\(3\\.49 gm\\)\\. Struck January-July 80 AD\\.",
+				"sub": "AR Denarius (3.49 gm). Rome mint. Struck January-July 80 AD.",
+				"note": "found mint from RIC"
+			},
+			{
+				"regexp": "TITUS\\.",
+				"sub": "Titus."
 			}
+
 		],
 		"Titus_Ses_EA1.htm": [
 			{
@@ -51,9 +76,39 @@
 				"regexp": "Struck under Titus 79-81 AD",
 				"sub": "Struck under Titus 79 AD",
 				"note": "Vespasian death"
+			},
+			{
+				"regexp": "Æ Sestertius \\(34mm 24\\.99 g 6h\\)\\. Rome mint\\. Struck AD 80\\. RIC II 184",
+				"sub": "Æ Sestertius (34mm 24.99 g 6h). Rome mint. Struck AD 80. unlisted obverse / unlisted reverse. RIC II 184",
+				"note": "lacking CNG description"
+			},
+			{
+				"regexp": "Cohen 221 var\\. Fine",
+				"sub": "Cohen 221 variation. Fine",
+				"note": "separate RIC and grade"
+			},
+			{
+				"regexp": "Fair porous tan and brown surfaces",
+				"sub": "Fine. Porous tan and brown surfaces",
+				"note": "separate RIC and grade"
+			},
+			{
+				"regexp": "Fair green and brown patina rough obverse surfaces",
+				"sub": "Fine. Green and brown patina rough obverse surfaces",
+				"note": "separate RIC and grade"
 			}
 		],
 		"Titus_Ses_PA1.htm":[
+			{
+				"regexp": "Æ Sestertius \\(26\\.84 gm 6h\\)\\. Struck 80 AD\\.",
+				"sub": "Æ Sestertius (26.84 gm 6h). Rome mint. Struck 80 AD.",
+				"note": "CNG missing mint"
+			},
+			{
+				"regexp": "h\\)\\. Struck 80 AD",
+				"sub": "h). unlisted mint. Struck 80 AD",
+				"note": "early CNG"
+			},
 			{
 				"regexp": "Lustrous EF",
 				"sub": "EF Lustrous"
@@ -69,6 +124,10 @@
 			{
 				"regexp": "Toned near EF",
 				"sub": "Near EF Toned"
+			},
+			{
+				"regexp": "Choice VF",
+				"sub": "VF"
 			}
 		],
 		"Titus_Cis_EA1.htm":[

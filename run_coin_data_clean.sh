@@ -35,33 +35,33 @@
 
 # Vespasian
 
-python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_EA1/Vespasian_Aur_EA1.csv config/replace_vespasian.json
-python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_PA1/Vespasian_Aur_PA1.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_EA1/Vespasian_Aur_EA1.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_PA1/Vespasian_Aur_PA1.csv config/replace_vespasian.json
 
-python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA1/Vespasian_Den_EA1.csv config/replace_vespasian.json
-python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA2/Vespasian_Den_EA2.csv config/replace_vespasian.json
-python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA3/Vespasian_Den_EA3.csv config/replace_vespasian.json
-python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA4/Vespasian_Den_EA4.csv config/replace_vespasian.json
-python3 coin_data_clean.py data/data_scraped/Vespasian_Den_PA1/Vespasian_Den_PA1.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA1/Vespasian_Den_EA1.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA2/Vespasian_Den_EA2.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA3/Vespasian_Den_EA3.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA4/Vespasian_Den_EA4.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Den_PA1/Vespasian_Den_PA1.csv config/replace_vespasian.json
 
-python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA1/Vespasian_Ses_EA1.csv config/replace_vespasian.json
-python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA2/Vespasian_Ses_EA2.csv config/replace_vespasian.json
-python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_PA1/Vespasian_Ses_PA1.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA1/Vespasian_Ses_EA1.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA2/Vespasian_Ses_EA2.csv config/replace_vespasian.json
+# python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_PA1/Vespasian_Ses_PA1.csv config/replace_vespasian.json
 
 # Titus
 
-# python3 coin_data_clean.py data/data_scraped/Titus_Aur_EA1/Titus_Aur_EA1.csv 
-# python3 coin_data_clean.py data/data_scraped/Titus_Aur_PA1/Titus_Aur_PA1.csv 
+python3 coin_data_clean.py data/data_scraped/Titus_Aur_EA1/Titus_Aur_EA1.csv config/replace_titus.json
+python3 coin_data_clean.py data/data_scraped/Titus_Aur_PA1/Titus_Aur_PA1.csv config/replace_titus.json
 
-# python3 coin_data_clean.py data/data_scraped/Titus_Den_EA1/Titus_Den_EA1.csv 
-# python3 coin_data_clean.py data/data_scraped/Titus_Den_EA2/Titus_Den_EA2.csv 
-# python3 coin_data_clean.py data/data_scraped/Titus_Den_PA1/Titus_Den_PA1.csv 
+python3 coin_data_clean.py data/data_scraped/Titus_Den_EA1/Titus_Den_EA1.csv config/replace_titus.json
+python3 coin_data_clean.py data/data_scraped/Titus_Den_EA2/Titus_Den_EA2.csv config/replace_titus.json
+python3 coin_data_clean.py data/data_scraped/Titus_Den_PA1/Titus_Den_PA1.csv config/replace_titus.json
 
-# python3 coin_data_clean.py data/data_scraped/Titus_Ses_EA1/Titus_Ses_EA1.csv 
-# python3 coin_data_clean.py data/data_scraped/Titus_Ses_PA1/Titus_Ses_PA1.csv 
+python3 coin_data_clean.py data/data_scraped/Titus_Ses_EA1/Titus_Ses_EA1.csv config/replace_titus.json
+python3 coin_data_clean.py data/data_scraped/Titus_Ses_PA1/Titus_Ses_PA1.csv config/replace_titus.json
 
-# python3 coin_data_clean.py data/data_scraped/Titus_Cis_EA1/Titus_Cis_EA1.csv 
-# python3 coin_data_clean.py data/data_scraped/Titus_Cis_PA1/Titus_Cis_PA1.csv 
+python3 coin_data_clean.py data/data_scraped/Titus_Cis_EA1/Titus_Cis_EA1.csv config/replace_titus.json
+python3 coin_data_clean.py data/data_scraped/Titus_Cis_PA1/Titus_Cis_PA1.csv config/replace_titus.json
 
 # AP
 
@@ -77,10 +77,4 @@ python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_PA1/Vespasian_Ses_PA1
 # python3 coin_data_clean.py data/data_scraped/Pius_Ses_EA2/Pius_Ses_EA2.csv
 # python3 coin_data_clean.py data/data_scraped/Pius_Ses_EA3/Pius_Ses_EA3.csv
 # python3 coin_data_clean.py data/data_scraped/Pius_Ses_PA1/Pius_Ses_PA1.csv
-
-
-
-
-
-
 

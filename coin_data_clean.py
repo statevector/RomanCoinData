@@ -145,7 +145,7 @@ def format_measurements(text, verbose=False):
          return text
    raise Exception('No regex match for measurements in text: \n{}'.format(text))
 
-def format_mint_new3(text):
+def format_mint(text):
    # first, check if 'mint' keyword is present
    if re.search(r'[Mm]int', text) is None:
       text = re.sub(r'Hour\.', 'Hour. Mint: unlisted mint.', text) # careful, this relies on 'Hour' existing
@@ -212,7 +212,7 @@ def format_moneyer(text):
 
    return text
 
-def format_strike_new(text):
+def format_strike(text):
    # check for keyword
    result = re.search(r'Struck', text, 1)
    if result is not None:
@@ -243,7 +243,7 @@ def format_RIC(text):
    text = re.sub(r'RIC', 'RN: RIC', text)
    return text
 
-def format_grade_new2(text):
+def format_grade_new(text):
    # introduce 'Grade' keyword
    segments = []
    isFound = False
@@ -370,12 +370,12 @@ if __name__ == '__main__':
    df['Description'] = df['Description'].apply(lambda x: format_reign(x))
    df['Description'] = df['Description'].apply(lambda x: format_denomination(x))
    df['Description'] = df['Description'].apply(lambda x: format_measurements(x))
-   df['Description'] = df['Description'].apply(lambda x: format_mint_new3(x))
+   df['Description'] = df['Description'].apply(lambda x: format_mint(x))
    df['Description'] = df['Description'].apply(lambda x: format_moneyer(x))
-   df['Description'] = df['Description'].apply(lambda x: format_strike_new(x))
+   df['Description'] = df['Description'].apply(lambda x: format_strike(x))
    df['Description'] = df['Description'].apply(lambda x: format_obverse_reverse(x))
    df['Description'] = df['Description'].apply(lambda x: format_RIC(x))
-   df['Description'] = df['Description'].apply(lambda x: format_grade_new2(x))
+   df['Description'] = df['Description'].apply(lambda x: format_grade_new(x))
    #print(df.info())
 
    # save intermediate result
