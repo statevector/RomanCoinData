@@ -89,12 +89,12 @@
 			},
 			{
 				"regexp": "Fair porous tan and brown surfaces",
-				"sub": "Fine. Porous tan and brown surfaces",
+				"sub": "Fair. Porous tan and brown surfaces",
 				"note": "separate RIC and grade"
 			},
 			{
 				"regexp": "Fair green and brown patina rough obverse surfaces",
-				"sub": "Fine. Green and brown patina rough obverse surfaces",
+				"sub": "Fair. Green and brown patina rough obverse surfaces",
 				"note": "separate RIC and grade"
 			}
 		],

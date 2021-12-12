@@ -6,10 +6,6 @@
 				"sub": "BC-AD"
 			},
 			{
-				"regexp": "Calicó 176. Fair",
-				"sub": "Calicó 176. Fine"
-			},
-			{
 				"regexp": "/  / PONTIF • MAX",
 				"sub": "/ PONTIF • MAX •"
 			},

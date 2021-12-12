@@ -28,16 +28,7 @@
 			{
 				"regexp": "Nice Fine",
 				"sub": "Good Fine"
-			},
-			{
-				"regexp": "Fair\\.",
-				"sub": "Fine."
-			},
-			{
-				"regexp": "Fair ",
-				"sub": "Fine "
 			}
-
 		],
 		"Vespasian_Aur_PA1.htm": [
 			{
