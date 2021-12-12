@@ -1,0 +1,126 @@
+{
+	"file": {
+		"Tiberius_Aur_EA1.csv": [
+			{
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
+			},
+			{
+				"regexp": "Choice VF\\. Rare variety",
+				"sub": "VF"
+			},
+			{
+				"regexp": "Choice VF\\. Rare\\.",
+				"sub": "Near EF"
+			}
+		],
+		"Tiberius_Aur_PA1.csv": [
+			{
+				"regexp": "Group 4 AD 18-35\\.",
+				"sub": "Group 4 AD 18-35. Struck unlisted.",
+				"note": "not sure about Group 4"
+			}
+		],
+		"Tiberius_Cis_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Tiberius_Cis_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Tiberius_Den_EA1.csv": [
+			{
+				"regexp": "Group 1 AD 15-18",
+				"sub": "Struck AD 15-18",
+				"note": "Group?"
+			}
+		],
+		"Tiberius_Den_EA2.csv": [
+			{
+				"regexp": "TIBERIUS\\.14-37 AD\\.",
+				"sub": "Tiberius. 14-37 AD.",
+				"note": "CNG typo"
+			},
+			{
+				"regexp": "\\[Roman Imperial\\] TIBERIUS\\. 14-37 AD\\.",
+				"sub": "Tiberius. 14-37 AD.",
+				"note": "early CNG formatting"
+			},
+			{
+				"regexp": "Toned VF",
+				"sub": "VF. Toned"
+			},
+			{
+				"regexp": "Toned near VF",
+				"sub": "Near VF. Toned"
+			}
+		],
+		"Tiberius_Den_PA1.csv": [
+			{
+				"regexp": "AR Denarius \"Tribute Penny\"",
+				"sub": "AR Denarius",
+				"note": "edge case for tribute penny"
+			},
+			{
+				"regexp": "AR Denarius “Tribute Penny”",
+				"sub": "AR Denarius",
+				"note": "same as above"
+			},
+			{
+				"regexp": "Group 5 AD 36-37",
+				"sub": "Struck AD 36-37",
+				"note": "Group?"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
+			},
+			{
+				"regexp": "Toned nice VF",
+				"sub": "Good VF. Toned"
+			},
+			{
+				"regexp": "Toned good VF",
+				"sub": "Good VF. Toned"
+			},
+			{
+				"regexp": "Lightly toned EF",
+				"sub": "EF. Lightly toned"
+			},
+			{
+				"regexp": "Lightly toned good VF",
+				"sub": "Good VF. Lightly toned"
+			}
+		],
+		"Tiberius_Ses_EA1.csv": [
+			{
+				"regexp": "Struck under Tiberius AD 22-23",
+				"sub": "Struck AD 22-23"
+			},
+			{
+				"regexp": "Host coin: VF",
+				"sub": "VF. Host coin: "
+			}
+		],
+		"Tiberius_Ses_PA1.csv":[
+			{
+				"regexp": "TIBERIUS\\. As Caesar 14-37 AD\\.",
+				"sub": "Tiberius as Caesar. 14-37 AD.",
+				"note": "issued during reign of Augustus"
+			},
+			{
+				"regexp": "TIBERIUS\\.",
+				"sub": "Tiberius."
+			},
+			{
+				"regexp": "TIBERIUS with DIVUS AUGUSTUS\\.",
+				"sub": "Tiberius with Divus Augustus."
+			}
+		]
+	}
+}

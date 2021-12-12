@@ -203,7 +203,7 @@ if __name__ == '__main__':
 	input_file = sys.argv[1]
 	outname = input_file.split('/')[-1].split('.')[0]+'.csv'
 	print(outname)
-	outdir = 'data_scraped/'+input_file.split('/')[-1].split('.')[0]
+	outdir = 'data/data_scraped/'+input_file.split('/')[-1].split('.')[0]
 	print(outdir)
 	if not os.path.exists(outdir):
 		os.mkdir(outdir)

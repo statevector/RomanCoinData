@@ -21,8 +21,9 @@ def format_abbreviations(text):
 
 def format_emperor(text, verbose=False):
    emperors = [
-      'Augustus', 
-      'Nero', 
+      'Augustus',
+      'Tiberius',
+      'Nero',
       'Vespasian',
       'Titus',
       'Julia Titi',
@@ -332,7 +333,11 @@ if __name__ == '__main__':
    with open('config/stop_words.txt', mode='r', encoding='utf-8') as f:
       # drop trailing \n for each line and skip lines that start with #
       stop_words = [re.compile(line[:-1]) for line in f if '#' not in line]
+   #print(stop_words)
    for stop in stop_words:
+      # if df[df['Description'].str.contains(stop, regex=True)].shape[0] > 0:
+      #    print('-------------')
+      #    print('{}\n: {}'.format(stop, df[df['Description'].str.contains(stop, regex=True)]['Description']))
       df = df[~df['Description'].str.contains(stop, regex=True)]
       #print(stop, df.shape)
    print('selection: {}'.format(df.shape))

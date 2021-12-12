@@ -88,4 +88,15 @@ Les miroirs de Néron
 Half of a Neronian Mirror
 mirror
 #
+# TIBERIUS WORDS
+#
+Indian Imitation
+Tiberius. AD 14-37. Æ 24 mm
+Fourré Denarius
+Æ Struck “Sestertius”
+Cavino
+ZEUGITANA
+SPAIN Tarraco
+Imitating Lugdunum
+#
 # keep last line here so we don't cut off last letter of previous word during read

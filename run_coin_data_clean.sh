@@ -12,7 +12,6 @@
 # python3 coin_data_clean.py data/data_scraped/Augustus_Den_EA2/Augustus_Den_EA2.csv config/replace_augustus.json
 # python3 coin_data_clean.py data/data_scraped/Augustus_Den_EA3/Augustus_Den_EA3.csv config/replace_augustus.json
 # python3 coin_data_clean.py data/data_scraped/Augustus_Den_EA4/Augustus_Den_EA4.csv config/replace_augustus.json
-
 # python3 coin_data_clean.py data/data_scraped/Augustus_Den_PA1/Augustus_Den_PA1.csv config/replace_augustus.json
 # python3 coin_data_clean.py data/data_scraped/Augustus_Den_PA2/Augustus_Den_PA2.csv config/replace_augustus.json
 # python3 coin_data_clean.py data/data_scraped/Augustus_Den_PA3/Augustus_Den_PA3.csv config/replace_augustus.json
@@ -20,7 +19,29 @@
 # python3 coin_data_clean.py data/data_scraped/Augustus_Ses_EA1/Augustus_Ses_EA1.csv config/replace_augustus.json
 # python3 coin_data_clean.py data/data_scraped/Augustus_Ses_PA1/Augustus_Ses_PA1.csv config/replace_augustus.json
 
+# Tiberius (no cistophori)
+
+python3 coin_data_clean.py data/data_scraped/Tiberius_Aur_EA1/Tiberius_Aur_EA1.csv config/replace_tiberius.json
+python3 coin_data_clean.py data/data_scraped/Tiberius_Aur_PA1/Tiberius_Aur_PA1.csv config/replace_tiberius.json
+
+python3 coin_data_clean.py data/data_scraped/Tiberius_Den_EA1/Tiberius_Den_EA1.csv config/replace_tiberius.json
+python3 coin_data_clean.py data/data_scraped/Tiberius_Den_EA2/Tiberius_Den_EA2.csv config/replace_tiberius.json
+python3 coin_data_clean.py data/data_scraped/Tiberius_Den_PA1/Tiberius_Den_PA1.csv config/replace_tiberius.json
+
+python3 coin_data_clean.py data/data_scraped/Tiberius_Ses_PA1/Tiberius_Ses_PA1.csv config/replace_tiberius.json
+python3 coin_data_clean.py data/data_scraped/Tiberius_Ses_EA1/Tiberius_Ses_EA1.csv config/replace_tiberius.json
+
+# Caligula
+
+# Claudius
+
 # Nero
+
+# Galba
+
+# Otho
+
+# Vitellius
 
 # python3 coin_data_clean.py data/data_scraped/Nero_Aur_EA1/Nero_Aur_EA1.csv config/replace_nero.json
 # python3 coin_data_clean.py data/data_scraped/Nero_Aur_PA1/Nero_Aur_PA1.csv config/replace_nero.json
@@ -50,20 +71,28 @@
 
 # Titus
 
-python3 coin_data_clean.py data/data_scraped/Titus_Aur_EA1/Titus_Aur_EA1.csv config/replace_titus.json
-python3 coin_data_clean.py data/data_scraped/Titus_Aur_PA1/Titus_Aur_PA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Aur_EA1/Titus_Aur_EA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Aur_PA1/Titus_Aur_PA1.csv config/replace_titus.json
 
-python3 coin_data_clean.py data/data_scraped/Titus_Den_EA1/Titus_Den_EA1.csv config/replace_titus.json
-python3 coin_data_clean.py data/data_scraped/Titus_Den_EA2/Titus_Den_EA2.csv config/replace_titus.json
-python3 coin_data_clean.py data/data_scraped/Titus_Den_PA1/Titus_Den_PA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Cis_EA1/Titus_Cis_EA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Cis_PA1/Titus_Cis_PA1.csv config/replace_titus.json
 
-python3 coin_data_clean.py data/data_scraped/Titus_Ses_EA1/Titus_Ses_EA1.csv config/replace_titus.json
-python3 coin_data_clean.py data/data_scraped/Titus_Ses_PA1/Titus_Ses_PA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Den_EA1/Titus_Den_EA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Den_EA2/Titus_Den_EA2.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Den_PA1/Titus_Den_PA1.csv config/replace_titus.json
 
-python3 coin_data_clean.py data/data_scraped/Titus_Cis_EA1/Titus_Cis_EA1.csv config/replace_titus.json
-python3 coin_data_clean.py data/data_scraped/Titus_Cis_PA1/Titus_Cis_PA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Ses_EA1/Titus_Ses_EA1.csv config/replace_titus.json
+# python3 coin_data_clean.py data/data_scraped/Titus_Ses_PA1/Titus_Ses_PA1.csv config/replace_titus.json
 
-# AP
+# Domitian
+
+# Nerva
+
+# Trajan
+
+# Hadrian
+
+# Antoninus Pius
 
 # python3 coin_data_clean.py data/data_scraped/Pius_Aur_EA1/Pius_Aur_EA1.csv
 # python3 coin_data_clean.py data/data_scraped/Pius_Aur_PA1/Pius_Aur_PA1.csv
@@ -77,4 +106,13 @@ python3 coin_data_clean.py data/data_scraped/Titus_Cis_PA1/Titus_Cis_PA1.csv con
 # python3 coin_data_clean.py data/data_scraped/Pius_Ses_EA2/Pius_Ses_EA2.csv
 # python3 coin_data_clean.py data/data_scraped/Pius_Ses_EA3/Pius_Ses_EA3.csv
 # python3 coin_data_clean.py data/data_scraped/Pius_Ses_PA1/Pius_Ses_PA1.csv
+
+# Marcus Aurelius
+
+# Lucius Verus
+
+# Commodus
+
+
+
 
