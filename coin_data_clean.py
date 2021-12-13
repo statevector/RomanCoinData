@@ -23,6 +23,8 @@ def format_emperor(text, verbose=False):
    emperors = [
       'Augustus',
       'Tiberius',
+      'Gaius',
+      'Agrippina Senior',
       'Nero',
       'Vespasian',
       'Titus',
@@ -37,7 +39,11 @@ def format_emperor(text, verbose=False):
    raise Exception('No emperor match in text: {}'.format(text))
 
 def format_reign(text):
+   # print('----------------------')
+   # print(text)
    regexps = [
+      r'Died\sAD\s\d+',
+      r'Died\s\d+\sAD', # AD scheme (Agrippina)
       r'\d+\sBC-AD\s\d+',
       r'AD\s\d+-\d+',
       r'\d+-\d+\sAD' # alternative AD scheme
@@ -46,9 +52,8 @@ def format_reign(text):
       result = re.search(regexp, text)
       if result is not None:
          result = result.group() # return the match
-         #print(text, result)
-         text = re.sub(result, 'Reign: '+result, text)
-         #print(text)
+         text = re.sub(result, 'Reign: '+result, text, 1) # first match
+         # print('---->', text)
          return text
    raise Exception('No regex match for reign in text: {}'.format(text))
 

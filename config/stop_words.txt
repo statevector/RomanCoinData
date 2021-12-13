@@ -99,4 +99,9 @@ ZEUGITANA
 SPAIN Tarraco
 Imitating Lugdunum
 #
+# CALIGULA WORDS
+#
+Æ “Medallic” Sestertius
+Æ Halved Sestertius
+#
 # keep last line here so we don't cut off last letter of previous word during read

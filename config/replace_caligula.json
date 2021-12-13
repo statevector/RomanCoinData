@@ -1,0 +1,206 @@
+{
+	"file": {
+		"Caligula_Aur_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Caligula_Aur_PA1.csv": [
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) with GERMANICUS",
+				"sub": "Gaius with Germanicus"
+			},
+			{
+				"regexp": "Special emission January AD 40",
+				"sub": "Struck January AD 40 (special emission)"
+			},
+			{
+				"regexp": "Gaius \\(Caligula\\) with Augustus\\.",
+				"sub": "Gaius with Divus Augustus. "
+			}
+		],
+		"Caligula_Cis_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Caligula_Cis_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Caligula_Den_EA1.csv": [
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) and AGRIPPINA Senior",
+				"sub": "Gaius with Agrippina Senior"
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) and DIVUS AUGUSTUS",
+				"sub": "Gaius with Divus Augustus"
+			},
+			{
+				"regexp": "Toned VF",
+				"sub": "VF. Toned"
+			},
+			{
+				"regexp": "Porous toned nice VF",
+				"sub": "Good VF. Porous toned"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
+			}
+		],
+		"Caligula_Den_PA1.csv": [
+			{
+				"regexp": "Lugdunum \\(Lyon\\) mint",
+				"sub": "Lugdunum (Lyons) mint"
+			},
+			{
+				"regexp": "Struck 37-38 AD\\. Lugdunum mint",
+				"sub": "Struck 37-38 AD. Lugdunum (Lyons) mint"
+			},
+			{
+				"regexp": "GAIUS CALIGULA and DIVUS AUGUSTUS",
+				"sub": "Gaius with Divus Augustus"
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) with DIVUS AUGUSTUS",
+				"sub": "Gaius with Divus Augustus"
+			},
+			{
+				"regexp": "Gaius \\(Caligula\\), with Germanicus",
+				"sub": "Gaius with Germanicus"
+			},
+			{
+				"regexp": "Gaius \\(Caligula\\), with Agrippina Senior",
+				"sub": "Gaius with Agrippina Senior"
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) with AGRIPPINA\\.",
+				"sub": "Gaius with Agrippina Senior."
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) with AGRIPPINA SENIOR",
+				"sub": "Gaius with Agrippina Senior"
+			},
+			{
+				"regexp": "GAIUS CALIGULA and DIVUS AUGUSTUS",
+				"sub": "Gaius with Divus Augustus"
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) and DIVUS AUGUSTUS",
+				"sub": "Gaius with Divus Augustus"
+			},
+			{
+				"regexp": "Toned Fine",
+				"sub": "Fine. Toned"
+			},
+			{
+				"regexp": "Toned EF",
+				"sub": "EF. Toned"
+			},
+			{
+				"regexp": "Beautifully toned EF",
+				"sub": "EF. Beautifully toned"
+			}
+		],
+		"Caligula_Ses_EA1.csv": [
+			{
+				"regexp": "S • P • Q • R/ P • P/ OB CIVES / SERVATOS",
+				"sub": "S • P • Q • R | P • P | OB CIVES | SERVATOS"
+			},
+			{
+				"regexp": "S P Q R / P P / OB CIVES / SERVATOS",
+				"sub": "S P Q R | P P | OB CIVES | SERVATOS"
+			},
+			{
+				"regexp": "Rome mint\\. Struck AD 37-38\\. RIC I 36",
+				"sub": "Rome mint. Struck AD 37-38. unlisted / unlisted. RIC I 36",
+				"note": "https://cngcoins.com/Coin.aspx?CoinID=202116"
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\) with AGRIPPINA SR mother of Gaius\\.",
+				"sub": "Gaius with Agrippina Senior."
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\)\\.37-41 AD",
+				"sub": "Gaius. 37-41 AD",
+				"note": "CNG typo"
+			},
+			{
+				"regexp": "AGRIPPINA SENIOR mother of Gaius \\(Caligula\\)\\.",
+				"sub": "Agrippina Senior."
+			},
+			{
+				"regexp": "Agrippina Senior\\. Wife of Germanicus AD 5-33",
+				"sub": "Agrippina Senior. Died AD 33"
+			},
+			{
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
+			},
+			{
+				"regexp": "Struck 39-40 AD\\. Pietas",
+				"sub": "Rome mint. Struck 39-40 AD. Pietas"
+			}
+		],
+		"Caligula_Ses_PA1.csv":[
+			{
+				"regexp": "AGRIPPINA SENIOR wife of Germanicus mother of Gaius \\(Caligula\\)",
+				"sub": "Agrippina Senior"
+			},
+			{
+				"regexp": "AGRIPPINA SR\\. mother of Gaius \\(Caligula\\)",
+				"sub": "Agrippina Senior"
+			},
+			{
+				"regexp": "GAIUS CALIGULA",
+				"sub": "Gaius"
+			},
+			{
+				"regexp": "S P Q R/ P P / OB CIVES / SERVATOS",
+				"sub": "S P Q R | P P | OB CIVES | SERVATOS"
+			},
+			{
+				"regexp": "Fine Tiber patina surfaces a little rough",
+				"sub": "Fine. Tiber patina surfaces a little rough"
+			},
+			{
+				"regexp": "Struck 37-38 AD. Laureate head left",
+				"sub": "Struck 37-38 AD. Rome mint. Laureate head left"
+			},
+			{
+				"regexp": "Struck under Gaius \\(Caligula\\) AD 37-41",
+				"sub": "Struck AD 37-41"
+			},
+			{
+				"regexp": "Struck under Gaius \\(Caligula\\) 37-41 AD",
+				"sub": "Struck 37-41 AD"
+			},
+			{
+				"regexp": "RIC I 44; Cohen 9 var\\. Fine green and brown patina smoothed",
+				"sub": "RIC I 44; Cohen 9 variation. Fine. Green and brown patina smoothed"
+			},
+			{
+				"regexp": "RIC I 44; BMCRE pl. 28 9; Cohen 9 var\\. VF green and brown patina surfaces a bit rough",
+				"sub": "RIC I 44; BMCRE pl. 28 9; Cohen 9 variation. VF. green and brown patina surfaces a bit rough"
+			},
+			{
+				"regexp": "",
+				"sub": ""
+			},
+			{
+				"regexp": "Gaius \\(Caligula\\)",
+				"sub": "Gaius"
+			},
+			{
+				"regexp": "GAIUS \\(CALIGULA\\)",
+				"sub": "Gaius"
+			}
+		]
+	}
+}
