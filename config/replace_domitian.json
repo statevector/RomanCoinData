@@ -1,0 +1,70 @@
+{
+	"file": {
+		"Domitian_Aur_EA1.csv": [
+			{
+				"regexp": "DOMITIAN\\. 81-96 AD",
+				"sub": "Domitian. 81-96 AD"
+			}
+		],
+		"Domitian_Aur_PA1.csv": [
+			{
+				"regexp": "DOMITIAN and DOMITIA\\. 81-96 AD",
+				"sub": "Domitian with Domitia. 81-96 AD"
+			}
+		],
+		"Domitian_Cis_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Domitian_Cis_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Domitian_Den_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Domitian_Den_EA2.csv": [
+			{
+				"regexp": "\\(18mm 2.90\\)",
+				"sub": "(18mm 2.90 g)"
+			},
+			{
+				"regexp": "Column inscribed LVD / SAEC / FEC in three lines",
+				"sub": "Column inscribed LVD | SAEC | FEC in three lines"
+			},
+			{
+				"regexp": "Good VF\\. Commemorates the Ludi Saeculares\\. \\(\\$250\\)",
+				"sub": "RIC II unlisted. Good VF. Commemorates the Ludi Saeculares. ($250)"
+			},
+			{
+				"regexp": "RIC II p\\. 317 note 79 \\(this coin\\); RSC 265 var\\. \\(obv\\. legend\\)\\. \\.",
+				"sub": "RIC II p. 317 note 79 (this coin); RSC 265 var. (obv. legend). Near EF. Minor porosity, corrosion."
+			}
+		],
+		"Domitian_Den_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Domitian_Ses_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Domitian_Ses_PA1.csv":[
+			{
+				"regexp": "DOMITIAN with DIVA JULIA TITI\\. 81-96 AD",
+				"sub": "Domitian with Diva Julia Titi. 81-96 AD"
+			}
+		]
+	}
+}

@@ -104,4 +104,8 @@ Imitating Lugdunum
 Æ “Medallic” Sestertius
 Æ Halved Sestertius
 #
+# DOMITIAN WORDS
+# 
+THRACE Philippopolis
+#
 # keep last line here so we don't cut off last letter of previous word during read

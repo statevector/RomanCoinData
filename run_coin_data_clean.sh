@@ -24,7 +24,7 @@
 # python3 coin_data_clean.py data/data_scraped/Tiberius_Aur_EA1/Tiberius_Aur_EA1.csv config/replace_tiberius.json
 # python3 coin_data_clean.py data/data_scraped/Tiberius_Aur_PA1/Tiberius_Aur_PA1.csv config/replace_tiberius.json
 
-# (no cistophori)
+# # (no cistophori)
 
 # python3 coin_data_clean.py data/data_scraped/Tiberius_Den_EA1/Tiberius_Den_EA1.csv config/replace_tiberius.json
 # python3 coin_data_clean.py data/data_scraped/Tiberius_Den_EA2/Tiberius_Den_EA2.csv config/replace_tiberius.json
@@ -35,16 +35,16 @@
 
 # Caligula
 
-python3 coin_data_clean.py data/data_scraped/Caligula_Aur_PA1/Caligula_Aur_PA1.csv config/replace_caligula.json
-python3 coin_data_clean.py data/data_scraped/Caligula_Aur_EA1/Caligula_Aur_EA1.csv config/replace_caligula.json
+# python3 coin_data_clean.py data/data_scraped/Caligula_Aur_PA1/Caligula_Aur_PA1.csv config/replace_caligula.json
+# python3 coin_data_clean.py data/data_scraped/Caligula_Aur_EA1/Caligula_Aur_EA1.csv config/replace_caligula.json
 
-# (no cistophori)
+# # (no cistophori)
 
-python3 coin_data_clean.py data/data_scraped/Caligula_Den_PA1/Caligula_Den_PA1.csv config/replace_caligula.json
-python3 coin_data_clean.py data/data_scraped/Caligula_Den_EA1/Caligula_Den_EA1.csv config/replace_caligula.json
+# python3 coin_data_clean.py data/data_scraped/Caligula_Den_PA1/Caligula_Den_PA1.csv config/replace_caligula.json
+# python3 coin_data_clean.py data/data_scraped/Caligula_Den_EA1/Caligula_Den_EA1.csv config/replace_caligula.json
 
-python3 coin_data_clean.py data/data_scraped/Caligula_Ses_PA1/Caligula_Ses_PA1.csv config/replace_caligula.json
-python3 coin_data_clean.py data/data_scraped/Caligula_Ses_EA1/Caligula_Ses_EA1.csv config/replace_caligula.json
+# python3 coin_data_clean.py data/data_scraped/Caligula_Ses_PA1/Caligula_Ses_PA1.csv config/replace_caligula.json
+# python3 coin_data_clean.py data/data_scraped/Caligula_Ses_EA1/Caligula_Ses_EA1.csv config/replace_caligula.json
 
 # Claudius
 
@@ -98,6 +98,19 @@ python3 coin_data_clean.py data/data_scraped/Caligula_Ses_EA1/Caligula_Ses_EA1.c
 # python3 coin_data_clean.py data/data_scraped/Titus_Ses_PA1/Titus_Ses_PA1.csv config/replace_titus.json
 
 # Domitian
+
+python3 coin_data_clean.py data/data_scraped/Domitian_Aur_EA1/Domitian_Aur_EA1.csv config/replace_domitian.json
+python3 coin_data_clean.py data/data_scraped/Domitian_Aur_PA1/Domitian_Aur_PA1.csv config/replace_domitian.json
+
+python3 coin_data_clean.py data/data_scraped/Domitian_Cis_EA1/Domitian_Cis_EA1.csv config/replace_domitian.json
+python3 coin_data_clean.py data/data_scraped/Domitian_Cis_PA1/Domitian_Cis_PA1.csv config/replace_domitian.json
+
+python3 coin_data_clean.py data/data_scraped/Domitian_Den_EA1/Domitian_Den_EA1.csv config/replace_domitian.json
+python3 coin_data_clean.py data/data_scraped/Domitian_Den_EA2/Domitian_Den_EA2.csv config/replace_domitian.json
+python3 coin_data_clean.py data/data_scraped/Domitian_Den_PA1/Domitian_Den_PA1.csv config/replace_domitian.json
+
+python3 coin_data_clean.py data/data_scraped/Domitian_Ses_EA1/Domitian_Ses_EA1.csv config/replace_domitian.json
+python3 coin_data_clean.py data/data_scraped/Domitian_Ses_PA1/Domitian_Ses_PA1.csv config/replace_domitian.json
 
 # Nerva
 

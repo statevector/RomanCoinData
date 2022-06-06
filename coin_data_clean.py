@@ -28,6 +28,7 @@ def format_emperor(text, verbose=False):
       'Nero',
       'Vespasian',
       'Titus',
+      'Domitian',
       'Julia Titi',
       'Antoninus Pius', 
       'Faustina Senior'
@@ -84,7 +85,8 @@ def format_measurements(text, verbose=False):
          print('case {}'.format(case))
          print('regexp: {}'.format(regexp))
       result = re.search(regexp, text)
-      if result is not None:        
+      if result is not None:
+         # print(result)
          result = result.group(0)
          if verbose:
             print('match: {}'.format(result))
@@ -152,10 +154,17 @@ def format_measurements(text, verbose=False):
    raise Exception('No regex match for measurements in text: \n{}'.format(text))
 
 def format_mint(text):
-   # first, check if 'mint' keyword is present
+   # print(text)
+   # first, check if 'mint' keyword is present, if not, add it in
    if re.search(r'[Mm]int', text) is None:
-      text = re.sub(r'Hour\.', 'Hour. Mint: unlisted mint.', text) # careful, this relies on 'Hour' existing
-      text = re.sub(r'Hour: unlisted', 'Hour: unlisted. Mint: unlisted mint.', text) # 2nd attempt when Hour is unlisted
+      # 1st attempt: careful, this relies on 'Hour' existing... does this make sense? When would Hour: be without \dh?
+      text = re.sub(r'Hour\.', 'Hour. Mint: unlisted mint.', text) 
+      # 2nd attempt when Hour is unlisted
+      text = re.sub(r'Hour: unlisted\.', 'Hour: unlisted. Mint: unlisted mint.', text) 
+      # 3rd attempt when Hour is defined
+      if re.search(r'Hour: \dh\.', text) is not None: 
+         x = re.search(r'Hour: \dh\.', text).group()
+         text = re.sub(x, x+' Mint: unlisted mint.', text) 
       return text
    # if so, then break text apart on  '.', find the mint segment, 
    # put 'Mint: ' at the front, sew it back together

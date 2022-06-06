@@ -15,8 +15,8 @@ from io import BytesIO
 from PIL import Image
 
 headers = {"User-Agent": 
-	"Analyzing Roman coins for a class project. \
-	If problems, please contact me at willisc9@msu.edu"}
+	"Hello! I'm analyzing Roman coins for a class project. \
+	If there's a problem, please contact me at willisc9@msu.edu"}
 
 def get_page_urls(html):
 	try:
