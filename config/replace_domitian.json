@@ -10,6 +10,11 @@
 			{
 				"regexp": "DOMITIAN and DOMITIA\\. 81-96 AD",
 				"sub": "Domitian with Domitia. 81-96 AD"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF",
+				"note": "should these be Near EF?"
 			}
 		],
 		"Domitian_Cis_EA1.csv": [
@@ -26,8 +31,8 @@
 		],
 		"Domitian_Den_EA1.csv": [
 			{
-				"regexp": "",
-				"sub": ""
+				"regexp": "AR Denarius \\(1919mm 3.44 g 7h\\)",
+				"sub": "AR Denarius (19.19mm 3.44 g 7h)"
 			}
 		],
 		"Domitian_Den_EA2.csv": [
@@ -46,18 +51,50 @@
 			{
 				"regexp": "RIC II p\\. 317 note 79 \\(this coin\\); RSC 265 var\\. \\(obv\\. legend\\)\\. \\.",
 				"sub": "RIC II p. 317 note 79 (this coin); RSC 265 var. (obv. legend). Near EF. Minor porosity, corrosion."
+			},
+			{
+				"regexp": "AD 81-96 \\(Struck AD 81-82\\). AR Denarius \\(3.43 g\\)",
+				"sub": "AD 81-96. AR Denarius (3.43 g). Struck AD 81-82"
+			},
+			{
+				"regexp": "RIC II 117; RSC 76. Toned VF\\. ",
+				"sub": "RIC II 117; RSC 76. VF. Toned."
+			},
+			{
+				"regexp": "RIC II 21 var\\. \\(raven\\); BMCRE 22; RSC 568c var\\. \\(same\\) VF\\.",
+				"sub": "RIC II 21 var. (raven); BMCRE 22; RSC 568c var. (same). VF."
+			},
+			{
+				"regexp": "RIC II 169; RSC 271\\. Lightly toned good VF\\.",
+				"sub": "RIC II 169; RSC 271. Good VF. Lightly toned."
+			},
+			{
+				"regexp": "Lustrous EF some light iridescent toning around edges\\.",
+				"sub": "EF. Lustrous some light iridescent toning around edges."
 			}
 		],
 		"Domitian_Den_PA1.csv": [
 			{
-				"regexp": "",
-				"sub": ""
+				"regexp": "RIC II 177; BMCRE 218; RSC 283\\. Toned EF\\.",
+				"sub": "RIC II 177; BMCRE 218; RSC 283. EF. Toned."
+			},
+			{
+				"regexp": "Toned nice VF slight horn silver on obverse",
+				"sub": "Good VF. Toned slight horn silver on obverse"
+			},
+			{
+				"regexp": "RIC II 93; RSC 215a\\. Toned EF small obverse die crack light porosity\\. Good portrait\\.",
+				"sub": "RIC II 93; RSC 215a. EF. Toned small obverse die crack light porosity. Good portrait."
 			}
 		],
 		"Domitian_Ses_EA1.csv": [
 			{
-				"regexp": "",
-				"sub": ""
+				"regexp": "Æ Sestertius \\(3433mm 25.49 g 6h\\)",
+				"sub": "Æ Sestertius (34.33mm 25.49 g 6h)"
+			},
+			{
+				"regexp": "RIC II 320; BMCRE pg\\. 381 \\*; Cohen 498 var\\. Near VF dark brown patina with tan high points",
+				"sub": "RIC II 320; BMCRE page 381; Cohen 498 variation. Near VF. Dark brown patina with tan high points"
 			}
 		],
 		"Domitian_Ses_PA1.csv":[

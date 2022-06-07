@@ -13,6 +13,7 @@ def format_abbreviations(text):
    text = re.sub(r'Cf\.', 'Confer', text)
    # include space to avoid entries that end in e.g. 'edge chip.'
    text = re.sub(r'p\. ', 'page ', text) 
+   text = re.sub(r'pg\. ', 'page ', text)
    text = re.sub(r'rev\. ', 'reverse ', text)
    text = re.sub(r'obv\. ', 'obverse ', text)
    text = re.sub(r'corr\. ', 'correction ', text)
