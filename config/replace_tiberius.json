@@ -4,14 +4,6 @@
 			{
 				"regexp": "Nice Fine",
 				"sub": "Good Fine"
-			},
-			{
-				"regexp": "Choice VF\\. Rare variety",
-				"sub": "VF"
-			},
-			{
-				"regexp": "Choice VF\\. Rare\\.",
-				"sub": "Near EF"
 			}
 		],
 		"Tiberius_Aur_PA1.csv": [

@@ -111,19 +111,23 @@
 			},
 			{
 				"regexp": "RSC 17\\. Choice VF",
-				"sub": "RSC 17. Good VF"
+				"sub": "RSC 17. Choice VF",
+				"note": "looks Good VF to me"
 			},
 			{
 				"regexp": "RSC 164\\. Choice VF",
-				"sub": "RSC 164. Near EF"
+				"sub": "RSC 164. Choice VF",
+				"note": "looks Near EF to me"
 			},
 			{
 				"regexp": "RSC 226\\. Choice VF",
-				"sub": "RSC 226. Good VF"
+				"sub": "RSC 226. Choice VF",
+				"note": "looks Good VF to me"
 			},
 			{
 				"regexp": "RSC 126\\. Choice VF",
-				"sub": "RSC 126. Near EF"
+				"sub": "RSC 126. Choice VF",
+				"note": "looks Near EF to me"
 			}
 		],
 		"Vespasian_Den_PA1.htm": [

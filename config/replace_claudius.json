@@ -1,0 +1,97 @@
+{
+	"file": {
+		"Claudius_Aur_EA1.csv": [
+			{
+				"regexp": "CLAUDIUS with AGRIPPINA Jr",
+				"sub": "Claudius with Agrippina Junior"
+			},
+			{
+				"regexp": "CLAUDIUS & AGRIPPINA Junior",
+				"sub": "Claudius with Agrippina Junior"
+			},
+			{
+				"regexp": "CLAUDIUS and AGRIPPINA JUNIOR",
+				"sub": "Claudius with Agrippina Junior"
+			},
+			{
+				"regexp": "CLAUDIUS with AGRIPPINA JR",
+				"sub": "Claudius with Agrippina Junior"
+			},
+			{
+				"regexp": "CLAUDIUS with AGRIPPINA JUNIOR",
+				"sub": "Claudius with Agrippina Junior"
+			},
+			{
+				"regexp": "CLAUDIUS & AGRIPPINA JUNIOR",
+				"sub": "Claudius with Agrippina Junior"
+			},
+			{
+				"regexp": "CLAUDIUS with NERO as Caesar",
+				"sub": "Claudius with Nero as Caesar"
+			},
+			{
+				"regexp": "\\[Roman Imperial\\] CLAUDIUS",
+				"sub": "Claudius"
+			},
+			{
+				"regexp": "CLAUDIUS",
+				"sub": "Claudius"
+			}
+		],
+		"Claudius_Aur_PA1.csv": [
+			{
+				"regexp": "41-54 BC",
+				"sub": "41-54 AD",
+				"note": "CNG typo"
+			},
+			{
+				"regexp": "S P Q R / P P / OB C S in three lines",
+				"sub": "S P Q R | P P | OB C S in three lines"
+			}
+		],
+		"Claudius_Cis_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Claudius_Cis_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Claudius_Den_EA1.csv": [
+			{
+				"regexp": " S P Q R / P P / OB C S legend",
+				"sub": " S P Q R | P P | OB C S legend"
+			},
+			{
+				"regexp": "SPQR / P P / OB CS within wreath",
+				"sub": "SPQR | P P | OB CS within wreath"
+			}
+		],
+		"Claudius_Den_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Claudius_Ses_EA1.csv": [
+			{
+				"regexp": "EX S C / P P / OB CIVES / SERVATOS",
+				"sub": "EX S C | P P | OB CIVES | SERVATOS"
+			},
+			{
+				"regexp": "EX S C / OB / CIVES / SERVATOS",
+				"sub": "EX S C | OB | CIVES | SERVATOS"
+			}
+		],
+		"Claudius_Ses_PA1.csv":[
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		]
+	}
+}

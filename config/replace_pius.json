@@ -88,7 +88,7 @@
 			},
 			{
 				"regexp": "RSC 916\\. Toned nice VF",
-				"sub": "RSC 916. Nice VF Toned"
+				"sub": "RSC 916. Good VF Toned"
 			},
 			{
 				"regexp": "Struck under Marcus Aurelius\\.",
@@ -110,6 +110,10 @@
 			}
 		],	
 		"Pius_Ses_EA3.htm": [
+			{
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
+			}
 		],
 		"Pius_Ses_PA1.htm":[
 		]

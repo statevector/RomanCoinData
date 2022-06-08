@@ -15,7 +15,7 @@
 			},
 			{
 				"regexp": "Toned VF",
-				"sub": "VF Toned"
+				"sub": "VF. Toned"
 			}
 		],
 		"Nero_Aur_PA1.csv": [
@@ -28,6 +28,10 @@
 				"regexp": "In ICG holder graded VF 35.",
 				"sub": "VF",
 				"note": "this uses the standard format"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
 			}
 		],
 		"Nero_Den_EA1.csv": [
@@ -60,19 +64,23 @@
 			},
 			{
 				"regexp": "Toned Fine",
-				"sub": "Fine Toned"
+				"sub": "Fine. Toned"
 			},
 			{
 				"regexp": "Lightly toned Fine",
-				"sub": "Fine Lightly toned"
+				"sub": "Fine. Lightly toned"
 			},
 			{
 				"regexp": "Nicely toned good VF",
-				"sub": "Good VF Nicely toned"
+				"sub": "Good VF. Nicely toned"
 			},
 			{
 				"regexp": "Toned good VF",
-				"sub": "Good VF Toned"
+				"sub": "Good VF. Toned"
+			},
+			{
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
 			}
 
 		],
@@ -87,19 +95,19 @@
 			},
 			{
 				"regexp": "Toned good Fine",
-				"sub": "Good Fine Toned"
+				"sub": "Good Fine. Toned"
 			},
 			{
 				"regexp": "Toned nice VF",
-				"sub": "Nice VF Toned"
+				"sub": "Good VF. Toned"
 			},
 			{
 				"regexp": "Attractively toned choice EF",
-				"sub": "Choice EF Attractively toned"
+				"sub": "Choice EF. Attractively toned"
 			},
 			{
 				"regexp": "Darkly toned VF",
-				"sub": "VF Darkly Toned"
+				"sub": "VF. Darkly Toned"
 			}
 
 		],
@@ -122,11 +130,11 @@
 		"Nero_Ses_EA2.csv": [
 			{
 				"regexp": "RIC I 388\\. green patina",
-				"sub": "RIC I 388. Fine, green patina"
+				"sub": "RIC I 388. Fine. Green patina"
 			},
 			{
 				"regexp": "Attractive VF",
-				"sub": "VF Attractive"
+				"sub": "VF. Attractive"
 			},
 			{
 				"regexp": "RIC I 132; WCN 96; BMCRE pg\\. 219 note; Cohen 8 var\\.",
@@ -137,7 +145,7 @@
 		"Nero_Ses_PA1.csv":[
 			{
 				"regexp": "Superb virtually as struck",
-				"sub": "Superb EF virtually as struck"
+				"sub": "Superb EF. Virtually as struck"
 			},
 			{
 				"regexp": "RIC I 433; BMCRE 330; BN 69; WCN 414; Cohen 306 Good VF",

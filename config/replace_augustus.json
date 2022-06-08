@@ -64,8 +64,8 @@
 		],
 		"Augustus_Den_EA4.csv": [
 			{
-				"regexp": "Choice VF",
-				"sub": "Near EF"
+				"regexp": "",
+				"sub": ""
 			}
 		],
 		"Augustus_Den_PA1.csv": [

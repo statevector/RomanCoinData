@@ -13,8 +13,7 @@
 			},
 			{
 				"regexp": "Nice VF",
-				"sub": "Good VF",
-				"note": "should these be Near EF?"
+				"sub": "Good VF"
 			}
 		],
 		"Domitian_Cis_EA1.csv": [

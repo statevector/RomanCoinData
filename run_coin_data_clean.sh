@@ -48,6 +48,18 @@
 
 # Claudius
 
+python3 coin_data_clean.py data/data_scraped/Claudius_Aur_EA1/Claudius_Aur_EA1.csv config/replace_claudius.json
+python3 coin_data_clean.py data/data_scraped/Claudius_Aur_PA1/Claudius_Aur_PA1.csv config/replace_claudius.json
+
+python3 coin_data_clean.py data/data_scraped/Claudius_Cis_EA1/Claudius_Cis_EA1.csv config/replace_claudius.json
+python3 coin_data_clean.py data/data_scraped/Claudius_Cis_PA1/Claudius_Cis_PA1.csv config/replace_claudius.json
+
+python3 coin_data_clean.py data/data_scraped/Claudius_Den_EA1/Claudius_Den_EA1.csv config/replace_claudius.json
+python3 coin_data_clean.py data/data_scraped/Claudius_Den_PA1/Claudius_Den_PA1.csv config/replace_claudius.json
+
+python3 coin_data_clean.py data/data_scraped/Claudius_Ses_EA1/Claudius_Ses_EA1.csv config/replace_claudius.json
+python3 coin_data_clean.py data/data_scraped/Claudius_Ses_PA1/Claudius_Ses_PA1.csv config/replace_claudius.json
+
 # Nero
 
 # python3 coin_data_clean.py data/data_scraped/Nero_Aur_EA1/Nero_Aur_EA1.csv config/replace_nero.json
@@ -72,6 +84,9 @@
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_EA1/Vespasian_Aur_EA1.csv config/replace_vespasian.json
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Aur_PA1/Vespasian_Aur_PA1.csv config/replace_vespasian.json
 
+# cis?
+# cis?
+
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA1/Vespasian_Den_EA1.csv config/replace_vespasian.json
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA2/Vespasian_Den_EA2.csv config/replace_vespasian.json
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Den_EA3/Vespasian_Den_EA3.csv config/replace_vespasian.json
@@ -81,6 +96,8 @@
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA1/Vespasian_Ses_EA1.csv config/replace_vespasian.json
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_EA2/Vespasian_Ses_EA2.csv config/replace_vespasian.json
 # python3 coin_data_clean.py data/data_scraped/Vespasian_Ses_PA1/Vespasian_Ses_PA1.csv config/replace_vespasian.json
+
+# Titus (as Caesar)
 
 # Titus
 
@@ -97,20 +114,22 @@
 # python3 coin_data_clean.py data/data_scraped/Titus_Ses_EA1/Titus_Ses_EA1.csv config/replace_titus.json
 # python3 coin_data_clean.py data/data_scraped/Titus_Ses_PA1/Titus_Ses_PA1.csv config/replace_titus.json
 
+# Domitian (as Caesar)
+
 # Domitian
 
-python3 coin_data_clean.py data/data_scraped/Domitian_Aur_EA1/Domitian_Aur_EA1.csv config/replace_domitian.json
-python3 coin_data_clean.py data/data_scraped/Domitian_Aur_PA1/Domitian_Aur_PA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Aur_EA1/Domitian_Aur_EA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Aur_PA1/Domitian_Aur_PA1.csv config/replace_domitian.json
 
-python3 coin_data_clean.py data/data_scraped/Domitian_Cis_EA1/Domitian_Cis_EA1.csv config/replace_domitian.json
-python3 coin_data_clean.py data/data_scraped/Domitian_Cis_PA1/Domitian_Cis_PA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Cis_EA1/Domitian_Cis_EA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Cis_PA1/Domitian_Cis_PA1.csv config/replace_domitian.json
 
-python3 coin_data_clean.py data/data_scraped/Domitian_Den_EA1/Domitian_Den_EA1.csv config/replace_domitian.json
-python3 coin_data_clean.py data/data_scraped/Domitian_Den_EA2/Domitian_Den_EA2.csv config/replace_domitian.json
-python3 coin_data_clean.py data/data_scraped/Domitian_Den_PA1/Domitian_Den_PA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Den_EA1/Domitian_Den_EA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Den_EA2/Domitian_Den_EA2.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Den_PA1/Domitian_Den_PA1.csv config/replace_domitian.json
 
-python3 coin_data_clean.py data/data_scraped/Domitian_Ses_EA1/Domitian_Ses_EA1.csv config/replace_domitian.json
-python3 coin_data_clean.py data/data_scraped/Domitian_Ses_PA1/Domitian_Ses_PA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Ses_EA1/Domitian_Ses_EA1.csv config/replace_domitian.json
+# python3 coin_data_clean.py data/data_scraped/Domitian_Ses_PA1/Domitian_Ses_PA1.csv config/replace_domitian.json
 
 # Nerva
 

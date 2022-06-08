@@ -25,6 +25,8 @@ def format_emperor(text, verbose=False):
       'Augustus',
       'Tiberius',
       'Gaius',
+      'Claudius',
+      'Nero Claudius Drusus'
       'Agrippina Senior',
       'Nero',
       'Vespasian',
@@ -44,6 +46,7 @@ def format_reign(text):
    # print('----------------------')
    # print(text)
    regexps = [
+      r'Died\s\d+\sBC', # Nero Drusus
       r'Died\sAD\s\d+',
       r'Died\s\d+\sAD', # AD scheme (Agrippina)
       r'\d+\sBC-AD\s\d+',
@@ -276,11 +279,11 @@ def format_grade_new(text):
       raise Exception('Grade not found in text: {}'.format(text))
    text = '. '.join(segments)
    # introduce 'Comments' section
-   text = re.sub(r' FDC\.?', ' FDC. Comments:', text)
-   text = re.sub(r' EF\.?', ' EF. Comments:', text)
-   text = re.sub(r' VF\.?', ' VF. Comments:', text)
-   text = re.sub(r' Fine\.?', ' Fine. Comments:', text)
-   text = re.sub(r' Fair\.?', ' Fair. Comments:', text)
+   text = re.sub(r' FDC\.?', ' FDC. Comments: ', text)
+   text = re.sub(r' EF\.?', ' EF. Comments: ', text)
+   text = re.sub(r' VF\.?', ' VF. Comments: ', text)
+   text = re.sub(r' Fine\.?', ' Fine. Comments: ', text)
+   text = re.sub(r' Fair\.?', ' Fair. Comments: ', text)
    return text
 
 

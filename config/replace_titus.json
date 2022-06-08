@@ -124,10 +124,6 @@
 			{
 				"regexp": "Toned near EF",
 				"sub": "Near EF Toned"
-			},
-			{
-				"regexp": "Choice VF",
-				"sub": "VF"
 			}
 		],
 		"Titus_Cis_EA1.htm":[
