@@ -36,6 +36,18 @@
 			{
 				"regexp": "CLAUDIUS",
 				"sub": "Claudius"
+			},
+			{
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
+			},
+			{
+				"regexp": "Coin in Fine condition",
+				"sub": "Fine"
 			}
 		],
 		"Claudius_Aur_PA1.csv": [
@@ -47,12 +59,28 @@
 			{
 				"regexp": "S P Q R / P P / OB C S in three lines",
 				"sub": "S P Q R | P P | OB C S in three lines"
+			},
+			{
+				"regexp": "Toned good VF",
+				"sub": "Good VF toned"
+			},
+			{
+				"regexp": "Lustrous EF",
+				"sub": "EF lustrous"
+			},
+			{
+				"regexp": "Toned nice VF",
+				"sub": "Good VF toned"
+			},
+			{
+				"regexp": "Toned Fine",
+				"sub": "Fine toned"
 			}
 		],
 		"Claudius_Cis_EA1.csv": [
 			{
-				"regexp": "",
-				"sub": ""
+				"regexp": "RIC I 119 var\\.; BMCRE 231 var\\.; RPC I 2224 var\\.; RSC 1 var\\. VF toned",
+				"sub": "RIC I 119 variation; BMCRE 231 variation; RPC I 2224 variation; RSC 1 variation. VF toned"
 			}
 		],
 		"Claudius_Cis_PA1.csv": [
@@ -73,8 +101,8 @@
 		],
 		"Claudius_Den_PA1.csv": [
 			{
-				"regexp": "",
-				"sub": ""
+				"regexp": "Toned VF",
+				"sub": "VF toned"
 			}
 		],
 		"Claudius_Ses_EA1.csv": [

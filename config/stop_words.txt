@@ -112,5 +112,8 @@ THRACE Philippopolis
 #
 contemporary false silver denarii
 Æ Imitation Sestertius
+Countermark
+PROB in incuse rectangle
+PROB in incuse square
 #
 # keep last line here so we don't cut off last letter of previous word during read
