@@ -50,7 +50,12 @@
 			{
 				"regexp": "Toned near VF",
 				"sub": "Near VF. Toned"
+			},	
+			{
+				"regexp": "363 g",
+				"sub": "3.63g"
 			}
+
 		],
 		"Tiberius_Den_PA1.csv": [
 			{

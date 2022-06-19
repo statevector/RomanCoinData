@@ -33,6 +33,8 @@ def format_emperor(text, verbose=False):
       'Titus',
       'Domitian',
       'Julia Titi',
+      'Galba',
+      'Civil War',
       'Antoninus Pius', 
       'Faustina Senior'
    ]
@@ -238,8 +240,9 @@ def format_strike(text):
       result = result.group()
       text = re.sub(result, result+':', text)
       return text
-   # if keyword not present, return unlisted
-   text = re.sub(r'Mint:', 'Struck: unlisted. Mint:', text) # careful, this relies on 'Mint:' existing
+   # if keyword not present, return unlisted.
+   # this relies on 'Mint' keyword already existing
+   text = re.sub(r'Mint:', 'Struck: unlisted. Mint:', text)
    return text
 
 def format_obverse_reverse(text):
@@ -271,6 +274,7 @@ def format_grade_new(text):
       if ('Obverse:' in seg) or ('Reverse:' in seg): 
          segments.append(seg)
          continue
+      # this is a safer extraction approach than being explicit and potentially mistagging. 
       if re.search(r'FDC|EF|VF|Fine|Fair', seg) is not None:
          seg = 'Grade: ' + seg
          isFound = True
@@ -287,15 +291,15 @@ def format_grade_new(text):
    return text
 
 
-# this needs work
+# # this needs work
 # def format_grade_new3(text):
 #    print('-------------------------')
 
 #    print(text)
 
 #    # find first occurance of grade --> introduce 'Grade' keyword
-#    # order matters here
-#    grades = ['FDC', 'Choice EF', 'Superb EF', 'Near EF', 'EF', 'Choice VF', 'Nice VF', 'Good VF', 'Near VF', 'VF', 'Good Fine', 'Near Fine', 'Fine', 'Fair']
+#    # order matters
+#    grades = ['FDC', 'Choice EF', 'Superb EF', 'Near EF', 'EF', 'Choice VF', 'Nice VF', 'Good VF', 'Near VF', 'Nice VF', 'VF', 'Good Fine', 'Near Fine', 'Fine', 'Fair']
 #    result = None
 #    for grade in grades:
 #       raw = r'{}'.format(grade)+r'[/. ]'

@@ -1,0 +1,58 @@
+{
+	"file": {
+		"xxx_Aur_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Aur_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Cis_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Cis_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Den_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Den_EA2.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Den_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Ses_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"xxx_Ses_PA1.csv":[
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		]
+	}
+}

@@ -1,0 +1,158 @@
+{
+	"file": {
+		"Galba_Aur_EA1.csv": [
+			{
+				"regexp": "GALBA\\.68-69 AD",
+				"sub": "GALBA. 68-69 AD",
+				"note": "CNG typo"
+			},
+			{
+				"regexp": "GALBA\\.",
+				"sub": "Galba."
+			},
+			{
+				"regexp": "68-69 AD",
+				"sub": "AD 68-69"
+			}
+		],
+		"Galba_Aur_PA1.csv": [
+			{
+				"regexp": "edge clipped and filed to fit prior bezel",
+				"sub": "",
+				"note": "coin looks fine. bezel stop word is cutting it out"
+			}
+		],
+		"Galba_Cis_EA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Galba_Cis_PA1.csv": [
+			{
+				"regexp": "",
+				"sub": ""
+			}
+		],
+		"Galba_Den_EA1.csv": [
+			{
+				"regexp": "Group IIIa \\(‘Augustus’ issue\\)\\.",
+				"sub": "",
+				"note": "remove for parsing"
+			},
+			{
+				"regexp": "Bare head right / S P Q R / O • B / C S within oak wreath",
+				"sub": "Bare head right / S P Q R | O • B | C S within oak wreath"
+			},
+			{
+				"regexp": "Bare head right / S P Q R / OB / C S in three lines",
+				"sub": "Bare head right / S P Q R | OB | C S in three lines"
+			}
+		],
+		"Galba_Den_EA2.csv": [
+			{
+				"regexp": "\\(17mm 3\\.23 GM\\)",
+				"sub": "(17mm 3.23 g)"
+			},
+			{
+				"regexp": "\\(17mm 3\\.43 GM\\)",
+				"sub": "(17mm 3.43 g)"
+			},
+			{
+				"regexp": "\\(18mm 3\\.14 GM\\)",
+				"sub": " (18mm 3.14 g)"
+			},
+			{
+				"regexp": "Bare head of Galba right / S P Q R / OB / C S legend in three lines",
+				"sub": "Bare head right / S P Q R | OB | C S legend in three lines"
+			},
+			{
+				"regexp": "IMP SER GALBA AVG bare head of Galba right / S P Q R / OB / C S legend in three lines",
+				"sub": "IMP SER GALBA AVG bare head right / S P Q R | OB | C S legend in three lines"
+			},
+			{
+				"regexp": "Laureate head right /Victory standing left",
+				"sub": "Laureate head right / Victory standing left"
+			},
+			{
+				"regexp": "Toned VF",
+				"sub": "VF Toned"
+			},
+			{
+				"regexp": "Toned Fine",
+				"sub": "Fine Toned"
+			},
+			{
+				"regexp": "Nice Fine",
+				"sub": "Good Fine"
+			},
+			{
+				"regexp": "Toned Near VF",
+				"sub": "Near VF Toned"
+			},
+			{
+				"regexp": "Lightly toned VF",
+				"sub": "VF Lightly toned"
+			}
+		],
+		"Galba_Den_PA1.csv": [
+			{
+				"regexp": "CIVIL WAR\\.",
+				"sub": "Civil War."
+			},
+			{
+				"regexp": "IMP SER GALBA AVG bare head right / S P Q R / OB / C S in three lines",
+				"sub": "IMP SER GALBA AVG bare head right / S P Q R | OB | C S in three lines"
+			},
+			{
+				"regexp": "Civil Wars\\.",
+				"sub": "Civil War."
+			},
+			{
+				"regexp": "Toned EF",
+				"sub": "EF Toned"
+			},
+			{
+				"regexp": "Toned good VF",
+				"sub": "Good VF Toned"
+			},
+			{
+				"regexp": "Lightly toned EF",
+				"sub": "EF Lightly toned"
+			},
+			{
+				"regexp": "Lightly toned near EF",
+				"sub": "Near EF Lightly toned"
+			}
+		],
+		"Galba_Ses_EA1.csv": [
+			{
+				"regexp": "\\(33mm 21.38 GM\\)",
+				"sub": "(33mm 21.38 g)"
+			},
+			{
+				"regexp": " \\(34mm 22.75 GM\\)",
+				"sub": " (34mm 22.75 g)"
+			},
+			{
+				"regexp": "RIC I 311 var\\. \\(wearing oak wreath\\)",
+				"sub": "RIC I 311 variation",
+				"note": "final h) in wreath messes up regex hour extraction"
+			}
+		],
+		"Galba_Ses_PA1.csv":[
+			{
+				"regexp": "\\(27.72 GM\\)",
+				"sub": "(27.72 g)"
+			},
+			{
+				"regexp": "\\(24.78 GM\\)",
+				"sub": "(24.78 g)"
+			},
+			{
+				"regexp": "Nice VF",
+				"sub": "Good VF"
+			}
+		]
+	}
+}

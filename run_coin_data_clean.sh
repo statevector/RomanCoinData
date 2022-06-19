@@ -48,17 +48,17 @@
 
 # Claudius
 
-python3 coin_data_clean.py data/data_scraped/Claudius_Aur_EA1/Claudius_Aur_EA1.csv config/replace_claudius.json
-python3 coin_data_clean.py data/data_scraped/Claudius_Aur_PA1/Claudius_Aur_PA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Aur_EA1/Claudius_Aur_EA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Aur_PA1/Claudius_Aur_PA1.csv config/replace_claudius.json
 
-python3 coin_data_clean.py data/data_scraped/Claudius_Cis_EA1/Claudius_Cis_EA1.csv config/replace_claudius.json
-python3 coin_data_clean.py data/data_scraped/Claudius_Cis_PA1/Claudius_Cis_PA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Cis_EA1/Claudius_Cis_EA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Cis_PA1/Claudius_Cis_PA1.csv config/replace_claudius.json
 
-python3 coin_data_clean.py data/data_scraped/Claudius_Den_EA1/Claudius_Den_EA1.csv config/replace_claudius.json
-python3 coin_data_clean.py data/data_scraped/Claudius_Den_PA1/Claudius_Den_PA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Den_EA1/Claudius_Den_EA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Den_PA1/Claudius_Den_PA1.csv config/replace_claudius.json
 
-python3 coin_data_clean.py data/data_scraped/Claudius_Ses_EA1/Claudius_Ses_EA1.csv config/replace_claudius.json
-python3 coin_data_clean.py data/data_scraped/Claudius_Ses_PA1/Claudius_Ses_PA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Ses_EA1/Claudius_Ses_EA1.csv config/replace_claudius.json
+# python3 coin_data_clean.py data/data_scraped/Claudius_Ses_PA1/Claudius_Ses_PA1.csv config/replace_claudius.json
 
 # Nero
 
@@ -75,9 +75,43 @@ python3 coin_data_clean.py data/data_scraped/Claudius_Ses_PA1/Claudius_Ses_PA1.c
 
 # Galba
 
+python3 coin_data_clean.py data/data_scraped/Galba_Aur_EA1/Galba_Aur_EA1.csv config/replace_galba.json
+python3 coin_data_clean.py data/data_scraped/Galba_Aur_PA1/Galba_Aur_PA1.csv config/replace_galba.json
+
+# (no cistophori)
+
+python3 coin_data_clean.py data/data_scraped/Galba_Den_EA1/Galba_Den_EA1.csv config/replace_galba.json
+python3 coin_data_clean.py data/data_scraped/Galba_Den_EA2/Galba_Den_EA2.csv config/replace_galba.json
+python3 coin_data_clean.py data/data_scraped/Galba_Den_PA1/Galba_Den_PA1.csv config/replace_galba.json
+
+python3 coin_data_clean.py data/data_scraped/Galba_Ses_EA1/Galba_Ses_EA1.csv config/replace_galba.json
+python3 coin_data_clean.py data/data_scraped/Galba_Ses_PA1/Galba_Ses_PA1.csv config/replace_galba.json
+
 # Otho
 
+# Otho_Aur_EA1.html
+# Otho_Aur_PA1.html
+
+# (no cistophori)
+
+# Otho_Den_EA1.html
+# Otho_Den_PA1.html
+
+# # (no sestertii)
+
 # Vitellius
+
+# Vitellius_Aur_EA1.html
+# Vitellius_Aur_PA1.html
+
+# (no cistophori)
+
+# Vitellius_Den_EA1.html
+# Vitellius_Den_EA2.html
+# Vitellius_Den_PA1.html
+
+# Vitellius_Ses_PA1.html
+# Vitellius_Ses_EA1.html
 
 # Vespasian
 
